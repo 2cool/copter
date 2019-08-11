@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="copter.rc2.DrawView" >
+
+
+    <item android:id="@+id/SAVE_PROG" android:title="Save"></item>
+    <item android:id="@+id/MAPS" android:title="Maps">
+        <menu>
+            <item android:id="@+id/GOOGLE_MAP" android:title="GoogleMap"></item>
+            <item android:id="@+id/OPEN_CYCLE_MAP" android:title="OpenCycleMap"></item>
+            <item android:id="@+id/MICROSOFT_EARTH" android:title="MicrosoftEarth"></item>
+
+
+        </menu>
+
+
+    </item>
+    <item android:id="@+id/EXIT" android:title="Exit Map"></item>
+</menu>
