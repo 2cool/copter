@@ -3,33 +3,23 @@ package cc.dewdrop.ffplayer;
 import android.util.Log;
 
 public class Telemetry {
+
     private static int  telemetry_couter=0;
     public static int get_counter(){return telemetry_couter;}
     static public int batVolt,current;
-    static public boolean maxTelemetry=false;
-    static private boolean hom_pos_is_loaded=false;
-    static private boolean read_lat_lon_zero=true;
-    static private long oldMsgTimer;
-    static private int motorsONtimer=0;
+    static public int motorsONtimer=0;
     static public String motors_on_timer="00:00";
     static private long oldTimeMS=0;
-    static int messageCode;
-    static public int satilites=0;
-    static public double lat=47.9;
-    static public double lon=33.2523;
+    static private boolean hom_pos_is_loaded=false;
+    static public double lat=0;
+    static public double lon=0;
     static public int r_accuracy_hor_pos=99,r_acuracy_ver_pos=99;//когда включаем смартконтрол мощность меняестя. (исправить)
     static public double roll=0,pitch=0,yaw=0;
-    static public double autoLat=0,autoLon=0;
-    static private double oldlat,oldlon;
+    static private double start_lat=0,start_lon=0;
     static public double dist=0,speed=0,v_speed=0,alt_time=0 ,speed_time=0,alt_speed;
     static public String messages=null;
     static public float heading=0,	battery_consumption=0,vibration=0;
     static public int status=0;
-    //	static public String message="message";
-    static float motorsTh[];
-
-    static public String lat(){return Double.toString(lat);}
-
     static double ap_pitch,ap_roll,realThrottle;  //autopilot
     static private  double ap_throttle=0;
     static int gimbalPitch;
@@ -39,32 +29,13 @@ public class Telemetry {
     static final int MIN_VOLT =1280;
     static final int VOLT_50  =1520;
     static boolean F_MIN_VOLT=false;
-    static int min_volt=0;
     static boolean F_VOLT50 =false;
-    static public double oldAlt=11110,oldLat=0,oldLon=0,oldHeading=110;
-    //static public int no_gps_data_counter=100;
-    static final long DELTA_TIME_4_MSG = 20;
+    static private double old_Lat=0,old_Lon=0;
     static final double GRAD2RAD = 0.01745329251994329576923690768489;
-
-
-    static public boolean motorsWasOn=false;
-    //counter,lat,lon,gpsHeight,bat1,bat2,bat3,pressure,temperature,heading*18000/PI,roll,pitch,messageCode,motorTh0,motorTh1,motorTh2,motorTh3,(bat0+200)/100
-
-
 
     static public float settings[]=new float[10];
     static public int n_settings;
     static private int old_control_bits=0;
-
-
-
-
-
-
-
-
-
-
 
 
     static public void init(){
@@ -72,7 +43,7 @@ public class Telemetry {
         for (int i=0; i<10; i++)
             settings[i]=Commander.NO_DATA;
 
-        old_control_bits=satilites=0;
+        old_control_bits=0;
         r_accuracy_hor_pos=0;
 
         ap_throttle=0.5f;
@@ -80,12 +51,8 @@ public class Telemetry {
         F_MIN_VOLT=false;
         F_VOLT50 =false;
         ap_roll=ap_pitch=roll=pitch=0;
-        oldMsgTimer=System.currentTimeMillis()+DELTA_TIME_4_MSG;
         battery_consumption=0;
     }
-
-
-
 
     static public float corectThrottle(){
 
@@ -416,65 +383,76 @@ public class Telemetry {
         //Log.i("DKDKD",Double.toString(lat)+ " "+Double.toHexString(lon));
         //---------------------------
 
-
-        if (hom_pos_is_loaded == false) {
-            if (MainActivity.motorsOnF()){
-                Disk.loadLatLonAlt("/sdcard/RC/start_location.save",false);
-                oldlat=lat;
-                oldlon=lon;
-               // Log.d("LOAD","LOAD "+autoLat+", "+autoLon);
-            }
-        }
-        hom_pos_is_loaded = true;
-        if (MainActivity.motorsOnF() && read_lat_lon_zero) {
-            read_lat_lon_zero=false;
-            autoLat = oldlat = lat;
-            autoLon = oldlon = lon;
-            speed_time=System.currentTimeMillis();
-            Disk.saveLatLonAlt("/sdcard/RC/start_location.save", lat, lon, 0);
-
-           // Log.d("LOAD", "SAVE " + autoLat + ", " + autoLon);
-        }
-
-        long timems = System.currentTimeMillis();
-        if ((timems-oldTimeMS)>=1000) {
-            if (oldTimeMS == 0) {
-                oldTimeMS = System.currentTimeMillis();
-            }else {
-                if (MainActivity.motorsOnF()) {
-                    motorsONtimer += (int) ((timems - oldTimeMS) / 1000);
-                    int minutes=(int)Math.ceil(motorsONtimer/60);
-                    int seconds=motorsONtimer-minutes*60;
-                    motors_on_timer=Integer.toString(minutes)+":"+((seconds<10)?"0":"")+Integer.toString(seconds);
-                }
-                oldTimeMS = timems;
-            }
-        }
-
-
-
-        if (MainActivity.motorsOnF()){
-            final long t = System.currentTimeMillis();
-            if (t-speed_time>500 && oldlat!=lat || oldlon!=lon) {
-                //вічисляем растояние до старта
-                dist=(autoLat==0 || autoLon==0)?0:dist(autoLat,autoLon,lat,lon);
-              //  Log.d("LOAD","2HOME "+dist+ " "+autoLat + " " + autoLon);
-                final double dDist = dist(oldlat, oldlon, lat, lon);
-                if (dDist>3) {
-                    oldlat = lat;
-                    oldlon = lon;
-                    final double dt = 0.001 * (t - speed_time);
-                    speed_time = t;
-                    speed += (dDist / dt - speed) * ((dt<1)?dt:1);
-                }
-            }
-
-        }
         r_accuracy_hor_pos = buf[i++];
         r_acuracy_ver_pos = buf[i++];
         _alt =load_int16(buf,i);
         i+=2;
         _alt*=0.1;
+
+
+
+        final long cur_time = System.currentTimeMillis();
+
+//load home pos
+        
+        if (MainActivity.motorsOnF()){
+            if (hom_pos_is_loaded == false) {
+                Disk.load_location("/sdcard/RC/start_location.save");
+                start_lat=Disk._lat;
+                start_lon=Disk._lon;
+                motorsONtimer=(int)((System.currentTimeMillis()-Disk._time)/1000);
+            }
+        }
+        hom_pos_is_loaded = true;
+        
+//init old and auto lat lon
+        if (MainActivity.motorsOnF()) {
+            if (start_lat==0 && start_lon==0){
+                start_lat =  lat;
+                start_lon =  lon;
+                Disk.save_location("/sdcard/RC/start_location.save", lat, lon, _alt,System.currentTimeMillis());
+            }
+        }else
+            start_lat=start_lon=0;
+
+//fly time
+        if ((cur_time-oldTimeMS)>=1000) {
+            if (oldTimeMS == 0) {
+                oldTimeMS = cur_time;
+            }else {
+                if (MainActivity.motorsOnF()) {
+                    motorsONtimer += (int) ((cur_time - oldTimeMS) / 1000);
+                    int minutes=(int)Math.ceil(motorsONtimer/60);
+                    int seconds=motorsONtimer-minutes*60;
+                    motors_on_timer=minutes+":"+((seconds<10)?"0":"")+seconds;
+                }
+                oldTimeMS = cur_time;
+            }
+        }
+
+//dist speed
+        if (old_Lat==0 && old_Lon==0) {
+            old_Lat = lat;
+            old_Lon = lon;
+            speed_time=System.currentTimeMillis();
+        }
+        if (cur_time-speed_time>500 && old_Lat!=lat || old_Lon!=lon) {
+            //вічисляем растояние до старта
+            dist=(start_lat==0 || start_lon==0)?0:dist(start_lat,start_lon,lat,lon);
+            final double dDist = dist(old_Lat, old_Lon, lat, lon);
+            if (dDist>3) {
+                old_Lat = lat;
+                old_Lon = lon;
+                final double dt = 0.001 * (cur_time - speed_time);
+                speed_time = cur_time;
+                speed += (dDist / dt - speed) * ((dt<1)?dt:1);
+            }
+        }
+
+
+
+
+
 
         if (old_alt1==-100000)
             old_alt1=_alt;

@@ -115,13 +115,25 @@ public class Disk {
     }
 
 
+    public static void saveLost_location(String fname,double lat, double lon, double alt){
+        // final File file = new File("/sdcard/RC/start_location.save");
+        try {
+            OutputStream os = new FileOutputStream(fname);//"/sdcard/RC/lost_location.save");
 
-    public static void saveLatLonAlt(String fname,double lat, double lon, double alt){
+            String t=lat+","+lon+","+alt+","+ _time;
+            os.write(t.getBytes());
+
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void save_location(String fname, double lat, double lon, double alt, long start_time){
         // final File file = new File("/sdcard/RC/start_location.save");
         try {
             OutputStream os = new FileOutputStream(fname);//"/sdcard/RC/start_location.save");
 
-            String t=Double.toString(lat)+","+Double.toString(lon)+","+Double.toString(alt);
+            String t=lat+","+lon+","+alt+","+start_time;
             os.write(t.getBytes());
 
             os.close();
@@ -130,8 +142,10 @@ public class Disk {
         }
     }
 
+    public static double _lat, _lon, _alt;
+    public static long _time;
 
-    public static boolean loadLatLonAlt(String fname,boolean to_telemetry){
+    public static boolean load_location(String fname){
         final File file = new File(fname);//"/sdcard/RC/start_location.save");
         if (!file.exists()) {
             return false;
@@ -150,15 +164,11 @@ public class Disk {
                 return false;
 
             String s[]=line.split(",");
-            if (to_telemetry){
-                Telemetry.lat=Double.parseDouble(s[0]);
-                Telemetry.lon=Double.parseDouble(s[1]);
-                Telemetry._alt=(float)Double.parseDouble(s[2]);
-            }else {
-                Telemetry.autoLat = Double.parseDouble(s[0]);
-                Telemetry.autoLon = Double.parseDouble(s[1]);
-                //   Telemetry.autoLat=Double.parseDouble(s[0]);
-            }
+
+            _lat =Double.parseDouble(s[0]);
+            _lon =Double.parseDouble(s[1]);
+            _alt =Double.parseDouble(s[2]);
+            _time =Long.parseLong(s[3]);
 
             is.close();
 

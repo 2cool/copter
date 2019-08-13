@@ -159,7 +159,14 @@ public class Net {
         DatagramSocket udpSocket=null;
         if (dataloaded == false) {
             dataloaded = true;
-            Disk.loadLatLonAlt("/sdcard/RC/lostCon_location.save", true);
+            Disk.load_location("/sdcard/RC/lostCon_location.save");
+            Telemetry.lat=Disk._lat;
+            Telemetry.lon=Disk._lon;
+            Telemetry._alt=(float)Disk._alt;
+            Telemetry.motorsONtimer=(int)((System.currentTimeMillis()-Disk._time)/1000);
+            Disk.load_location("/sdcard/RC/start_location.save");
+            Telemetry.dist=Telemetry.dist(Disk._lat,Disk._lon,Telemetry.lat,Telemetry.lon);
+
         }
         if (ip_port == null)
             return false;
@@ -197,7 +204,7 @@ public class Net {
                         if (offline_cnt++>3) {
                             run=false;
                             if (Commander.link)
-                                Disk.saveLatLonAlt("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt);
+                                Disk.save_location("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt,System.currentTimeMillis());
                             Commander.link = false;
                             Log.d("UDP", "Error1:");
                         }
@@ -214,7 +221,7 @@ public class Net {
             if (udpSocket!=null)
                 udpSocket.close();
             if (Commander.link)
-                Disk.saveLatLonAlt("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt);
+                Disk.save_location("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt,System.currentTimeMillis());
             Commander.link = false;
             if (MainActivity.drawView != null)
                 MainActivity.drawView.postInvalidate();
