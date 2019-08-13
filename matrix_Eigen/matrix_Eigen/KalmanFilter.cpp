@@ -10,15 +10,31 @@
 
 #include "KalmanFilter.h"
 
+/*
+B*uk - kontrol signal - B=0
+A - 
+H -
+Q -
+R - noise i the environment
+P - error covariance
+
+
+
+
+*/
+
+
+
+
 KalmanFilter::KalmanFilter(
 	double dt,
 	const Eigen::MatrixXd& A,
-	const Eigen::MatrixXd& C,
+	const Eigen::MatrixXd& H,
 	const Eigen::MatrixXd& Q,
 	const Eigen::MatrixXd& R,
 	const Eigen::MatrixXd& P)
-	: A(A), C(C), Q(Q), R(R), P0(P),
-	m(C.rows()), n(A.rows()), dt(dt), initialized(false),
+	: A(A), H(H), Q(Q), R(R), P0(P),
+	m(H.rows()), n(A.rows()), dt(dt), initialized(false),
 	I(n, n), x_hat(n), x_hat_new(n)
 {
 	I.setIdentity();
@@ -49,9 +65,9 @@ void KalmanFilter::update(const Eigen::VectorXd& y) {
 
 	x_hat_new = A * x_hat;
 	P = A * P * A.transpose() + Q;
-	K = P * C.transpose() * (C * P * C.transpose() + R).inverse();
-	x_hat_new += K * (y - C * x_hat_new);
-	P = (I - K * C) * P;
+	K = P * H.transpose() * (H * P * H.transpose() + R).inverse();
+	x_hat_new += K * (y - H * x_hat_new);
+	P = (I - K * H) * P;
 	x_hat = x_hat_new;
 
 	t += dt;

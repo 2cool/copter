@@ -8,7 +8,7 @@ public class Telemetry {
     static public int batVolt,current;
     static public boolean maxTelemetry=false;
     static private boolean hom_pos_is_loaded=false;
-    static private int old_motors_status=-1;
+    static private boolean read_lat_lon_zero=true;
     static private long oldMsgTimer;
     static private int motorsONtimer=0;
     static public String motors_on_timer="00:00";
@@ -426,20 +426,15 @@ public class Telemetry {
             }
         }
         hom_pos_is_loaded = true;
-        if (MainActivity.motorsOnF() && old_motors_status==1) {
+        if (MainActivity.motorsOnF() && read_lat_lon_zero) {
+            read_lat_lon_zero=false;
             autoLat = oldlat = lat;
             autoLon = oldlon = lon;
+            speed_time=System.currentTimeMillis();
             Disk.saveLatLonAlt("/sdcard/RC/start_location.save", lat, lon, 0);
+
            // Log.d("LOAD", "SAVE " + autoLat + ", " + autoLon);
         }
-
-        old_motors_status = MainActivity.motorsOnF()?2:1;
-
-
-
-
-
-
 
         long timems = System.currentTimeMillis();
         if ((timems-oldTimeMS)>=1000) {
@@ -459,16 +454,20 @@ public class Telemetry {
 
 
         if (MainActivity.motorsOnF()){
-            //вічисляем растояние до старта
-            dist=(autoLat==0 || autoLon==0)?0:dist(autoLat,autoLon,lat,lon);
-          //  Log.d("LOAD","2HOME "+dist+ " "+autoLat + " " + autoLon);
-            double dDist=dist(oldlat,oldlon,lat,lon);
-            oldlat=lat;
-            oldlon=lon;
-            long t=System.currentTimeMillis();
-            double dt=0.001*(double)(t-speed_time);
-            speed_time=t;
-            speed+=(dDist/dt-speed)*dt;
+            final long t = System.currentTimeMillis();
+            if (t-speed_time>500 && oldlat!=lat || oldlon!=lon) {
+                //вічисляем растояние до старта
+                dist=(autoLat==0 || autoLon==0)?0:dist(autoLat,autoLon,lat,lon);
+              //  Log.d("LOAD","2HOME "+dist+ " "+autoLat + " " + autoLon);
+                final double dDist = dist(oldlat, oldlon, lat, lon);
+                if (dDist>3) {
+                    oldlat = lat;
+                    oldlon = lon;
+                    final double dt = 0.001 * (t - speed_time);
+                    speed_time = t;
+                    speed += (dDist / dt - speed) * ((dt<1)?dt:1);
+                }
+            }
 
         }
         r_accuracy_hor_pos = buf[i++];
