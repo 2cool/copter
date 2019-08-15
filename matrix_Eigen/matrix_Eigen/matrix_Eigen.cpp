@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
 	cout << "P: \n" << P << endl;
 
 	// Construct the filter
-	KalmanFilter kf(dt, A, B, H, Q, R, P);
+	KalmanFilter kf(A, B, H, Q, R, P);
 
 	const int size = 100;
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 	double a = -9.81;
 	double oldA = a;
 	x0 << 0, 0, a;
-	kf.init(0, x0);
+	kf.init(x0);
 
 	// Feed measurements into filter, output estimated states
 
@@ -124,6 +124,12 @@ int main(int argc, char* argv[]) {
 		kf.update(y);
 		cout << "t = " << t << ",\t" << "y[" << i << "] = " << y.transpose() << ", x_hat[" << i << "] = " << kf.state().transpose() << " REAL L,S="<< alt <<","<<speed<<endl;
 	}
+	cout << "P: \n" << kf.getP() << endl;
+
+	cout << "K: \n" << kf.getK() << endl;
+
+
+
 
 	return 0;
 }

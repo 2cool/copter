@@ -27,7 +27,6 @@ public:
 	*   P - Estimate error covariance
 	*/
 	KalmanFilter(
-		double dt,
 		const Eigen::MatrixXd& A,
 		const Eigen::VectorXd& B,
 		const Eigen::MatrixXd& H,
@@ -49,7 +48,7 @@ public:
 	/**
 	* Initialize the filter with a guess for initial states.
 	*/
-	void init(double t0, const Eigen::VectorXd& x0);
+	void init(const Eigen::VectorXd& x0);
 
 	/**
 	* Update the estimated state based on measured values. The
@@ -61,17 +60,18 @@ public:
 	* Update the estimated state based on measured values,
 	* using the given time step and dynamics matrix.
 	*/
-	void update(const Eigen::VectorXd& y, double dt, const Eigen::MatrixXd A);
+	void update(const Eigen::VectorXd& y, const Eigen::MatrixXd A);
 
 	/**
 	* Return the current state and time.
 	*/
 	Eigen::VectorXd state() { return x_hat; };
-	double time() { return t; };
+
 	void initU(const double x0);
 
 	Eigen::VectorXd B;
-
+	Eigen::MatrixXd getP() { return P; }
+	Eigen::MatrixXd getK() { return K; }
 private:
 
 	// Matrices for computation
@@ -81,10 +81,10 @@ private:
 	int m, n;
 
 	// Initial and current time
-	double t0, t;
+
 
 	// Discrete time step
-	double dt;
+
 
 	// Is the filter initialized?
 	bool initialized;

@@ -27,7 +27,6 @@ P - error covariance
 
 
 KalmanFilter::KalmanFilter(
-	double dt,
 	const Eigen::MatrixXd& A,
 	const Eigen::VectorXd& B,
 	const Eigen::MatrixXd& H,
@@ -35,7 +34,7 @@ KalmanFilter::KalmanFilter(
 	const Eigen::MatrixXd& R,
 	const Eigen::MatrixXd& P)
 	: A(A), B(B), H(H), Q(Q), R(R), P0(P),
-	m(H.rows()), n(A.rows()), dt(dt), initialized(false),
+	m(H.rows()), n(A.rows()),  initialized(false),
 	I(n, n), x_hat(n), x_hat_new(n)
 {
 	I.setIdentity();
@@ -43,11 +42,10 @@ KalmanFilter::KalmanFilter(
 
 KalmanFilter::KalmanFilter() {}
 
-void KalmanFilter::init(double t0, const Eigen::VectorXd& x0) {
+void KalmanFilter::init(const Eigen::VectorXd& x0) {
 	x_hat = x0;
 	P = P0;
-	this->t0 = t0;
-	t = t0;
+
 	initialized = true;
 }
 void KalmanFilter::initU(const double a) {
@@ -59,8 +57,7 @@ void KalmanFilter::initU(const double a) {
 void KalmanFilter::init() {
 	x_hat.setZero();
 	P = P0;
-	t0 = 0;
-	t = t0;
+
 	initialized = true;
 }
 
@@ -76,12 +73,12 @@ void KalmanFilter::update(const Eigen::VectorXd& y) {
 	P = (I - K * H) * P;
 	x_hat = x_hat_new;
 
-	t += dt;
+	
 }
 
-void KalmanFilter::update(const Eigen::VectorXd & y, double dt, const Eigen::MatrixXd A) {
+void KalmanFilter::update(const Eigen::VectorXd & y, const Eigen::MatrixXd A) {
 
 	this->A = A;
-	this->dt = dt;
+
 	update(y);
 }
