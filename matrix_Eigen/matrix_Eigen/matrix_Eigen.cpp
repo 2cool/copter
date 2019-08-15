@@ -1,4 +1,154 @@
- // matrix_Eigen.cpp : This file contains the 'main' function. Program execution begins and ends there.
+
+
+// matrix_Eigen.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+#define MODIFIED
+
+#ifdef MODIFIED
+
+
+#include <iostream>
+#include "../../eigen/Eigen/Dense"
+
+using namespace std;
+using namespace Eigen;
+/**
+ * Test for the KalmanFilter class with 1D projectile motion.
+ *
+ * @author: Hayk Martirosyan
+ * @date: 2014.11.15
+ */
+
+#include <iostream>
+#include <vector>
+
+
+#include "KalmanFilter.h"
+
+
+using namespace std;
+
+int main(int argc, char* argv[]) {
+
+
+
+	int n = 3; // Number of states
+	int m = 1; // Number of measurements
+
+	double dt = 1.0 / 200; // Time step
+
+	MatrixXd A(n, n); // System dynamics matrix
+	VectorXd B(n);
+	MatrixXd H(m, n); // Output matrix
+	MatrixXd Q(n, n); // Process noise covariance
+	MatrixXd R(m, m); // Measurement noise covariance
+	MatrixXd P(n, n); // Estimate error covariance
+
+	// Discrete LTI projectile motion, measuring position only
+	A <<
+		1, dt, 0,
+		0, 1, dt,
+		0, 0, 1;
+
+	B << 0, 0, 0;
+
+	H << 1, 0, 0;
+
+	// Reasonable covariance matrices
+	Q <<
+		0.05, .05, .0,
+		.05, .05, .0,
+		.0, .0, .0;
+
+	R << 5;
+
+	P <<
+		.1, .1, .1,
+		.1, 10000, 10,
+		.1, 10, 100;
+
+	cout << "A: \n" << A << endl;
+	cout << "B: \n" << B << endl;
+	cout << "H: \n" << H << endl;
+	cout << "Q: \n" << Q << endl;
+	cout << "R: \n" << R << endl;
+	cout << "P: \n" << P << endl;
+
+	// Construct the filter
+	KalmanFilter kf(dt, A, B, H, Q, R, P);
+
+	const int size = 100;
+
+	// Best guess of initial states
+	VectorXd x0(n);
+
+
+	double t = 0;
+
+	double a = -9.81;
+	double oldA = a;
+	x0 << 0, 0, a;
+	kf.init(0, x0);
+
+	// Feed measurements into filter, output estimated states
+
+	VectorXd y(m);
+	cout << "t = " << t << ", " << "x_hat[0]: " << kf.state().transpose() << endl;
+
+
+	double alt = 0;
+	double speed = 0;
+	double tB = -9.81;
+	for (int i = 0; i < size; i++) {
+
+		t += dt;
+		if (i == 50) 
+			a = 9.81;
+		if (i == 60)
+			a = 0;
+		kf.B[2] = a-oldA;
+		oldA = a;
+
+
+
+		double noise =  3 * ((double)rand() / (double)RAND_MAX - 0.5);
+
+		alt += (a) * dt * dt * 0.5 + speed*dt;
+		speed += dt * a;
+
+		//alt = a * t * t * 0.5;
+		//speed = a * t;
+
+		
+		y << (alt + noise);
+		kf.update(y);
+		cout << "t = " << t << ",\t" << "y[" << i << "] = " << y.transpose() << ", x_hat[" << i << "] = " << kf.state().transpose() << " REAL L,S="<< alt <<","<<speed<<endl;
+	}
+
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#else
+
+
+
+
+// matrix_Eigen.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include <iostream>
@@ -92,3 +242,4 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
+#endif

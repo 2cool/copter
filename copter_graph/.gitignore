@@ -5,3 +5,5 @@
 /.vs
 /x64
 /copter_graph/x64
+/copter_graph/bin
+/copter_graph/obj

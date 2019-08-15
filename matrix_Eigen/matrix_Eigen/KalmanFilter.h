@@ -29,6 +29,7 @@ public:
 	KalmanFilter(
 		double dt,
 		const Eigen::MatrixXd& A,
+		const Eigen::VectorXd& B,
 		const Eigen::MatrixXd& H,
 		const Eigen::MatrixXd& Q,
 		const Eigen::MatrixXd& R,
@@ -67,6 +68,9 @@ public:
 	*/
 	Eigen::VectorXd state() { return x_hat; };
 	double time() { return t; };
+	void initU(const double x0);
+
+	Eigen::VectorXd B;
 
 private:
 

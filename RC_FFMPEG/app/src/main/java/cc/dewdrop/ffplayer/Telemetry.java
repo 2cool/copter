@@ -402,7 +402,8 @@ public class Telemetry {
                 start_lon=Disk._lon;
                 motorsONtimer=(int)((System.currentTimeMillis()-Disk._time)/1000);
             }
-        }
+        }else if (hom_pos_is_loaded==false)
+            dist=0;
         hom_pos_is_loaded = true;
         
 //init old and auto lat lon

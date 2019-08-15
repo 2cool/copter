@@ -4,4 +4,6 @@
 
 /.vs
 /x64
-
+/opencv_/x64
+/opencv_/bin
+/opencv_/obj

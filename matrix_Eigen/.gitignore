@@ -1,6 +1,8 @@
 *.iml
 /.gradle
 /.idea
+/.vs
+/x64
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries
@@ -11,3 +13,6 @@
 /captures
 .externalNativeBuild
 /app/build
+/matrix_Eigen/x64
+/matrix_Eigen/bin
+/matrix_Eigen/obj

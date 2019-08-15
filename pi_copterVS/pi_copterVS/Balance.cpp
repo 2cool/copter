@@ -332,6 +332,10 @@ bool BalanceClass::loop()
 			true_throttle = constrain(true_throttle, c_min_throttle, c_max_throttle);
 			throttle = true_throttle;
 			const float thr = throttle / Mpu.tiltPower;
+
+
+			//зробити приоритет оставатися на місті перед оставатися на висоті
+			//пріорітет швидкості меньший за висоту. -це зробленно
 			if (thr > OVER_THROTTLE) {
 				t_max_angle = RAD2GRAD * acos(throttle / OVER_THROTTLE);
 				t_max_angle = constrain(t_max_angle, MIN_ANGLE, max_angle);
