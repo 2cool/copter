@@ -607,8 +607,8 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 		//printf( "\MS5611 err: %f\n",MS5611.getErrorsK());
 #ifndef FLY_EMULATOR
 		cout << "on ";
-		if (Mpu.timed < 25) {
-			cout << "\n!!!calibrating!!! to end:"<< 25-millis()/1000 <<" sec." << "\t"<<Mpu.timed << endl;
+		if (Mpu.timed < CALIBRATION_TIMEOUT) {
+			cout << "\n!!!calibrating!!! to end:"<< CALIBRATION_TIMEOUT -millis()/1000 <<" sec." << "\t"<<Mpu.timed << endl;
 			mega_i2c.beep_code(B_MS611_ERROR);
 			return false;
 		}
@@ -884,7 +884,7 @@ bool AutopilotClass::set_control_bits(uint32_t bits) {
 	
 	//-----------------------------------------------
 	if (bits & (MPU_ACC_CALIBR | MPU_GYRO_CALIBR)) {
-		if (Mpu.timed > 25) {
+		if (Mpu.timed > CALIBRATION_TIMEOUT) {
 			control_bits |= (MPU_ACC_CALIBR | MPU_GYRO_CALIBR);
 			Mpu.new_calibration(!(bits&MPU_ACC_CALIBR));
 			control_bits &= (0xffffffff ^ (MPU_ACC_CALIBR | MPU_GYRO_CALIBR));

@@ -1,6 +1,9 @@
 
 #ifndef DEFINE_H
 #define DEFINE_H
+#define USE_KALMAN
+
+
 
 #include "glob_header.h" 
 #include "WProgram.h"
@@ -19,6 +22,7 @@
 //#define DEBUG_MODE
 #define GPS_ALT_MAX_ERROR 30
 #define MAX_BAROMETR_ERRORS 40
+#define CALIBRATION_TIMEOUT 60
 
 #define WORK_WITH_WIFI
 #define LED_ON
@@ -86,7 +90,7 @@
 #define MAX_G 32760  
 #define RAD2GRAD 57.29578
 #define GRAD2RAD 0.0174533
-#define G 9.8
+#define GRAVITY_G 9.81
 
 #define wrap_180(x) (x < -180 ? x+360 : (x > 180 ? x - 360: x))
 #define wrap_PI(x) (x < -PI ? x+TWO_PI : (x > PI ? x - TWO_PI: x))

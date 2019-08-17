@@ -9,12 +9,20 @@
 #include <windows.h>
 #include <stdio.h>
 #include <shellapi.h>
+#include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
+#include <windows.h>
+#include <iostream>
+#include "Mpu.h"
 
+void redraw_log();
 
+using namespace std;
 using namespace Gdiplus;
 #pragma comment (lib,"Gdiplus.lib")
 
-
+volatile bool redraw = false;
 HWND hWndTEXT;
 HWND hWndGPS;
 HWND hWndGRAPH;
@@ -160,6 +168,66 @@ int but1func2(int i) {
 
 
 
+// maximum mumber of lines the output console should have
+static const WORD MAX_CONSOLE_LINES = 500;
+
+
+void RedirectIOToConsole()
+{
+	int hConHandle;
+	long lStdHandle;
+	CONSOLE_SCREEN_BUFFER_INFO coninfo;
+	FILE* fp;
+
+	// allocate a console for this app
+	AllocConsole();
+
+	freopen("CONIN$", "r", stdin);
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
+	
+}
+
+
+#include <string>
+
+DWORD WINAPI myThread(LPVOID lpParameter)
+{
+	char buf[1000];
+	cout << "write new variables there like\n\n";
+	cout << "KALMAN_R=4\n";
+	cout << "-------------------------------------------\n\n";
+	while (true) {
+		cin >> buf;
+		string s = string(buf);
+		int eq=s.find_first_of("=");
+		if (eq > 0) {
+			string name = s.substr(0,eq);
+			string val = s.substr(++eq);
+
+			if (name.find("newR")==0) {
+				mpu.newR = stod(val);
+				cout << name.c_str() << " = "<< mpu.newR << endl;
+				
+			}
+			else if (name.find("newQ") == 0) {
+				mpu.newQ = stod(val);
+				cout << name.c_str() << " = " << mpu.newQ << endl;
+			}
+			redraw = true;
+			redraw_log();
+		}
+
+		
+	}
+
+	return 0;
+}
+
+
+
+
+
 
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
@@ -185,7 +253,21 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 	int xButton = 10;
 
 
-	//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+	//-----open conslole----------------------------------------------------------------------------------------------------------------
+	RedirectIOToConsole();
+	DWORD myThreadID;
+	HANDLE myHandle = CreateThread(0, 0, myThread, 0, 0, 0);
+
+	//---------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
 	
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"rotate", gr, ROTATE);
 	yButton += 2;
@@ -342,6 +424,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 	}
 
 	GdiplusShutdown(gdiplusToken);
+	
+
 	return msg.wParam;
 }  // WinMain
 
@@ -356,6 +440,23 @@ bool inRect(const int x, const int y, const RectF &r) {
 
 
 
+HWND hwnd;
+
+void redraw_log() {
+	if (redraw) {
+		gr->readLog();
+		RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE);
+		if (gps_hwnd != NULL)
+			RedrawWindow(gps_hwnd, NULL, NULL, RDW_INVALIDATE);
+		if (text_hwnd != NULL)
+			RedrawWindow(text_hwnd, NULL, NULL, RDW_INVALIDATE);
+
+		redraw = false;
+	}
+}
+
+
+
 
 int old_filter = 3;
 
@@ -365,10 +466,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 	HDC          hdc;
 	PAINTSTRUCT  ps;
 	
-
-
-
-	bool redraw = false;
+	hwnd = hWnd;
 	switch (message)
 	{
 
@@ -416,7 +514,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 
 		xPos = lParam&0xffff;
 		yPos = lParam>>16;
-		bool redraw = false;
+		//bool redraw = false;
 
 		if(inRect(xPos, yPos, horScroll)) {
 			scrollX_f = true;
@@ -440,17 +538,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 			}
 		}
 		
-
-
-		if (redraw) {
-			RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
-			if (gps_hwnd!=NULL)
-				RedrawWindow(gps_hwnd, NULL, NULL, RDW_INVALIDATE);
-			if (text_hwnd != NULL)
-				RedrawWindow(text_hwnd, NULL, NULL, RDW_INVALIDATE);
-
-
-		}
 		return 0;
 
 	}
@@ -459,7 +546,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 
 		xPos = lParam & 0xffff;
 		yPos = lParam >> 16;
-		bool redraw = false;
+	
 		for (int i = 0; i < buttons; i++) {
 			if (mb[i]->buttonUp(xPos, yPos))
 				redraw = true;;
@@ -472,10 +559,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 			if (old_filter != gr->flags[FILTER]+(gr->flags[ROTATE]*2)) {
 				old_filter = gr->flags[FILTER] + (gr->flags[ROTATE] * 2);
 
-				gr->readLog();
+				
 			}
-			RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
+			
 		}
+
+		redraw_log();
+
 		return 0;
 
 	}

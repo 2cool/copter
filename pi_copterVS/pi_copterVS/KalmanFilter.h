@@ -74,12 +74,12 @@ public:
 	Eigen::MatrixXd getP() { return P; }
 	Eigen::MatrixXd getK() { return K; }
 
-Eigen::MatrixXd A, H, Q, R, P, K, P0;
+	Eigen::MatrixXd A, H, Q, R, P, K, P0;
 
 private:
 
 	// Matrices for computation
-	
+
 
 	// System dimensions
 	int m, n;

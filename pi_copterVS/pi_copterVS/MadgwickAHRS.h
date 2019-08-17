@@ -13,7 +13,7 @@ class MadgwickAHRS
 
 private:
 
-	void MadgwickAHRSupdateIMU(Quaternion &q, float gx, float gy, float gz, float ax, float ay, float az, float dt);
+	void MadgwickAHRSupdateIMU(Quaternion_ &q, float gx, float gy, float gz, float ax, float ay, float az, float dt);
 	
 
 public:
@@ -26,7 +26,7 @@ public:
 	
 	void setBeta(float b);
 	float invSqrt(float x);
-	void MadgwickAHRSupdate(Quaternion &q, float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float dt);
+	void MadgwickAHRSupdate(Quaternion_ &q, float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float dt);
 };
 
 extern MadgwickAHRS AHRS;

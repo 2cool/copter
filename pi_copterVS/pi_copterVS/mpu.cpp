@@ -41,6 +41,21 @@ double  mpu_time_ ;
 
 //3G
 
+
+
+#ifdef USE_KALMAN
+const int mn = 3; // Number of states
+const int m = 1; // Number of measurements
+Eigen::MatrixXd A(mn, mn); // System dynamics matrix
+Eigen::MatrixXd H(m, mn); // Output matrix
+Eigen::MatrixXd Q(mn, mn); // Process noise covariance
+Eigen::MatrixXd R(m, m); // Measurement noise covariance
+Eigen::MatrixXd P(mn, mn); // Estimate error covariance
+KalmanFilter* kf;
+#endif
+
+
+
 static const float f_constrain(const float v, const float min, const float max){
 	return constrain(v, min, max);
 }
@@ -142,6 +157,57 @@ void MpuClass::init()
 
 	q.w = 1; q.x = q.y = q.z = 0;
 	oldmpuTimed = mpu_time_ = 0.000001*micros();
+
+
+
+
+#ifdef USE_KALMAN
+
+	// Discrete LTI projectile motion, measuring position only
+	A <<
+		1, 0.005, 0,
+		0, 1, 0.005,
+		0, 0, 1;
+
+	H << 1, 0, 0;
+
+	// Reasonable covariance matrices
+#define newQ 0.001
+#define newR 0.2
+
+	Q <<
+		newQ, newQ, .0,
+		newQ, newQ, .0,
+		.0, .0, .0;
+
+	R << newR;
+
+	P <<
+		.1, .1, .1,
+		.1, 10000, 10,
+		.1, 10, 100;
+
+
+	VectorXd B(mn);
+	B << 0, 0, 0;
+	// Construct the filter
+	kf = new KalmanFilter(A, B, H, Q, R, P);
+
+	// Construct the filter
+
+	Eigen::VectorXd x0(mn);
+	x0 << 0, 0, 0;
+	kf->init(x0);
+
+
+#endif
+
+
+
+
+
+
+
 
 	cout << "Initializing MPU6050\n";
 
@@ -372,7 +438,7 @@ bool MpuClass::loop(){
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-uint8_t GetGravity(VectorFloat *v, Quaternion *q) {
+uint8_t GetGravity(VectorFloat *v, Quaternion_ *q) {
 	v->x = 2 * (q->x*q->z - q->w*q->y);
 	v->y = 2 * (q->w*q->x + q->y*q->z);
 	v->z = q->w*q->w - q->x*q->x - q->y*q->y + q->z*q->z;
@@ -392,7 +458,7 @@ bool compas_flip = false;
 #define _2PI 6.283185307179586476925286766559
 bool pitch_flag;
 
-static void toEulerianAngle(const Quaternion& q, float& roll, float& pitch, float& yaw)
+static void toEulerianAngle(const Quaternion_& q, float& roll, float& pitch, float& yaw)
 {
 	// roll (x-axis rotation)
 	double sinr = +2.0 * (q.w * q.x + q.y * q.z);
@@ -453,25 +519,18 @@ void MpuClass::gyro_calibr() {
 }
 double gravity = 1;
 
+
+
+
+
 bool MpuClass::loop() {//-------------------------------------------------L O O P-------------------------------------------------------------
 	
 	bool ret = true;
 	timed = 0.000001*(double)micros();
 	mpu_dt = timed - mpu_time_;
-	if (mpu_dt < 0.005) {
-		usleep(long(1000000.0*(0.005 - mpu_dt)));
-		timed = 0.000001*(double)micros();
-	}
-
-	mpu_dt = timed - mpu_time_;
 	mpu_dt = constrain(mpu_dt,0.005, 0.03);
-
 	mpu_time_ = timed;
 	double old_tied = timed;
-
-
-
-
 
 	double _dt = (timed - oldmpuTimed);
 	if (ret=(_dt >= 0.01)) {
@@ -588,11 +647,35 @@ float Z_CF_SPEED = 0.0025;//CF filter //при 0.005 На ошибку в ACC на 0.1 ошибка 
 float AltErrorI=0;
 void MpuClass::test_Est_Alt() {
 
+
+	
 	float alt = MS5611.alt();
 	   	 	
 
 
+#ifdef USE_KALMAN
 
+	float static old_bar_alt = 0,old_accZ=0;
+	kf->A(3) = kf->A(7)= mpu_dt;
+	kf->B[2] = accZ - old_accZ;
+	old_accZ = accZ;
+
+	if (alt != old_bar_alt) { 
+		old_bar_alt = alt;
+		Eigen::VectorXd y(m);
+		y << old_bar_alt;
+		kf->update(y);
+
+	}
+	else {
+		kf->update();
+	}
+	est_speedZ = kf->state()(1);
+	est_alt_ = kf->state()(0);
+	
+	Debug.dump(est_alt_, est_speedZ, 0, 0);
+
+#else
 	if (timed<8) {
 		est_alt_ = alt;
 		est_speedZ = 0;
@@ -621,7 +704,7 @@ void MpuClass::test_Est_Alt() {
 //	AltErrorI += AltError;
 //	AltErrorI = constrain(AltErrorI, -10000.0f, 10000.0f);
 
-
+#endif
 
 #ifdef FLY_EMULATOR
 	if (alt <= 0) {

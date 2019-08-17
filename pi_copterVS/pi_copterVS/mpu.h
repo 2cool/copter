@@ -1,5 +1,5 @@
 #include "define.h"
-
+#include "KalmanFilter.h"
 // mpu.h
 
 #ifndef _MPU_h
@@ -31,6 +31,8 @@ class MpuClass
 {
 	friend class HmcClass;
  protected:
+
+
 	 float tiltPower_CF;
 	 void log_emu();
 	 void log();
@@ -52,7 +54,7 @@ class MpuClass
 	 int dmpReady = 0;
 	 float lastval[3];
 	 int16_t sensors;
-	 Quaternion q;
+	 Quaternion_ q;
 	 //calibration offsets for MPU6050
 	 ///////////////////////////////////   CONFIGURATION   /////////////////////////////
 	 //Change this 3 variables if you want to fine tune the skecth to your needs.

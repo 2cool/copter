@@ -27,7 +27,7 @@
 // AHRS algorithm update
 float beta = betaDef;								// 2 * proportional gain (Kp)
 void MadgwickAHRS::setBeta(float b) { beta = b; }
-void MadgwickAHRS::MadgwickAHRSupdate(Quaternion &q,float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float dt) {
+void MadgwickAHRS::MadgwickAHRSupdate(Quaternion_ &q,float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float dt) {
 	float recipNorm;
 	float s0, s1, s2, s3;
 	float qDot1, qDot2, qDot3, qDot4;
@@ -126,7 +126,7 @@ void MadgwickAHRS::MadgwickAHRSupdate(Quaternion &q,float gx, float gy, float gz
 //---------------------------------------------------------------------------------------------------
 // IMU algorithm update
 
-void MadgwickAHRS::MadgwickAHRSupdateIMU(Quaternion &q,float gx, float gy, float gz, float ax, float ay, float az, float dt) {
+void MadgwickAHRS::MadgwickAHRSupdateIMU(Quaternion_ &q,float gx, float gy, float gz, float ax, float ay, float az, float dt) {
 	float recipNorm;
 	float s0, s1, s2, s3;
 	float qDot1, qDot2, qDot3, qDot4;

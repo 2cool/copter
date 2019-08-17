@@ -908,8 +908,7 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 	draw(g, rect, 1, 0, THROTTLE);
 
 #define MAX_ALT press.max_alt
-#define MIN_ALT 112
-	//press.min_alt
+#define MIN_ALT press.min_alt
 //#define MAX_ALT 130
 //#define MIN_ALT 117
 	draw(g, rect, MAX_ALT, MIN_ALT, SZ);

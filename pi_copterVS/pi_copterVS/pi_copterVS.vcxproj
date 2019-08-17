@@ -79,6 +79,7 @@
     <ClCompile Include="I2Cdev.cpp" />
     <ClCompile Include="inv_mpu.cpp" />
     <ClCompile Include="inv_mpu_dmp_motion_driver.cpp" />
+    <ClCompile Include="KalmanFilter.cpp" />
     <ClCompile Include="Location.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MadgwickAHRS.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="I2Cdev.h" />
     <ClInclude Include="inv_mpu.h" />
     <ClInclude Include="inv_mpu_dmp_motion_driver.h" />
+    <ClInclude Include="KalmanFilter.h" />
     <ClInclude Include="Location.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MadgwickAHRS.h" />

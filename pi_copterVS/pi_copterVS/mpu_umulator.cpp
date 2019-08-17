@@ -236,7 +236,7 @@ void EmuClass::init(float wx, float wy, float wz,float y , float p , float r ) {
 	init_wind(wx, wy, wz);
 	pos[Z] = pos[Y] = pos[X] = 0;
 	speed[X] = speed[Y] = speed[Z] = 0;
-	acc[X] = acc[Y] = acc[Z] = -G;
+	acc[X] = acc[Y] = acc[Z] = -GRAVITY_G;
 	gyro[X] = gyro[Y] = gyro[Z] = 0;
 	ang[YAW] = y;
 	ang[PITCH] = p;
@@ -324,13 +324,13 @@ void EmuClass::update(const float fm_[4], double dt) {
 
 
 	const double arm03_force = fmin(fm[0], fm[3]);
-	const double arm03_pitch_rotation = 30*G * (fm[0] - fm[3]) -gyro_res[PITCH];
+	const double arm03_pitch_rotation = 30*GRAVITY_G * (fm[0] - fm[3]) -gyro_res[PITCH];
 	const double arm03_yaw_rot = (motors_pow[0] + motors_pow[3]);
 	const double arm21_force = fmin(fm[1], fm[2]);
-	const double arm21_roll_rotation = 30*G * (fm[2] - fm[1]) -gyro_res[ROLL];
+	const double arm21_roll_rotation = 30*GRAVITY_G * (fm[2] - fm[1]) -gyro_res[ROLL];
 	const double arm21_yaw_rot = (motors_pow[2] + motors_pow[1]);
 	const double yaw_rot_force = 100 * (arm21_yaw_rot - arm03_yaw_rot) - gyro_res[YAW];
-	double force = G * (arm03_force + arm21_force);
+	double force = GRAVITY_G * (arm03_force + arm21_force);
 
 	gyro[YAW] += (yaw_rot_force + wgyro[Z])*dt;
 	gyro[PITCH] += (arm03_pitch_rotation + wgyro[Y])*dt;
@@ -369,7 +369,7 @@ void EmuClass::update(const float fm_[4], double dt) {
 
 	acc[X] = (acc[X] * force) - resistenceF[X] + wacc[X];
 	acc[Y] = (acc[Y] * force) - resistenceF[Y] + wacc[Y];
-	acc[Z] = (acc[Z] * force) - resistenceF[Z] - G + wacc[Z];
+	acc[Z] = (acc[Z] * force) - resistenceF[Z] - GRAVITY_G + wacc[Z];
 #ifdef NOISE_ON
 	acc[Z] += 2.5 - 5.0*((float)(rand()) / (float)RAND_MAX);
 	acc[X] += 1.0 - 2.0*((float)(rand()) / (float)RAND_MAX);
@@ -392,7 +392,7 @@ void EmuClass::update(const float fm_[4], double dt) {
 		
 		pos[Z] = 0;
 		speed[X] = speed[Y] = speed[Z] = 0;
-		acc[X] = acc[Y] = acc[Z] = 0;// -G;
+		acc[X] = acc[Y] = acc[Z] = 0;// -GRAVITY_G;
 		gyro[X] = gyro[Y] = gyro[Z] = 0;
 		ang[PITCH] = 0;
 		ang[ROLL] = 0;

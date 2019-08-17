@@ -84,7 +84,7 @@ double MS5611Class::getAltitude(const double pressure) {
 			if (gps_barometr_alt_dif == ALT_NOT_SET)
 				gps_barometr_alt_dif = GPS.loc.altitude - altitude_;
 			
-			if (fabs(old_alt - alt) > 10 || fabs(gps_alt - alt) > 10) {
+			if (fabs(old_alt - alt) > 20 ) {
 				alt = gps_alt;
 				Telemetry.addMessage(e_BAROMETR_ERROR);
 			}
@@ -311,7 +311,11 @@ void MS5611Class::phase2() {
 			altitude_ =  getAltitude(pressure);	
 		}
 
+#ifdef USE_KALMAN
+		pressure = P;
+#else
 		pressure += ((double)P - pressure)*0.3;
+#endif
 		log_sens();
 		
 		const double new_altitude = getAltitude(pressure);

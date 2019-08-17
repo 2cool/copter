@@ -41,10 +41,11 @@
 #define OSR_2048     5000 //us
 #define OSR_4096     10000 //us
 
+/*
 #define alpha 0.96
 #define beta 0.96
 #define gamma 0.96
-
+*/
 // check daily sea level pressure at 
 // http://www.kma.go.kr/weather/observation/currentweather.jsp
 #define SEA_LEVEL_PRESSURE 1023.20 // Seoul 1023.20hPa

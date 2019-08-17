@@ -165,6 +165,16 @@ void Mpu::loadmax_min(const int mn, const double val, bool simetric) {
 double old_bar_alt = 0;
 Pendulum p0(1,0, 0, 0.3);
 Pendulum p1(1.01, 0, 0,0);
+
+
+
+
+#include <iostream>
+using namespace std;
+
+
+
+
 void Mpu::parser(byte buf[], int j, int len, bool filter) {
 
 
@@ -185,9 +195,13 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 	int a[3];
 	int q[4];
 
+	if (dt > 0.01)
+		dt = 0.01;
 
-
-
+	kf->A <<
+		1, dt, 0,
+		0, 1, dt,
+		0, 0, 1;
 	memcpy(g, &(buf[j]), 6);
 	j += 6;
 	memcpy(a, &(buf[j]), 6);
@@ -245,7 +259,10 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 
 	static float old_accZ = 0;
 	if (filter) {
-		if (press.altitude != old_bar_alt) { ?????????????????????????????????????????
+
+		
+
+		if (press.altitude != old_bar_alt) { //?????????????????????????????????????????
 			old_bar_alt = press.altitude;
 			Eigen::VectorXd y(m);
 			y << old_bar_alt;
@@ -259,8 +276,9 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 			old_accZ = accZ;
 			kf->update();
 		}
-		est_alt = kf->state().transpose()[0];
-		accZ = kf->state().transpose()[2];
+		est_speedZ = kf->state()(1);// .transpose()[1];
+		est_alt = kf->state()(0);
+		accZ = kf->state()(2);
 	}
 
 
@@ -300,10 +318,10 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 }
 
 
-
-
-
 void Mpu::init() {
+
+	
+
 	// Discrete LTI projectile motion, measuring position only
 	A <<
 		1, 0.005, 0,
@@ -314,11 +332,11 @@ void Mpu::init() {
 
 	// Reasonable covariance matrices
 	Q <<
-		0.05, .05, .0,
-		.05, .05, .0,
+		newQ, newQ, .0,
+		newQ, newQ, .0,
 		.0, .0, .0;
 
-	R << 5;
+	R << newR;
 
 	P <<
 		.1, .1, .1,
@@ -334,7 +352,7 @@ void Mpu::init() {
 	// Construct the filter
 
 	Eigen::VectorXd x0(3);
-	x0 << 0, 0, -9.81;
+	x0 << 0, 0, 0;
 	kf->init(x0);
 
 

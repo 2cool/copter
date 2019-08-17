@@ -6,6 +6,10 @@ enum { mPITCH, mROLL, mrPITCH, mrROLL, mYAW, mGYRO_PITCH, mGYRO_ROLL, mGYRO_YAW,
 class Mpu
 {
 public:
+	double newR=0.2;
+	double newQ = 0.001;
+
+
 
 	void loadmax_min(const int n, const double val, bool simetric = false);
 
