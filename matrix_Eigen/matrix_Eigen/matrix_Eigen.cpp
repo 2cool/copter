@@ -2,7 +2,7 @@
 
 // matrix_Eigen.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-#define MODIFIED
+//#define MODIFIED
 
 #ifdef MODIFIED
 
@@ -213,9 +213,9 @@ int main(int argc, char* argv[]) {
 	std::cout << "Q: \n" << Q << std::endl;
 	std::cout << "R: \n" << R << std::endl;
 	std::cout << "P: \n" << P << std::endl;
-
+	VectorXd B(n);
 	// Construct the filter
-	KalmanFilter kf(dt,A, H, Q, R, P);
+	KalmanFilter kf(A,B, H, Q, R, P);
 
 	// List of noisy position measurements (y)
 	std::vector<double> measurements = {
@@ -233,7 +233,7 @@ int main(int argc, char* argv[]) {
 	// Best guess of initial states
 	Eigen::VectorXd x0(n);
 	x0 << measurements[0], 0, -9.81;
-	kf.init(0,x0);
+	kf.init(x0);
 
 	// Feed measurements into filter, output estimated states
 	double t = 0;

@@ -7,13 +7,9 @@ class Mpu
 {
 public:
 
-	void do_magic();
 	void loadmax_min(const int n, const double val, bool simetric = false);
 
 	void init();
-
-	int decode(char buffer[], int &i, bool rotate = false);
-	int view(int &indexes, char buffer[], int &i);
 
 	void parser(byte buf[], int n, int len, bool filter);
 	void toEulerianAngle();

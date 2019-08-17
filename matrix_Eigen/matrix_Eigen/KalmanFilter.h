@@ -61,7 +61,7 @@ public:
 	* using the given time step and dynamics matrix.
 	*/
 	void update(const Eigen::VectorXd& y, const Eigen::MatrixXd A);
-
+	void update();
 	/**
 	* Return the current state and time.
 	*/

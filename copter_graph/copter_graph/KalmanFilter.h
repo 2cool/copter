@@ -11,7 +11,6 @@
 */
 
 #pragma once
-#include "stdafx.h"
 #include "../../eigen/Eigen/Dense"
 using namespace Eigen;
 
@@ -23,15 +22,15 @@ public:
 	/**
 	* Create a Kalman filter with the specified matrices.
 	*   A - System dynamics matrix
-	*   C - Output matrix
+	*   H - Output matrix
 	*   Q - Process noise covariance
 	*   R - Measurement noise covariance
 	*   P - Estimate error covariance
 	*/
 	KalmanFilter(
-		double dt,
 		const Eigen::MatrixXd& A,
-		const Eigen::MatrixXd& C,
+		const Eigen::VectorXd& B,
+		const Eigen::MatrixXd& H,
 		const Eigen::MatrixXd& Q,
 		const Eigen::MatrixXd& R,
 		const Eigen::MatrixXd& P
@@ -50,7 +49,7 @@ public:
 	/**
 	* Initialize the filter with a guess for initial states.
 	*/
-	void init(double t0, const Eigen::VectorXd& x0);
+	void init(const Eigen::VectorXd& x0);
 
 	/**
 	* Update the estimated state based on measured values. The
@@ -62,27 +61,31 @@ public:
 	* Update the estimated state based on measured values,
 	* using the given time step and dynamics matrix.
 	*/
-	void update(const Eigen::VectorXd& y, double dt, const Eigen::MatrixXd A);
-
+	void update(const Eigen::VectorXd& y, const Eigen::MatrixXd A);
+	void update();
 	/**
 	* Return the current state and time.
 	*/
 	Eigen::VectorXd state() { return x_hat; };
-	double time() { return t; };
 
+	void initU(const double x0);
+
+	Eigen::VectorXd B;
+	Eigen::MatrixXd getP() { return P; }
+	Eigen::MatrixXd getK() { return K; }
 private:
 
 	// Matrices for computation
-	Eigen::MatrixXd A, C, Q, R, P, K, P0;
+	Eigen::MatrixXd A, H, Q, R, P, K, P0;
 
 	// System dimensions
 	int m, n;
 
 	// Initial and current time
-	double t0, t;
+
 
 	// Discrete time step
-	double dt;
+
 
 	// Is the filter initialized?
 	bool initialized;

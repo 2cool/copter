@@ -308,6 +308,9 @@ int Graph::decode_Log() {
 	*/
 
 	press.init();
+	mpu.init();
+
+
 
 	int t1 = load_int16_((byte*)buffer, 0);
 	int t2 = load_int16_((byte*)buffer, 2);
@@ -904,9 +907,8 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 	draw(g, rect, 1, 0, F3);
 	draw(g, rect, 1, 0, THROTTLE);
 
-#define MAX_ALT 80
-	//press.max_alt
-#define MIN_ALT 75
+#define MAX_ALT press.max_alt
+#define MIN_ALT 112
 	//press.min_alt
 //#define MAX_ALT 130
 //#define MIN_ALT 117

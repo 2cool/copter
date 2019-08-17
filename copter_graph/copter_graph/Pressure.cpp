@@ -2,18 +2,10 @@
 #include "Pressure.h"
 #include <math.h>
 
-#include "KalmanFilter.h"
 
 
 
-	//double dt = 1.0 / 30; // Time step
 
-	static Eigen::MatrixXd A(3, 3); // System dynamics matrix
-	static Eigen::MatrixXd C(1, 3); // Output matrix
-	static Eigen::MatrixXd Q(3, 3); // Process noise covariance
-	static Eigen::MatrixXd R(1, 1); // Measurement noise covariance
-	static Eigen::MatrixXd P(3, 3); // Estimate error covariance
-	KalmanFilter *kf;
 
 void Pressure::init()
 {
@@ -21,23 +13,7 @@ void Pressure::init()
 
 
 
-	
 
-	// Discrete LTI projectile motion, measuring position only
-	A << 1, dt, 0, 0, 1, dt, 0, 0, 1;
-	C << 1, 0, 0;
-
-	// Reasonable covariance matrices
-	Q << .05, .05, .0, .05, .05, .0, .0, .0, .0;
-	R << 5;
-	P << .1, .1, .1, .1, 10000, 10, .1, 10, 100;
-	kf=new KalmanFilter(dt, A, C, Q, R, P);
-
-	// Construct the filter
-
-	Eigen::VectorXd x0(3);
-	x0 << 0, 0, -9.81;
-	kf->init(0, x0);
 
 }
 int Pressure::view(int &indexes, char buffer[], int &i) {
@@ -114,10 +90,7 @@ void Pressure::parser(byte buf[], int n, bool filter) {
 	if (pressure > 80000 && pressure < 120000) {
 		altitude = (44330.0f * (1.0f - pow(pressure / PRESSURE_AT_0, 0.1902949f)));
 		if (filter) {
-			Eigen::VectorXd y(1);
-			y << altitude;
-			kf->update(y);
-			altitude = kf->state().transpose()[0];
+			
 		}
 		if (old_alt == 0)
 			old_alt=t_alt=told_alt2=told_alt1 = altitude;

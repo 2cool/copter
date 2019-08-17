@@ -234,7 +234,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"speedY", gr, SPEED_Y);
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"speedZ    ", gr, SPEED_Z);
 
-	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"alt", gr, SZ);
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"  alt  ", gr, SZ);
     tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"bar_alt", gr, BAR_ALT);
 
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"gps_alt", gr, GPS_ALT);

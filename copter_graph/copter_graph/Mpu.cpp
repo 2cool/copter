@@ -2,8 +2,8 @@
 #include "Mpu.h"
 #include "Pressure.h"
 #include "GPS_Loger.h"
-
-
+#include "Pressure.h"
+#include "KalmanFilter.h"
 
 class Pendulum {
 private:
@@ -39,9 +39,18 @@ public:
 
 };
 
+int mn = 3; // Number of states
+int m = 1; // Number of measurements
 
+double dt = 1.0 / 30; // Time step
 
+Eigen::MatrixXd A(mn, mn); // System dynamics matrix
+Eigen::MatrixXd H(m, mn); // Output matrix
+Eigen::MatrixXd Q(mn, mn); // Process noise covariance
+Eigen::MatrixXd R(m, m); // Measurement noise covariance
+Eigen::MatrixXd P(mn, mn); // Estimate error covariance
 
+KalmanFilter* kf;
 #define ROLL_COMPENSATION_IN_YAW_ROTTATION 0.02
 #define PITCH_COMPENSATION_IN_YAW_ROTTATION 0.025
 
@@ -72,50 +81,6 @@ inline void sin_cos(const float a, float &s, float &c) {
 	*/
 }
 
-
-
-/*
-void Mpu::do_magic() {
-	sin_cos(f[mYAW] *GRAD2RAD, _sinYaw, _cosYaw);
-	//---calc acceleration on angels------
-	sin_cos(f[mPITCH] *GRAD2RAD, sinPitch, cosPitch);
-	sin_cos(f[mROLL] *GRAD2RAD, sinRoll, cosRoll);
-
-#define WIND_SPEED_X sqrt(abs(w_accX / DRAG_K))*((w_accX>=0)?1:-1)
-#define WIND_SPEED_Y sqrt(abs(w_accY / DRAG_K))*((w_accY>=0)?1:-1)
-
-	//	float windX = e_speedX;/// +WIND_SPEED_X;
-	//	float windY = e_speedY;// +WIND_SPEED_Y;
-
-
-	e_accX = -G*(-_cosYaw*sinPitch - _sinYaw*sinRoll) - e_speedX*abs(e_speedX)*DRAG_K - w_accX;
-	e_accY = G*(-_cosYaw*sinRoll + _sinYaw*sinPitch) - e_speedY*abs(e_speedY)*DRAG_K - w_accY;
-
-	w_accX += (e_accX - gps_log.gax - w_accX)*0.01;
-	w_accY += (e_accY - gps_log.gay - w_accY)*0.01;
-
-	e_speedX += e_accX*dt;
-	e_speedX += (gps_log.gspeedX - e_speedX)*0.1;
-
-	e_speedY += e_accY*dt;
-	e_speedY += (gps_log.gspeedY - e_speedY)*0.1;
-
-	//-----calc real angels------
-	m7_accX += ((_cosYaw*e_accX + _sinYaw*e_accY) - m7_accX)*0.007;
-	m7_accX = constrain(m7_accX, -MAX_ACC / 2, MAX_ACC / 2);
-	m7_accY += ((_cosYaw*e_accY - _sinYaw*e_accX) - m7_accY)*0.007;
-	m7_accY = constrain(m7_accY, -MAX_ACC / 2, MAX_ACC / 2);
-
-	f_pitch = f[mPITCH];
-	f_roll = f[mROLL];
-
-	f[mPITCH] = RAD2GRAD*atan2((sinPitch + m7_accX*cosPitch / G), cosPitch);// +abs(gaccX*sinPitch));
-	f[mROLL] = RAD2GRAD*atan2((sinRoll - m7_accY*cosRoll / G), cosRoll);// +abs(gaccY*sinRoll));
-
-}
-
-
-*/
 
 
 
@@ -179,25 +144,25 @@ void Mpu::toEulerianAngle()
 	g_yaw = RAD2GRAD * atan2(siny, cosy);
 }
 
-void Mpu::loadmax_min(const int n, const double val, bool simetric) {
+void Mpu::loadmax_min(const int mn, const double val, bool simetric) {
 
 
 
-	if (_max_minC[n] == 0) {
-		_max[n] = _min[n] = val;
-		_max_minC[n]++;
+	if (_max_minC[mn] == 0) {
+		_max[mn] = _min[mn] = val;
+		_max_minC[mn]++;
 	}
 	else {
-		_max[n] = max(mpu._max[n], val);
-		_min[n] = min(mpu._min[n], val);
+		_max[mn] = max(mpu._max[mn], val);
+		_min[mn] = min(mpu._min[mn], val);
 		if (simetric) {
-			_max[n] = max(mpu._max[n], -val);
-			_min[n] = min(mpu._min[n], -val);
+			_max[mn] = max(mpu._max[mn], -val);
+			_min[mn] = min(mpu._min[mn], -val);
 		}
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+double old_bar_alt = 0;
 Pendulum p0(1,0, 0, 0.3);
 Pendulum p1(1.01, 0, 0,0);
 void Mpu::parser(byte buf[], int j, int len, bool filter) {
@@ -239,7 +204,7 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 
 #define ACC_CF 0.007
 
-	const float f = (filter ? ACC_CF : 1);
+	const float f = 1;// (filter ? ACC_CF : 1);
 	if (j <= len) { 
 		const float tacc =  *(float*)& buf[j];
 		j += 4;
@@ -276,6 +241,30 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 	if (j <= len) {
 		est_speedY = *(float*)& buf[j]; j += 4;
 	}
+
+
+	static float old_accZ = 0;
+	if (filter) {
+		if (press.altitude != old_bar_alt) { ?????????????????????????????????????????
+			old_bar_alt = press.altitude;
+			Eigen::VectorXd y(m);
+			y << old_bar_alt;
+			kf->B[2] = accZ - old_accZ;
+			old_accZ = accZ;
+			kf->update(y);
+			
+		}
+		else {
+			kf->B[2] = accZ - old_accZ;
+			old_accZ = accZ;
+			kf->update();
+		}
+		est_alt = kf->state().transpose()[0];
+		accZ = kf->state().transpose()[2];
+	}
+
+
+
 
 	_max[mPITCH] = 60;
 	_min[mPITCH] = -60;
@@ -315,43 +304,40 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 
 
 void Mpu::init() {
+	// Discrete LTI projectile motion, measuring position only
+	A <<
+		1, 0.005, 0,
+		0, 1, 0.005,
+		0, 0, 1;
+
+	H << 1, 0, 0;
+
+	// Reasonable covariance matrices
+	Q <<
+		0.05, .05, .0,
+		.05, .05, .0,
+		.0, .0, .0;
+
+	R << 5;
+
+	P <<
+		.1, .1, .1,
+		.1, 10000, 10,
+		.1, 10, 100;
 
 
+	VectorXd B(mn);
+	B << 0, 0, 0;
+	// Construct the filter
+	kf = new KalmanFilter( A,B ,H, Q, R, P);
 
-	time = rdt = 0;
-	for (int i = 0; i < mALL_E; i++) {
-		_max[i] = -1000;
-		_min[i] = 1000;
-	}
+	// Construct the filter
 
-		//hower_thr = HOVER_THROTHLE;
-		//min_thr = MIN_THROTTLE_;
-		//fall_thr = FALLING_THROTTLE;
-		DRAG_K = 0.0052;
-		//DRAG_K = 0.022;
-		_0007 = 0.007;
-		gaccX = gaccY = 0;
-		acc_callibr_timed = 0;
-		rate = 100;
-		tiltPower_CF = 0.05;
+	Eigen::VectorXd x0(3);
+	x0 << 0, 0, -9.81;
+	kf->init(x0);
 
-		f_pitch = f_roll = 0;
 
-		windFX = windFY = e_speedX = e_speedY = e_accX = e_accY = m7_accX = m7_accY = w_accX = w_accY = 0;
-		yaw_off = 0;
-		maccX = maccY = maccZ = 0;
-		max_g_cnt = 0;
-		cosYaw = 1;
-		sinYaw = 0;
-		temp_deb = 6;
-		fx = fy = fz = 0;
-
-		faccX = faccY = faccZ = 0;
-		oldmpuTimed = 0;
-		yaw_offset = yaw = pitch = roll = gyroPitch = gyroRoll = gyroYaw = accX = accY = accZ = 0;
-		sinPitch = sinRoll = 0;
-		tiltPower = cosPitch = cosRoll = 1;
-		timed = 0;
 }
 
 
