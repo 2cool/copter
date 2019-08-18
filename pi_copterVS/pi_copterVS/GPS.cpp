@@ -11,8 +11,9 @@
 
 void GPSClass::init()
 {	
+
 #ifndef	FLY_EMULATOR
-	loc.last_gps_data_timed = 0;
+	//loc.last_gps_data_timed = 10;
 #endif
 	if (loc.init() == -1) {
 		cout << "GPS ERROR\n";
@@ -137,36 +138,26 @@ void GPSClass::loop(){
 SEND_I2C g_data;
 
 void GPSClass::loop(){
-	double ttt = micros();
-static uint cnt2l = 0;
-static double last_gps_time1d = 0;
-	if (Mpu.timed - last_gps_time1d >= 0.05) {
-		last_gps_time1d = Mpu.timed;
-
-		if (mega_i2c.get_gps(&g_data)!= -1) {
-			loc.proceed(&g_data);
-		}
-		else{
-			Telemetry.addMessage(e_GPS_ERROR);
-			cout << "gps right write error  " << Mpu.timed - loc.last_gps_data_timed << "," << Mpu.timed << "," << loc.last_gps_data_timed << endl;
-			mega_i2c.beep_code(B_I2C_ERR);
-			return;
-		}
+	int ret = mega_i2c.get_gps(&g_data);
+	if (ret == -1) {
+		Telemetry.addMessage(e_GPS_ERROR);
+		cout << "gps right write error  " << Mpu.timed - loc.last_gps_data_timed << "," << Mpu.timed << "," << loc.last_gps_data_timed << endl;
+		mega_i2c.beep_code(B_I2C_ERR);
+		return;
+	}else if (ret>0)
+		loc.proceed(&g_data);
+		
 		
 
-		if ( Mpu.timed - loc.last_gps_data_timed > 0.3){
-			if (cnt2l++) {
-				Telemetry.addMessage(e_GPS_ERROR);
-				cout << "gps update error  " << Mpu.timed - loc.last_gps_data_timed << "," << Mpu.timed << "," << loc.last_gps_data_timed << endl;
-				mega_i2c.beep_code(B_GPS_TOO_LONG);
-			}
-		}
-		if (Autopilot.motors_is_on() && Mpu.timed - loc.last_gps_accurasy_okd > NO_GPS_DATA) {
-			//printf( "gps accuracy error  %i\n", millis() / 1000);
-		}
-		
+	if ( Mpu.timed - loc.last_gps_data_timed > 0.3){
+		Telemetry.addMessage(e_GPS_ERROR);
+		cout << "gps update error  " << Mpu.timed - loc.last_gps_data_timed << "," << Mpu.timed << "," << loc.last_gps_data_timed << endl;
+		mega_i2c.beep_code(B_GPS_TOO_LONG);
 	}
-
+	if (Autopilot.motors_is_on() && Mpu.timed - loc.last_gps_accurasy_okd > NO_GPS_DATA) {
+		//printf( "gps accuracy error  %i\n", millis() / 1000);
+	}
+		
 	Mpu.gps_timed = 0.000001*(double)micros();
 }
 #endif

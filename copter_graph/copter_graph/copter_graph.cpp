@@ -195,7 +195,7 @@ DWORD WINAPI myThread(LPVOID lpParameter)
 {
 	char buf[1000];
 	cout << "write new variables there like\n\n";
-	cout << "KALMAN_R=4\n";
+	cout << "newQ,newR \n";
 	cout << "-------------------------------------------\n\n";
 	while (true) {
 		cin >> buf;
@@ -311,10 +311,26 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 	yButton += 5;
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"distX", gr, SX);
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"distY", gr, SY);
-
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"GdistX", gr, GSX);
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"GdistY", gr, GSY);
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"speedX", gr, SPEED_X);
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"speedY", gr, SPEED_Y);
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"GspeedX", gr, GSPEED_X);
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"GspeedY", gr, GSPEED_Y);
+
+
+
+
+
+
+
+
+
+
+
+
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"speedZ    ", gr, SPEED_Z);
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"BAR_speedZ    ", gr, BAR_SPEED);
 
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"  alt  ", gr, SZ);
     tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"bar_alt", gr, BAR_ALT);

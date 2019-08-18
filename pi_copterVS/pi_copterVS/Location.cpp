@@ -120,8 +120,6 @@ void LocationClass::updateXY(){
 
 
 }
-
-
 //////////////////////////////////////////////////////////////
 void LocationClass::proceed(SEND_I2C *d) {
 	last_gps_data_timed = Mpu.timed;
@@ -229,7 +227,7 @@ int LocationClass::init(){
 	dt = 0.1f;
 	rdt = 10;
 	speedX = speedY = 0;
-	last_gps_data_timed = 0;
+	last_gps_data_timed = 10;
 	last_gps_accurasy_okd = 0;
 	
 	cout << "loc init\n";

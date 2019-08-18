@@ -70,9 +70,15 @@ int GPS_Loger::decode(/*SEND_I2C*p, */byte buf[], int i, int len, bool rotate ) 
 	if (len -  sizeof(SEND_I2C) >= 16) {
 		i += sizeof(SEND_I2C);
 		gx= *(float*)& buf[i]; i += 4;
-		gspeedX = *(float*)& buf[i]; i += 4;
+		float speedX = *(float*)& buf[i]; i += 4;
 		gy = *(float*)& buf[i]; i += 4;
-		gspeedY = *(float*)& buf[i]; i += 4;
+		float speedY = *(float*)& buf[i]; i += 4;
+
+		if (speedX == 0 && speedY == 0) {  //кастиль
+			return 0;
+		}
+		gspeedX = speedX;
+		gspeedY = speedY;
 	}
 
 

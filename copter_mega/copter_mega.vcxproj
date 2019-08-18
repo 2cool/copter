@@ -51,7 +51,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\copter_mega;$(ProjectDir)..\..\..\..\Arduino\hardware\arduino\avr\libraries\Adafruit_NeoPixel-master;$(ProjectDir)..\..\..\..\Arduino\hardware\arduino\avr\libraries\Wire\src;$(ProjectDir)..\..\..\..\Arduino\hardware\arduino\avr\libraries\Wire\src\utility;$(ProjectDir)..\..\..\..\Arduino\libraries;D:\Users\2cool\Documents\Arduino\libraries;$(ProjectDir)..\..\..\..\Arduino\hardware\arduino\avr\libraries;$(ProjectDir)..\..\..\..\Arduino\hardware\arduino\avr\cores\arduino;$(ProjectDir)..\..\..\..\Arduino\hardware\arduino\avr\variants\mega;$(ProjectDir)..\..\..\..\Arduino\hardware\tools\avr\avr\include;$(ProjectDir)..\..\..\..\Arduino\hardware\tools\avr\avr\include\avr;$(ProjectDir)..\..\..\..\Arduino\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\Arduino\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\Arduino\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.copter_mega.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <PreprocessorDefinitions>__AVR_atmega2560__;__AVR_ATmega2560__;F_CPU=16000000L;ARDUINO=106012;ARDUINO_AVR_MEGA2560;ARDUINO_ARCH_AVR;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__AVR_atmega2560__;__AVR_ATmega2560__;_VMDEBUG=1;F_CPU=16000000L;ARDUINO=106012;ARDUINO_AVR_MEGA2560;ARDUINO_ARCH_AVR;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

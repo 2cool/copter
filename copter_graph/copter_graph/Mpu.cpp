@@ -50,7 +50,11 @@ Eigen::MatrixXd Q(mn, mn); // Process noise covariance
 Eigen::MatrixXd R(m, m); // Measurement noise covariance
 Eigen::MatrixXd P(mn, mn); // Estimate error covariance
 
-KalmanFilter* kf;
+
+enum {X,Y,Z};
+KalmanFilter* kf[3];
+
+
 #define ROLL_COMPENSATION_IN_YAW_ROTTATION 0.02
 #define PITCH_COMPENSATION_IN_YAW_ROTTATION 0.025
 
@@ -162,7 +166,7 @@ void Mpu::loadmax_min(const int mn, const double val, bool simetric) {
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double old_bar_alt = 0;
+
 Pendulum p0(1,0, 0, 0.3);
 Pendulum p1(1.01, 0, 0,0);
 
@@ -198,7 +202,7 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 	if (dt > 0.01)
 		dt = 0.01;
 
-	kf->A <<
+	kf[Z]->A <<
 		1, dt, 0,
 		0, 1, dt,
 		0, 0, 1;
@@ -257,28 +261,62 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 	}
 
 
-	static float old_accZ = 0;
+	static float old_accZ = 0,old_accX=0,old_accY=0;
+	static double old_bar_alt = 0,oldSX=0,oldSY=0;
 	if (filter) {
 
 		
+		//ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
-		if (press.altitude != old_bar_alt) { //?????????????????????????????????????????
+
+		kf[Z]->B[2] = accZ - old_accZ;
+		old_accZ = accZ;
+		if (press.altitude != old_bar_alt) { 
 			old_bar_alt = press.altitude;
 			Eigen::VectorXd y(m);
 			y << old_bar_alt;
-			kf->B[2] = accZ - old_accZ;
-			old_accZ = accZ;
-			kf->update(y);
-			
+			kf[Z]->update(y);
 		}
 		else {
-			kf->B[2] = accZ - old_accZ;
-			old_accZ = accZ;
-			kf->update();
+			kf[Z]->update();
 		}
-		est_speedZ = kf->state()(1);// .transpose()[1];
-		est_alt = kf->state()(0);
-		accZ = kf->state()(2);
+		est_speedZ = kf[Z]->state()(1);
+		est_alt = kf[Z]->state()(0);
+		accZ = kf[Z]->state()(2);
+		//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+		kf[0]->B[2] =  accX - old_accX;
+		old_accX = accX;
+		if (gps_log.gx != oldSX) {
+			oldSX = gps_log.gx;
+			Eigen::VectorXd y(m);
+			y << oldSX;
+			kf[0]->update(y);
+		}
+		else {
+			kf[0]->update();
+		}
+		est_speedX = kf[0]->state()(1);
+		estX = kf[0]->state()(0);
+		accX = kf[0]->state()(2);
+
+
+		//YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+
+		kf[1]->B[2] = accY - old_accY;
+		old_accY = accY;
+		if (gps_log.gy != oldSY) {
+			oldSY = gps_log.gy;
+			Eigen::VectorXd y(m);
+			y << oldSY;
+			kf[1]->update(y);
+		}
+		else {
+			kf[1]->update();
+		}
+		est_speedY = kf[1]->state()(1);
+		estY = kf[1]->state()(0);
+		accY = kf[1]->state()(2);
 	}
 
 
@@ -319,43 +357,25 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 
 
 void Mpu::init() {
-
-	
-
 	// Discrete LTI projectile motion, measuring position only
-	A <<
-		1, 0.005, 0,
-		0, 1, 0.005,
-		0, 0, 1;
-
+	A <<1, 0.005, 0,0, 1, 0.005,0, 0, 1;
 	H << 1, 0, 0;
-
 	// Reasonable covariance matrices
-	Q <<
-		newQ, newQ, .0,
-		newQ, newQ, .0,
-		.0, .0, .0;
-
+	Q <<newQ, newQ, .0,newQ, newQ, .0,.0, .0, .0;
 	R << newR;
-
-	P <<
-		.1, .1, .1,
-		.1, 10000, 10,
-		.1, 10, 100;
-
-
+	P <<.1, .1, .1,.1, 10000, 10,.1, 10, 100;
 	VectorXd B(mn);
 	B << 0, 0, 0;
 	// Construct the filter
-	kf = new KalmanFilter( A,B ,H, Q, R, P);
-
+	kf[X] = new KalmanFilter(A, B, H, Q, R, P);
+	kf[Y] = new KalmanFilter(A, B, H, Q, R, P);
+	kf[Z] = new KalmanFilter( A,B ,H, Q, R, P);
 	// Construct the filter
-
 	Eigen::VectorXd x0(3);
 	x0 << 0, 0, 0;
-	kf->init(x0);
-
-
+	kf[X]->init(x0);
+	kf[Y]->init(x0);
+	kf[Z]->init(x0);
 }
 
 

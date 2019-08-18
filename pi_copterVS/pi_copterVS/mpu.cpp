@@ -102,9 +102,9 @@ void MpuClass::log() {
 
 		Log.loadFloat(est_alt_);
 		Log.loadFloat(est_speedZ);
-		Log.loadFloat(get_Est_X());
+		Log.loadFloat(estX);
 		Log.loadFloat(est_speedX);
-		Log.loadFloat(get_Est_Y());
+		Log.loadFloat(estY);
 		Log.loadFloat(est_speedY);
 
 		Log.block_end();
@@ -163,42 +163,23 @@ void MpuClass::init()
 
 #ifdef USE_KALMAN
 
+	//Z beg
 	// Discrete LTI projectile motion, measuring position only
-	A <<
-		1, 0.005, 0,
-		0, 1, 0.005,
-		0, 0, 1;
-
+	A <<1, 0.005, 0,0, 1, 0.005,0, 0, 1;
 	H << 1, 0, 0;
-
 	// Reasonable covariance matrices
 #define newQ 0.001
 #define newR 0.2
-
-	Q <<
-		newQ, newQ, .0,
-		newQ, newQ, .0,
-		.0, .0, .0;
-
+	Q <<newQ, newQ, .0,	newQ, newQ, .0,	.0, .0, .0;
 	R << newR;
-
-	P <<
-		.1, .1, .1,
-		.1, 10000, 10,
-		.1, 10, 100;
-
-
+	P <<.1, .1, .1,.1, 10000, 10,.1, 10, 100;
 	VectorXd B(mn);
 	B << 0, 0, 0;
-	// Construct the filter
 	kf = new KalmanFilter(A, B, H, Q, R, P);
-
-	// Construct the filter
-
 	Eigen::VectorXd x0(mn);
 	x0 << 0, 0, 0;
 	kf->init(x0);
-
+	//Z end
 
 #endif
 
@@ -673,7 +654,7 @@ void MpuClass::test_Est_Alt() {
 	est_speedZ = kf->state()(1);
 	est_alt_ = kf->state()(0);
 	
-	Debug.dump(est_alt_, est_speedZ, 0, 0);
+	//Debug.dump(est_alt_, est_speedZ, 0, 0);
 
 #else
 	if (timed<8) {

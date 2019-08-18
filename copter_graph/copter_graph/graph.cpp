@@ -277,6 +277,9 @@ int findLOg(int &pos, int lsize,char * buffer) {
 
 int indexes[] = { 0,0,0,0,0,0,0,0,0,0,0 };
 
+
+float zeroEstX = 0, zeroEstY = 0; //костіль
+
 int Graph::decode_Log() {
 	/*
 	gps_log.init();
@@ -310,7 +313,7 @@ int Graph::decode_Log() {
 	press.init();
 	mpu.init();
 
-
+	zeroEstX = zeroEstY = 0;
 
 	int t1 = load_int16_((byte*)buffer, 0);
 	int t2 = load_int16_((byte*)buffer, 2);
@@ -387,10 +390,35 @@ int Graph::decode_Log() {
 		sensors_data[n].sd[GYRO_YAW] = mpu.gyroYaw;
 
 
-		sensors_data[n].sd[SX] = mpu.estX;
-		sensors_data[n].sd[SY] = mpu.estY;
+
+
+
+		if (flags[FILTER]==false)//кастиль
+		if (control_bits & 1) {
+			if (zeroEstX == 0 && zeroEstY == 0) {
+				zeroEstX = sensors_data[n - 2].sd[SX];
+				zeroEstY = sensors_data[n - 2].sd[SY];
+			}
+		}
+		
+			
+
+		sensors_data[n].sd[SX] = mpu.estX+zeroEstX;
+		sensors_data[n].sd[SY] = mpu.estY+zeroEstY;
+
+
+
+
+
 		sensors_data[n].sd[SPEED_X] = mpu.est_speedX;
 		sensors_data[n].sd[SPEED_Y] = mpu.est_speedY;
+
+
+		sensors_data[n].sd[GSX] = gps_log.gx;
+		sensors_data[n].sd[GSY] = gps_log.gy;
+		sensors_data[n].sd[GSPEED_X] = gps_log.gspeedX;
+		sensors_data[n].sd[GSPEED_Y] = gps_log.gspeedY;
+
 
 		sensors_data[n].sd[F0] = bal.f0;
 		sensors_data[n].sd[F1] = bal.f1;
@@ -419,6 +447,7 @@ int Graph::decode_Log() {
 			zero_alt = press.altitude;
 			
 		}
+		sensors_data[n].sd[BAR_SPEED] = press.speed;
 		sensors_data[n].sd[BAR_ALT] = press.altitude;
 		sensors_data[n].sd[GPS_ALT] = gps_log.z;
 
@@ -573,6 +602,10 @@ Graph::Graph(char*fn)
 	color[BAR_ALT] = Color(255, 155, 0, 180);
 	name[BAR_ALT] = L"bar_alt    ";
 
+color[BAR_SPEED] = Color(255, 155, 30, 180);
+	name[BAR_SPEED] = L"bar_alt    ";
+
+
 	color[GPS_ALT] = Color(155, 255, 0, 180);
 	name[GPS_ALT] = L"gps_alt    ";
 
@@ -665,31 +698,23 @@ Graph::Graph(char*fn)
 
 	color[SX] = Color(255, 0, 200, 0);
 	name[SX] = L"s_x";
-
+	color[GSX] = Color(255, 0, 100, 0);
+	name[GSX] = L"Gs_x";
 
 	color[SPEED_X] = Color(100, 200, 0, 0);
 	name[SPEED_X] = L"speed_x";
+	color[GSPEED_X] = Color(100, 100, 0, 0);
+	name[GSPEED_X] = L"Gspeed_x";
+
 	color[SPEED_Y] = Color(100, 200, 0, 200);
 	name[SPEED_Y] = L"speed_y";
-
-/*	color[EXP0] = Color(100, 200, 0, 0);
-	name[EXP0] = L"exp0";
-	color[EXP1] = Color(100, 200, 0, 200);
-	name[EXP1] = L"exp1";
-
-	color[EXP2] = Color(100, 200, 0, 0);
-	name[EXP2] = L"exp2";
-	color[EXP3] = Color(100, 200, 0, 200);
-	name[EXP3] = L"exp3";
-	*/
-
-
-	//color[M_C_PITCH] = Color(100, 200, 100, 0);
-	//name[M_C_PITCH] = L"mcpitch";
+	color[GSPEED_Y] = Color(100, 100, 0, 200);
+	name[GSPEED_Y] = L"Gspeed_y";
 
 	color[SY] = Color(255, 255, 0, 0);
 	name[SY] = L"s_y";
-
+	color[GSY] = Color(255, 155, 0, 0);
+	name[GSY] = L"Gs_y";
 
 
 	/*
@@ -885,10 +910,19 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 
 
 
-	draw(g, rect, 10, -10, SX);
-	draw(g, rect, 10, -10, SY);
-	draw(g, rect, 10, -10, SPEED_X);
-	draw(g, rect, 10, -10, SPEED_Y);
+	draw(g, rect, 15, -20, SX);
+	draw(g, rect, 100, -10, SY);
+	draw(g, rect, 15, -20, GSX);
+	draw(g, rect, 100, -10, GSY);
+
+	draw(g, rect, 15, -15, SPEED_X);
+	draw(g, rect, 15, -15, SPEED_Y);
+
+	draw(g, rect, 15, -15, GSPEED_X);
+	draw(g, rect, 15, -15, GSPEED_Y);
+
+
+
 
 
 
@@ -914,13 +948,15 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 	draw(g, rect, MAX_ALT, MIN_ALT, SZ);
 	draw(g, rect, MAX_ALT, MIN_ALT, BAR_ALT);
 	draw(g, rect, MAX_ALT+50, MIN_ALT+50, GPS_ALT);
+	
+
 
 
 	//draw(g, rect, 9, -3, SZ);
 	//draw(g, rect, 9, -3, BAR_ALT);
 
 	draw(g, rect, 3, -3, SPEED_Z);
-
+	draw(g, rect, 3, -3, BAR_SPEED);
 
 
 	return 0;

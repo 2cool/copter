@@ -3,8 +3,6 @@
 #define DEFINE_H
 #define USE_KALMAN
 
-
-
 #include "glob_header.h" 
 #include "WProgram.h"
 
