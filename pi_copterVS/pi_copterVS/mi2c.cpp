@@ -120,19 +120,12 @@ static int sms_received = 0;
 	}
 }
 
-
 int Megai2c::init()
 {
 	if (init_shmPTR())
 		return 0;
-
-	
-	
 	current_led_mode = 100;
-
 	ring_received = false;
-
-
 	if ((fd = open("/dev/i2c-0", O_RDWR)) < 0) {
 		cout << "Failed to open /dev/i2c-0" << "\t"<<Mpu.timed << endl;
 		return -1;
@@ -141,11 +134,6 @@ int Megai2c::init()
 		cout << "Failed to acquire /dev/i2c-0 access and/or talk to slave." << "\t"<<Mpu.timed << endl;
 		return -1;
 	}
-	
-	
-	
-	
-	
 	//--------------------------------init sound & colors 
 	char buf[7];
 
@@ -158,27 +146,21 @@ int Megai2c::init()
 	buf[4] = 255;
 	buf[5] = 0;
 	buf[6] = 0;
-
 	write(fd, buf, 7);
-
-
 	shmPTR->sim800_reset_time = 0;
 
 	//mega_i2c.settings(300, 10, 5); упал 2019 07 10 при збое и резком  рывке
 	mega_i2c.settings(300, 10, 15);   //if not execute/ copters motors not start;
 	return 0;
-
-
 }
 
 void Megai2c::beep_code(uint8_t c) {
+	cout << "BEEP:" << (int)c << endl;
 	if (DO_SOUND) {
 		char chBuf[] = { 1,c };
 		write(fd, chBuf, 2);
 	}
 }
-
-
 
 void Megai2c::Buzzer(const bool on) {
 
@@ -221,8 +203,6 @@ void Megai2c::set_led_color(uint8_t n, uint8_t r, uint8_t g, uint8_t b) {
 		cout << "arduino write LED error" << Mpu.timed << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
-
-
 }
 void Megai2c::sim800_reset() {
 	char chBuf[] = { 1,16 };
@@ -254,9 +234,7 @@ bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с к
 	}
 	else
 		return false;
-
 }
-
 
 
 int Megai2c::get_gps(SEND_I2C *gps_d) {
@@ -334,14 +312,11 @@ int Megai2c::getiiiiv(char *iiiiv) {
 #define LED_MODS 3
 //против часовой стрелки с 3 ноги.
 
-
 #define RED 1,0,0
 #define GRN 0,1,0
 #define BLE 0,0,1
 #define BLK 0,0,0
 #define YEL 1,1,0
-
-
 
 const uint8_t collors[][8][3] = { 
 	{ { GRN },{ GRN },{ GRN },{ GRN },{ GRN },{ GRN },{ GRN },{ GRN } } ,// green
@@ -352,8 +327,9 @@ const uint8_t collors[][8][3] = {
 	{ { BLK },{ BLK },{ BLK },{ BLK },{ BLK },{ BLK },{ BLK },{ BLK } } // black
 };
 	
-
 void Megai2c::set_led_mode(uint8_t n, uint8_t briht, bool pulse) {
+	static uint32_t old_led_mode = 0;
+	static uint8_t pulse_f0 = 1;
 	static int cur_led_n = 8;
 	static double last_timed = 0;
 	static uint8_t pulse_f = 1;
@@ -364,17 +340,25 @@ void Megai2c::set_led_mode(uint8_t n, uint8_t briht, bool pulse) {
 		cur_led_n++;
 	}
 	else {
-		float dt = Mpu.timed - last_timed;
-		if (current_led_mode != n || dt > 0.1) {
-			if (pulse)
-				pulse_f ^= 1;
-			else
-				pulse_f = 1;
-
-			last_timed = Mpu.timed;
-			cur_led_n = 0;
-			current_led_mode = n;
-	}
+		if (pulse)
+			pulse_f0 ^= 1;
+		else
+			pulse_f0 = 1;
+		uint32_t t = n | (briht <<8) | (pulse_f0 <<16);
+		if (t != old_led_mode){
+			old_led_mode = t;
+			//cout << "LED "<<t << endl;
+			float dt = Mpu.timed - last_timed;
+			if (current_led_mode != n || dt > 0.1) {
+				if (pulse)
+					pulse_f ^= 1;
+				else
+					pulse_f = 1;
+				last_timed = Mpu.timed;
+				cur_led_n = 0;
+				current_led_mode = n;
+			}
+		}
 		
 		
 		

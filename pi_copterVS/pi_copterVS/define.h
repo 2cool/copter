@@ -20,7 +20,7 @@
 //#define DEBUG_MODE
 #define GPS_ALT_MAX_ERROR 30
 #define MAX_BAROMETR_ERRORS 40
-#define CALIBRATION_TIMEOUT 60
+
 
 #define WORK_WITH_WIFI
 #define LED_ON

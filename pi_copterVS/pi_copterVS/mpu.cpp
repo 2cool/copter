@@ -46,12 +46,8 @@ double  mpu_time_ ;
 #ifdef USE_KALMAN
 const int mn = 3; // Number of states
 const int m = 1; // Number of measurements
-Eigen::MatrixXd A(mn, mn); // System dynamics matrix
-Eigen::MatrixXd H(m, mn); // Output matrix
-Eigen::MatrixXd Q(mn, mn); // Process noise covariance
-Eigen::MatrixXd R(m, m); // Measurement noise covariance
-Eigen::MatrixXd P(mn, mn); // Estimate error covariance
-KalmanFilter* kf;
+
+KalmanFilter* kf[3];
 #endif
 
 
@@ -162,24 +158,40 @@ void MpuClass::init()
 
 
 #ifdef USE_KALMAN
-
+	Eigen::MatrixXd A(mn, mn); // System dynamics matrix
+	Eigen::MatrixXd H(m, mn); // Output matrix
+	Eigen::MatrixXd Q(mn, mn); // Process noise covariance
+	Eigen::MatrixXd R(m, m); // Measurement noise covariance
+	Eigen::MatrixXd P(mn, mn); // Estimate error covariance
 	//Z beg
 	// Discrete LTI projectile motion, measuring position only
 	A <<1, 0.005, 0,0, 1, 0.005,0, 0, 1;
 	H << 1, 0, 0;
 	// Reasonable covariance matrices
-#define newQ 0.001
-#define newR 0.2
-	Q <<newQ, newQ, .0,	newQ, newQ, .0,	.0, .0, .0;
-	R << newR;
+#define newQ4z 0.002
+#define newR4z 0.2
+	Q <<newQ4z, newQ4z, .0,	newQ4z, newQ4z, .0,	.0, .0, .0;
+	R << newR4z;
 	P <<.1, .1, .1,.1, 10000, 10,.1, 10, 100;
 	VectorXd B(mn);
 	B << 0, 0, 0;
-	kf = new KalmanFilter(A, B, H, Q, R, P);
+	kf[Z] = new KalmanFilter(A, B, H, Q, R, P);
 	Eigen::VectorXd x0(mn);
 	x0 << 0, 0, 0;
-	kf->init(x0);
+	kf[Z]->init(x0);
 	//Z end
+	//X beg
+#define newQ4x 0.05
+#define newR4x 1
+	Q << newQ4x, newQ4x, .0, newQ4x, newQ4x, .0, .0, .0, .0;
+	R << newR4x;
+	kf[X] = new KalmanFilter(A, B, H, Q, R, P);
+	kf[X]->init(x0);
+	//X end
+	//Y beg
+	kf[Y] = new KalmanFilter(A, B, H, Q, R, P);
+	kf[Y]->init(x0);
+	//X end
 
 #endif
 
@@ -637,22 +649,22 @@ void MpuClass::test_Est_Alt() {
 #ifdef USE_KALMAN
 
 	float static old_bar_alt = 0,old_accZ=0;
-	kf->A(3) = kf->A(7)= mpu_dt;
-	kf->B[2] = accZ - old_accZ;
+	kf[Z]->A(3) = kf[Z]->A(7)= mpu_dt;
+	kf[Z]->B[2] = accZ - old_accZ;
 	old_accZ = accZ;
 
 	if (alt != old_bar_alt) { 
 		old_bar_alt = alt;
-		Eigen::VectorXd y(m);
-		y << old_bar_alt;
-		kf->update(y);
+		Eigen::VectorXd z(m);
+		z << old_bar_alt;
+		kf[Z]->update(z);
 
 	}
 	else {
-		kf->update();
+		kf[Z]->update();
 	}
-	est_speedZ = kf->state()(1);
-	est_alt_ = kf->state()(0);
+	est_speedZ = kf[Z]->state()(1);
+	est_alt_ = kf[Z]->state()(0);
 	
 	//Debug.dump(est_alt_, est_speedZ, 0, 0);
 
@@ -728,7 +740,61 @@ float est_XError = 0, est_XErrorI = 0;
 float est_YError = 0, est_YErrorI = 0;
 #define ACC_Cr 10000.0f
 void MpuClass::test_Est_XY() {
-	//accX = 0.9;
+	
+
+#ifdef USE_KALMAN
+
+	static bool gps_bad = true;
+	if (GPS.loc.accuracy_hor_pos_ < MIN_ACUR_HOR_POS_2_START)
+		gps_bad = false;
+
+	if (gps_bad)
+		return;
+
+	w_accX = (-cosYaw * accX + sinYaw * accY); //relative to world
+	w_accY = (-cosYaw * accY - sinYaw * accX);
+
+	float static old_X = 0, old_accX = 0,old_Y,old_accY;
+
+	//XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+	kf[X]->A(3) = kf[X]->A(7) = mpu_dt;
+	kf[X]->B[2] = w_accX - old_accX;
+	old_accX = w_accX;
+
+	if (GPS.loc.dX != old_X) {
+		old_X = GPS.loc.dX;
+		Eigen::VectorXd x(m);
+		x << old_X;
+		kf[X]->update(x);
+	}
+	else 
+		kf[X]->update();
+
+	est_speedX = kf[X]->state()(1);
+	estX = kf[X]->state()(0);
+	//YYYYYYYYYYYYYYYYYYYYYYYYYY
+	kf[Y]->A(3) = kf[Y]->A(7) = mpu_dt;
+	kf[Y]->B[2] = w_accY - old_accY;
+	old_accY = w_accY;
+
+	if (GPS.loc.dY != old_Y) {
+		old_Y = GPS.loc.dY;
+		Eigen::VectorXd y(m);
+		y << old_Y;
+		kf[Y]->update(y);
+	}
+	else
+		kf[Y]->update();
+
+	est_speedY = kf[Y]->state()(1);
+	estY = kf[Y]->state()(0);
+	//double t[] = { estX, est_speedX, estY, est_speedY };
+
+	
+#else
+
+	
+//accX = 0.9;
 	//accY = 0.5;
 	if (GPS.loc.dX == 0 && GPS.loc.dY == 0) {
 		est_XError = est_XErrorI = est_YError = est_YErrorI = 0;
@@ -739,15 +805,8 @@ void MpuClass::test_Est_XY() {
 	float e_ex = (-cosYaw * est_XError - sinYaw * est_YError); //relative to copter xy
 	float e_ey = (-cosYaw * est_YError + sinYaw * est_XError);
 	
-	/*
 
-	est_XErrorI += e_ex;
-	est_XErrorI = constrain(est_XErrorI, -ACC_Cr, ACC_Cr);
-	est_YErrorI += e_ey;
-	est_YErrorI = constrain(est_YErrorI, -ACC_Cr, ACC_Cr);
-	float c_accX = accX + est_XErrorI / ACC_Cr;
-	float c_accY = accY + est_YErrorI / ACC_Cr;
-	*/
+	
 	est_XErrorI += (e_ex - est_XErrorI)*0.0001;
 	//est_XErrorI = constrain(est_XErrorI, -1, 1);
 	float c_accX = accX + est_XErrorI;
@@ -774,6 +833,15 @@ void MpuClass::test_Est_XY() {
 	estY += (GPS.loc.dY - estY)*XY_KF_DIST;
 	est_speedY += (GPS.loc.speedY - est_speedY)*XY_KF_SPEED;
 	
+	//Debug.dump(estX, t[0], estY, t[2]);
+
+#endif
+
+
+
+
+
+
 	//Debug.load(0, Mpu.w_accX, Mpu.w_accY);
 	//Debug.dump();
 }

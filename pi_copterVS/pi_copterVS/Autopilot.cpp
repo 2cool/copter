@@ -21,7 +21,8 @@ THG out of Perimetr high
 //при shift yaw на 180 грудусов летает в обратном направление при управлении наклоном телефона
 //при старте его кидает в сторону. наверное проблема в необнулении стаб спид
 
-
+#define CALIBRATION_TIMEOUT 60
+static double oldTimed = 0;
 
 #define WIND_X 10
 #define WIND_Y 10
@@ -78,6 +79,10 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 
 	if (init_shmPTR())
 		return;
+
+
+	cout << "TIME NOW " << (int)(millis()/1000) << endl;
+
 #ifdef FLY_EMULATOR
 	Emu.init(WIND_X, WIND_Y, WIND_Z);
 #endif
@@ -286,9 +291,14 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 		}
 			
 	}
-
-	if (Mpu.timed<30 || Mpu.acc_callibr_timed > Mpu.timed)
+	
+	if (Mpu.timed<CALIBRATION_TIMEOUT || Mpu.acc_callibr_timed > Mpu.timed) {
 		mega_i2c.set_led_mode(2, 5, true);
+		if (Mpu.timed > oldTimed) {
+			oldTimed = Mpu.timed + 1;
+			cout << "calibration 60s: now is - " << (int)Mpu.timed << endl;
+		}
+	}
 	else {
 
 		if (motors_is_on() == false) {
@@ -602,7 +612,10 @@ beep codes
 bool AutopilotClass::motors_do_on(const bool start, const string msg){////////////////////////  M O T O R S  D O  ON  /////////////////////////////////////////////////////////////////////////
 
 	cout << msg << "-";
-	
+	if (oldTimed < CALIBRATION_TIMEOUT) {
+		system("reboot");
+		return false;
+	}
 	if (start){
 		//printf( "\MS5611 err: %f\n",MS5611.getErrorsK());
 #ifndef FLY_EMULATOR

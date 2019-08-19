@@ -392,7 +392,7 @@ int Graph::decode_Log() {
 
 
 
-
+		/*
 		if (flags[FILTER]==false)//кастиль
 		if (control_bits & 1) {
 			if (zeroEstX == 0 && zeroEstY == 0) {
@@ -400,7 +400,7 @@ int Graph::decode_Log() {
 				zeroEstY = sensors_data[n - 2].sd[SY];
 			}
 		}
-		
+		*/
 			
 
 		sensors_data[n].sd[SX] = mpu.estX+zeroEstX;

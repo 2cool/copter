@@ -73,14 +73,14 @@ int GPS_Loger::decode(/*SEND_I2C*p, */byte buf[], int i, int len, bool rotate ) 
 		float speedX = *(float*)& buf[i]; i += 4;
 		gy = *(float*)& buf[i]; i += 4;
 		float speedY = *(float*)& buf[i]; i += 4;
-
+		/*
 		if (speedX == 0 && speedY == 0) {  //кастиль
 			return 0;
-		}
+		}*/
 		gspeedX = speedX;
 		gspeedY = speedY;
 	}
-
+	
 
 
 	double distance = mymath.distance_(n_lat, n_lon, lat, lon);

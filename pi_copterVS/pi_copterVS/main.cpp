@@ -58,7 +58,7 @@ Igor Toocool, [27.06.17 00:15]
 root@skx:~# update-rc.d pi_copter defaults
 */
  
-#define PROG_VERSION "ver 3.190811\n"
+#define PROG_VERSION "ver 3.190819\n"
 #define SIM800_F
 
 //при стартре замерять вибрацию после чего делать корекцию или вообще запрещать полет при сильной вибрации
@@ -356,8 +356,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 	init_millis_micros();
-	if (millis() > 31000)
-		return 0;
+
 
 	shmPTR->in_fly = (shmPTR->control_bits&MOTORS_ON);
 	shmPTR->wifi_cnt = 0;
