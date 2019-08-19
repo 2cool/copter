@@ -612,10 +612,7 @@ beep codes
 bool AutopilotClass::motors_do_on(const bool start, const string msg){////////////////////////  M O T O R S  D O  ON  /////////////////////////////////////////////////////////////////////////
 
 	cout << msg << "-";
-	if (oldTimed < CALIBRATION_TIMEOUT) {
-		system("reboot");
-		return false;
-	}
+	
 	if (start){
 		//printf( "\MS5611 err: %f\n",MS5611.getErrorsK());
 #ifndef FLY_EMULATOR
