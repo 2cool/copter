@@ -41,16 +41,9 @@ double  mpu_time_ ;
 
 //3G
 
-
-
-#ifdef USE_KALMAN
 const int mn = 3; // Number of states
 const int m = 1; // Number of measurements
-
 KalmanFilter* kf[3];
-#endif
-
-
 
 static const float f_constrain(const float v, const float min, const float max){
 	return constrain(v, min, max);
@@ -127,6 +120,7 @@ void MpuClass::log_emu() {
 
 }
 //-----------------------------------------------------
+double newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.05, newR4xy = 1;
 //-----------------------------------------------------
 void MpuClass::init()
 {
@@ -155,9 +149,6 @@ void MpuClass::init()
 	oldmpuTimed = mpu_time_ = 0.000001*micros();
 
 
-
-
-#ifdef USE_KALMAN
 	Eigen::MatrixXd A(mn, mn); // System dynamics matrix
 	Eigen::MatrixXd H(m, mn); // Output matrix
 	Eigen::MatrixXd Q(mn, mn); // Process noise covariance
@@ -168,8 +159,6 @@ void MpuClass::init()
 	A <<1, 0.005, 0,0, 1, 0.005,0, 0, 1;
 	H << 1, 0, 0;
 	// Reasonable covariance matrices
-#define newQ4z 0.002
-#define newR4z 0.2
 	Q <<newQ4z, newQ4z, .0,	newQ4z, newQ4z, .0,	.0, .0, .0;
 	R << newR4z;
 	P <<.1, .1, .1,.1, 10000, 10,.1, 10, 100;
@@ -181,10 +170,8 @@ void MpuClass::init()
 	kf[Z]->init(x0);
 	//Z end
 	//X beg
-#define newQ4x 0.05
-#define newR4x 1
-	Q << newQ4x, newQ4x, .0, newQ4x, newQ4x, .0, .0, .0, .0;
-	R << newR4x;
+	Q << newQ4xy, newQ4xy, .0, newQ4xy, newQ4xy, .0, .0, .0, .0;
+	R << newR4xy;
 	kf[X] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[X]->init(x0);
 	//X end
@@ -192,15 +179,6 @@ void MpuClass::init()
 	kf[Y] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[Y]->init(x0);
 	//X end
-
-#endif
-
-
-
-
-
-
-
 
 	cout << "Initializing MPU6050\n";
 
@@ -258,8 +236,12 @@ string MpuClass::get_set(){
 	
 	
 	ostringstream convert;
-	convert << "0,0";
-		
+
+	convert << \
+		newQ4xy << "," << \
+		newR4xy << "," << \
+		newQ4z << "," << \
+		newR4z;
 	
 	string ret = convert.str();
 	return string(ret);
@@ -271,31 +253,34 @@ void MpuClass::set(const float  *ar){
 	int i = 0;
 	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK){
 		int error = 0;
-		/*
+		
 		float t;
 
-		t = DRAG_K;
+		t = (float)newQ4xy;
 		if (error += Settings._set(ar[i++], t) == 0)
-			DRAG_K = t;
-		t = _0007;
+			newQ4xy = t;
+		t = newR4xy;
 		if (error += Settings._set(ar[i++], t) == 0)
-			_0007 = t;
-		t = tiltPower_CF;
+			newR4xy = t;
+		t = newQ4z;
 		if (error += Settings._set(ar[i++], t) == 0)
-			tiltPower_CF = t;
+			newQ4z = t;
+		t = newR4z;
+		if (error += Settings._set(ar[i++], t) == 0)
+			newR4z = t;
+
 		cout << "mpu set:\n";
-		//int ii;
-		if (error == 0){
-			//for (ii = 0; ii < i; ii++){
-			//	Out.cout << ar[ii]); Out.cout << ",");
-			//}
-			//Out.println(ar[ii]);
-			cout << "OK\n";
-		}
-		else{
-			cout << "ERROR to big or small. P=" << error << endl;
-		}
-		*/
+		if (error == 0) {
+			kf[X]->Q(0) = kf[X]->Q[1] = kf[X]->Q(3) = kf[X]->Q(4) = newQ4xy;
+			kf[X]->Q(0) = kf[X]->Q[1] = kf[X]->Q(3) = kf[X]->Q(4) = newQ4xy;
+			kf[Z]->Q(0) = kf[Z]->Q[1] = kf[Z]->Q(3) = kf[Z]->Q(4) = newQ4z;
+			kf[X]->R(0) = kf[Y]->R(0) = newR4xy;
+			kf[Z]->R(0) = newR4z;
+			for (uint8_t ii = 0; ii < i; ii++) 
+				cout << ar[ii] << ",";
+			}
+			else
+				cout << "ERROR to big or small. P=" << error << endl;
 	}
 	else{
 		cout << "ERROR\n";
@@ -643,10 +628,6 @@ void MpuClass::test_Est_Alt() {
 
 	
 	float alt = MS5611.alt();
-	   	 	
-
-
-#ifdef USE_KALMAN
 
 	float static old_bar_alt = 0,old_accZ=0;
 	kf[Z]->A(3) = kf[Z]->A(7)= mpu_dt;
@@ -667,37 +648,6 @@ void MpuClass::test_Est_Alt() {
 	est_alt_ = kf[Z]->state()(0);
 	
 	//Debug.dump(est_alt_, est_speedZ, 0, 0);
-
-#else
-	if (timed<8) {
-		est_alt_ = alt;
-		est_speedZ = 0;
-		return;
-	}
-	
-	float acc = accZ + AltErrorI;
-	
-	est_alt_ += mpu_dt*(est_speedZ + acc*mpu_dt*0.5f);
-	est_speedZ += acc*mpu_dt;
-
-	//est_speedZ += acc * mpu_dt;
-	//est_alt_ += est_speedZ * mpu_dt;
-
-	est_alt_ += (alt - est_alt_)*Z_CF_DIST;
-	est_speedZ += (MS5611.speed - est_speedZ)*Z_CF_SPEED;
-
-	AltErrorI += (alt - est_alt_ - AltErrorI)*0.0001;
-	AltErrorI = constrain(AltErrorI, -1, 1);
-
-
-	//Debug.load(0, AltErrorI, alt - est_alt_,est_alt_);
-	//Debug.dump(true);
-
-//	AltError = alt - est_alt_;
-//	AltErrorI += AltError;
-//	AltErrorI = constrain(AltErrorI, -10000.0f, 10000.0f);
-
-#endif
 
 #ifdef FLY_EMULATOR
 	if (alt <= 0) {
@@ -740,9 +690,6 @@ float est_XError = 0, est_XErrorI = 0;
 float est_YError = 0, est_YErrorI = 0;
 #define ACC_Cr 10000.0f
 void MpuClass::test_Est_XY() {
-	
-
-#ifdef USE_KALMAN
 
 	static bool gps_bad = true;
 	if (GPS.loc.accuracy_hor_pos_ < MIN_ACUR_HOR_POS_2_START)
@@ -791,51 +738,6 @@ void MpuClass::test_Est_XY() {
 	//double t[] = { estX, est_speedX, estY, est_speedY };
 
 	
-#else
-
-	
-//accX = 0.9;
-	//accY = 0.5;
-	if (GPS.loc.dX == 0 && GPS.loc.dY == 0) {
-		est_XError = est_XErrorI = est_YError = est_YErrorI = 0;
-		estX = estY = est_speedX = est_speedY = 0;
-	}
-	est_XError = GPS.loc.dX - estX;
-	est_YError = GPS.loc.dY - estY;
-	float e_ex = (-cosYaw * est_XError - sinYaw * est_YError); //relative to copter xy
-	float e_ey = (-cosYaw * est_YError + sinYaw * est_XError);
-	
-
-	
-	est_XErrorI += (e_ex - est_XErrorI)*0.0001;
-	//est_XErrorI = constrain(est_XErrorI, -1, 1);
-	float c_accX = accX + est_XErrorI;
-
-	est_YErrorI += (e_ey - est_YErrorI)*0.0001;
-	//est_YErrorI = constrain(est_YErrorI, -1, 1);
-	float c_accY = accY + est_YErrorI;
-
-
-
-	
-	w_accX = (-cosYaw*c_accX + sinYaw*c_accY); //relative to world
-	w_accY = (-cosYaw*c_accY - sinYaw*c_accX);
-
-	//--------------------------------------------------------estimate
-	estX += mpu_dt*(est_speedX + w_accX * mpu_dt*0.5f);
-	est_speedX += (w_accX*mpu_dt);
-	estY += mpu_dt*(est_speedY + w_accY * mpu_dt*0.5f);
-	est_speedY += (w_accY*mpu_dt);
-	// -------------------------------------------------------corection
-	estX += (GPS.loc.dX - estX)*XY_KF_DIST;
-	est_speedX += (GPS.loc.speedX - est_speedX)*XY_KF_SPEED;
-	//--------------------------------------------------------
-	estY += (GPS.loc.dY - estY)*XY_KF_DIST;
-	est_speedY += (GPS.loc.speedY - est_speedY)*XY_KF_SPEED;
-	
-	//Debug.dump(estX, t[0], estY, t[2]);
-
-#endif
 
 
 

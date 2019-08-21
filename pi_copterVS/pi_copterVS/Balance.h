@@ -71,7 +71,7 @@ class BalanceClass
 
 
 
-string get_set(int n=0);
+string get_set();
 void set(const float  *ar,int n=0);
 
 	void init();

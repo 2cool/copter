@@ -32,7 +32,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             {0.2,0.2,0.2,0.2,0.2,0.2,0.2,1,0.2,0.2},
             {0.2,0.2,0.2,0.2,0.2,0.2,1,0.2,0.2,0.2},
             {0.2,0.2,0.2,0.2,0.2,0.2,1,0.2,0.2,0.2},
-            {1,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
+            {0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
             {0.2,10,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
             {0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2}
 
@@ -49,7 +49,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             // secure
             {"high_to_lift_2_home","max_throttle","min_throttle","sens_xy","sens_z","min_hight","lift at start","debug_n",_null,_null},//,"gimbP_Z","gimbR_Z"},
             // mpu
-            {_null,_null,_null,_null,_null,_null,_null,_null,_null,_null},
+            {"Q_XY","R_XY","Q_Z","R_Z",_null,_null,_null,_null,_null,_null},
             //compas
             {"m power on,1,0,100","yaw_correction",_null,_null,_null,_null,_null,_null,_null,_null},
             //rest

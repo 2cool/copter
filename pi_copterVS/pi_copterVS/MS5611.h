@@ -82,12 +82,6 @@ public:
 	
 
 	int8_t i_readTemperature;
-	
-	float speed;
-
-	
-
-
 	double getAltitude(const double pres);
 
 	float get_pressure(float h);
@@ -112,7 +106,6 @@ private:
 	float oldAltt;
 	int bar_task;
 	uint64_t b_timeDelay;
-	double old_timed;
 	uint8_t bar_D[3];
 	int  bar_h;
 	char bar_zero;

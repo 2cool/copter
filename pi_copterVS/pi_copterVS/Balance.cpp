@@ -166,24 +166,21 @@ void BalanceClass::init()
 }
 
 
-string BalanceClass::get_set(int n){
+string BalanceClass::get_set(){
 	
 	ostringstream convert;
-	if (n == 0) {
-		convert << \
-			pids[PID_PITCH_RATE].kP() << "," << \
-			pids[PID_PITCH_RATE].kI() << "," << \
-			pids[PID_PITCH_RATE].imax() << "," << \
-			pitch_roll_stabKP << "," << \
-			pids[PID_YAW_RATE].kP() << "," << \
-			pids[PID_YAW_RATE].kI() << "," << \
-			pids[PID_YAW_RATE].imax() << "," << \
-			yaw_stabKP << "," << \
-			max_angle;
-	}
-	else {
-		
-	}
+	
+	convert << \
+		pids[PID_PITCH_RATE].kP() << "," << \
+		pids[PID_PITCH_RATE].kI() << "," << \
+		pids[PID_PITCH_RATE].imax() << "," << \
+		pitch_roll_stabKP << "," << \
+		pids[PID_YAW_RATE].kP() << "," << \
+		pids[PID_YAW_RATE].kI() << "," << \
+		pids[PID_YAW_RATE].imax() << "," << \
+		yaw_stabKP << "," << \
+		max_angle;
+	
 	string ret = convert.str();
 	return string(ret);
 }

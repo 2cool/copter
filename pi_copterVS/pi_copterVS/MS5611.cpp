@@ -294,7 +294,6 @@ void MS5611Class::phase2() {
 
 		if (tP < 80000 || tP > 107000) {
 			cout << "PRESSURE ERROR " << tP << "\t"<<Mpu.timed << endl;
-			
 			error(33);
 			return;
 		}
@@ -303,29 +302,15 @@ void MS5611Class::phase2() {
 			P = tP;
 			ct = NORM_CT;
 		}
-		const double dt = 0.02;// (Mpu.timed - old_timed);
-		old_timed = Mpu.timed;
-
 		if (altitude_ == ALT_NOT_SET) {
 			pressure = P;
 			altitude_ =  getAltitude(pressure);	
 		}
-
-#ifdef USE_KALMAN
 		pressure = P;
-#else
-		pressure += ((double)P - pressure)*0.3;
-#endif
 		log_sens();
-		
-		const double new_altitude = getAltitude(pressure);
-
-		shmPTR->altitude_ = (int32_t)(new_altitude * 1000.0);
+		altitude_ = getAltitude(pressure);
+		shmPTR->altitude_ = (int32_t)(altitude_ * 1000.0);
 		shmPTR->pressure = pressure;
-
-		speed = (new_altitude - altitude_) / dt;
-		altitude_ = new_altitude;
-
 
 #ifdef Z_SAFE_AREA
 		if (Autopilot.motors_is_on() && (altitude_ - altitude_error) > Z_SAFE_AREA) {
