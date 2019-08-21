@@ -58,7 +58,7 @@ Igor Toocool, [27.06.17 00:15]
 root@skx:~# update-rc.d pi_copter defaults
 */
  
-#define PROG_VERSION "ver 3.190819\n"
+#define PROG_VERSION "ver 3.190821\n"
 #define SIM800_F
 
 //при стартре замерять вибрацию после чего делать корекцию или вообще запрещать полет при сильной вибрации
@@ -173,18 +173,6 @@ int setup(int cnt) {////--------------------------------------------- SETUP ----
 
 uint8_t teil = 0, maxTeilN = 3;
 
-
-
-uint64_t tt, maxTT = 0; \
-void print_time() {
-	\
-		uint64_t d = micros() - tt; \
-		if (d > maxTT) {
-			\
-				maxTT = d; \
-				cout << maxTT<<endl; \
-		}\
-}
 #ifndef WORK_WITH_WIFI
 bool foo_flag = false;
 uint32_t ttiimer = 0;
@@ -193,7 +181,7 @@ uint32_t ttiimer = 0;
 
 int cccccc_ss = 0;
 
-uint64_t old_time4loop;
+//uint64_t old_time4loop;
 bool temp4test = true;
 
 
@@ -207,7 +195,7 @@ bool loop()
 {
 	usleep(5000);
 #ifndef WORK_WITH_WIFI
-	if (temp4test && Autopilot.motors_is_on() == false && millis() > 2000) {
+	if (temp4test && Autopilot.motors_is_on() == false && (int)Mput.timed > 2) {
 		//Autopilot.motors_do_on(true, "FALSE WIFI");
 		//Mpu.new_calibration(false);
 		temp4test = false;
@@ -222,14 +210,14 @@ bool loop()
 
 #ifdef WORK_WITH_WIFI
 		Telemetry.loop();
-		Mpu.telem_timed = 0.000001*(double)micros();
+		Mpu.telem_timed = Mpu.timed;
 #endif
 		Commander.input();
-		Mpu.com_timed = 0.000001*(double)micros();
+		Mpu.com_timed = Mpu.timed;
 		Autopilot.loop();
-		Mpu.autopilot_timed = 0.000001*(double)micros();
+		Mpu.autopilot_timed = Mpu.timed;
 		//mega_i2c.gsm_loop();
-		if (shmPTR->sim800_reset_time > 0 && shmPTR->sim800_reset_time + 40000 < millis())
+		if (shmPTR->sim800_reset_time > 0 && shmPTR->sim800_reset_time + 40 < (uint32_t)Mpu.timed)
 			shmPTR->sim800_reset_time = 0;
 
 #ifdef FLY_EMULATOR
@@ -343,20 +331,9 @@ int main(int argc, char *argv[]) {
 			return 0;
 		}
 	}
-	{
-	//	const int i = string(argv[0]).find("pi_copterVS.out");
-		//if (i == -1) {
-		//	sleep(10);
-		//}
-	}
 
-#ifdef NDEBUG
-	sleep(10);
-
-#endif
-
-	init_millis_micros();
-
+	const double d_uptime = std::stod(exec("awk '{print $1}' /proc/uptime"));
+	
 
 	shmPTR->in_fly = (shmPTR->control_bits&MOTORS_ON);
 	shmPTR->wifi_cnt = 0;
@@ -369,93 +346,92 @@ int main(int argc, char *argv[]) {
 
 	thread tl(watch_dog);
 	tl.detach();
-
 	string fname;
-	
+	shmPTR->connected = 0;
+	shmPTR->fly_at_start = 3;
+	shmPTR->lowest_altitude_to_fly = 1.6f;
+	Debug.n_debug = 0;
 
-		shmPTR->connected = 0;
-		shmPTR->fly_at_start = 3;
-		shmPTR->lowest_altitude_to_fly = 1.6f;
-		Debug.n_debug = 0;
+	int counter = 0;
 
-		int counter = 0;
+	if (argc >= 2) {
+		int tt = string(argv[1]).compare("-help");
+		if (tt == 0) {
+			return printHelp();
+		}
+		if (argc >= 9) {
+			int t = atoi(argv[1]);
+			//t = constrain(t, 300, 300);/////
+			shmPTR->fly_at_start = 0.01f*(float)t;
 
-		if (argc >= 2) {
-			int tt = string(argv[1]).compare("-help");
-			if (tt == 0) {
-				return printHelp();
-			}
-			if (argc >= 9) {
-				int t = atoi(argv[1]);
-				//t = constrain(t, 300, 300);/////
-				shmPTR->fly_at_start = 0.01f*(float)t;
-
-				t = atoi(argv[2]);
-				shmPTR->lowest_altitude_to_fly = 0.01f*(float)t;
-				if (shmPTR->lowest_altitude_to_fly > shmPTR->fly_at_start)
-					shmPTR->lowest_altitude_to_fly = shmPTR->fly_at_start;
+			t = atoi(argv[2]);
+			shmPTR->lowest_altitude_to_fly = 0.01f*(float)t;
+			if (shmPTR->lowest_altitude_to_fly > shmPTR->fly_at_start)
+				shmPTR->lowest_altitude_to_fly = shmPTR->fly_at_start;
 #define LOG_COUNTER_NAME "/home/igor/logs/logCounter"
 
-				FILE *set = fopen(LOG_COUNTER_NAME, "r");
-				if (set) {
-					fscanf(set, "%i", &counter);
+			FILE *set = fopen(LOG_COUNTER_NAME, "r");
+			if (set) {
+				fscanf(set, "%i", &counter);
 
-					fclose(set);
-					usleep(500);
-					if (counter < 9999)
-					{
-						FILE *in;
-						char buff[512];
-
-						if (!(in = popen("ls /home/igor/logs", "r"))) {
-							return 1;
-						}
-						counter = 10000;
-						while (fgets(buff, sizeof(buff), in) != NULL) {
-							string s = string(buff);
-							int b = s.find_first_of("0123456789");
-							int e = s.find_first_of(".");
-							if (b > 0 && e + 4 > b) {
-								int cnt = stoi(s.substr(b, e));
-								if (cnt > counter)
-									counter = cnt;
-							}
-						}
-						fclose(in);
-					}
-					remove(LOG_COUNTER_NAME);
-				}
-				else {
-					cout << "no counter file";
-					return 0;
-				}
-				set = fopen(LOG_COUNTER_NAME, "w+");
-				fprintf(set, "%i\n", counter + 1);
 				fclose(set);
-				if (argv[3][0] == 'f' || argv[3][0] == 'F') {
-					stdout_file_ext = "/home/igor/logs/log_out" + to_string(counter);
-					fname = stdout_file_ext+".txt";
-					out = std::ofstream(fname.c_str()); //откроем файл для вывод
-					coutbuf = std::cout.rdbuf(); //запомним старый буфер
-					std::cout.rdbuf(out.rdbuf()); //и теперь все будет в файл!
+				usleep(500);
+				if (counter < 9999)
+				{
+					FILE *in;
+					char buff[512];
+
+					if (!(in = popen("ls /home/igor/logs", "r"))) {
+						return 1;
+					}
+					counter = 10000;
+					while (fgets(buff, sizeof(buff), in) != NULL) {
+						string s = string(buff);
+						int b = s.find_first_of("0123456789");
+						int e = s.find_first_of(".");
+						if (b > 0 && e + 4 > b) {
+							int cnt = stoi(s.substr(b, e));
+							if (cnt > counter)
+								counter = cnt;
+						}
+					}
+					fclose(in);
 				}
-				Log.writeTelemetry = (argv[4][0] == 'y' || argv[4][0] == 'Y');
-				shmPTR->wifi_run = start_wifi = (argv[5][0] == 'y' || argv[5][0] == 'Y');
-				start_inet = (argv[6][0] == 'y' || argv[6][0] == 'Y');
-				start_inet |= start_loger=(argv[7][0] == 'y' || argv[7][0] == 'Y');
-				start_inet |= start_telegram=(argv[8][0] == 'y' || argv[8][0] == 'Y');
-				shmPTR->internet_run = start_inet;
+				remove(LOG_COUNTER_NAME);
 			}
-
+			else {
+				cout << "no counter file";
+				return 0;
+			}
+			set = fopen(LOG_COUNTER_NAME, "w+");
+			fprintf(set, "%i\n", counter + 1);
+			fclose(set);
+			if (argv[3][0] == 'f' || argv[3][0] == 'F') {
+				stdout_file_ext = "/home/igor/logs/log_out" + to_string(counter);
+				fname = stdout_file_ext+".txt";
+				out = std::ofstream(fname.c_str()); //откроем файл для вывод
+				coutbuf = std::cout.rdbuf(); //запомним старый буфер
+				std::cout.rdbuf(out.rdbuf()); //и теперь все будет в файл!
+			}
+			cout << "UPTIME=" << d_uptime << endl;
+			uptime(true);
+			Log.writeTelemetry = (argv[4][0] == 'y' || argv[4][0] == 'Y');
+			shmPTR->wifi_run = start_wifi = (argv[5][0] == 'y' || argv[5][0] == 'Y');
+			start_inet = (argv[6][0] == 'y' || argv[6][0] == 'Y');
+			start_inet |= start_loger=(argv[7][0] == 'y' || argv[7][0] == 'Y');
+			start_inet |= start_telegram=(argv[8][0] == 'y' || argv[8][0] == 'Y');
+			shmPTR->internet_run = start_inet;
 		}
-		else
-			return printHelp();
+
+	}
+	else
+		return printHelp();
 
 
-		//---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-		cout << PROG_VERSION << endl;
-		cout << "start_seccons=" << get_start_sec() << endl;
-		cout << argv[0] << "\n"<< argv[1] << " " << argv[2] << " " << argv[3] << " " << argv[4] << " " << argv[5] << " " << argv[6] << " " << argv[7]<< " "<< argv[8] <<endl;
+	//---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	cout << PROG_VERSION << endl;
+
+	cout << argv[0] << "\n"<< argv[1] << " " << argv[2] << " " << argv[3] << " " << argv[4] << " " << argv[5] << " " << argv[6] << " " << argv[7]<< " "<< argv[8] <<endl;
 	
 	if (signal(SIGINT, handler) == SIG_ERR) {
 		return EXIT_FAILURE;
@@ -480,7 +456,7 @@ int main(int argc, char *argv[]) {
 	if (setup(counter) == 0) {
 		
 
-		old_time4loop = micros();
+	//	old_time4loop = micros_();
 
 		
 		shmPTR->reboot = 0;
@@ -500,13 +476,13 @@ int main(int argc, char *argv[]) {
 			if (loop()) {
 				shmPTR->main_cnt++;
 				//usleep(5400);
-			//	int ttt = micros();
+			//	int ttt = micros_();
 			//	dfr += ((1000000 / (ttt - old_time4loop)) - dfr)*0.01;
 			//	Debug.load(0, dfr, 0);
 			//	old_time4loop = ttt;
-				int64_t t = micros();
-				int32_t time_past = (int32_t)(t - old_time4loop);
-				old_time4loop = t;
+			//	int64_t t = micros_();
+			//	int32_t time_past = (int32_t)(t - old_time4loop);
+			//	old_time4loop = t;
 				//if (time_past > 15000)
 				//	printf("too long %i\n",time_past);
 

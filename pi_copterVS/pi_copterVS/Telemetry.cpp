@@ -105,7 +105,7 @@ void TelemetryClass::init_()
 	powerK = 1;
 	minimumTelemetry = false;
 	lov_voltage_cnt = 0;
-	//inner_clock_old_sec = millis() >> 10;
+
 	low_voltage = voltage50P=false;
 	message = "";
 	next_battery_test_timed = BAT_timeout;

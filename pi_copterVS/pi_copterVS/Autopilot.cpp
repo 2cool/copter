@@ -80,9 +80,6 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	if (init_shmPTR())
 		return;
 
-
-	cout << "TIME NOW " << (int)(millis()/1000) << endl;
-
 #ifdef FLY_EMULATOR
 	Emu.init(WIND_X, WIND_Y, WIND_Z);
 #endif
@@ -291,12 +288,17 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 		}
 			
 	}
-	
+	static double old_loop_time = 0;
+	if (Mpu.timed - old_loop_time > 0.07 && old_loop_time > 0)
+			cout << "loop delta:" << Mpu.timed - old_loop_time << " timeIS:" << Mpu.timed << endl;
+
+	old_loop_time = Mpu.timed;
+
 	if (Mpu.timed<CALIBRATION_TIMEOUT || Mpu.acc_callibr_timed > Mpu.timed) {
 		mega_i2c.set_led_mode(2, 5, true);
 		if (Mpu.timed > oldTimed) {
 			oldTimed = Mpu.timed + 1;
-			cout << "calibration 60s: now is - " << (int)Mpu.timed << endl;
+			//cout << "calibration 60s: now is - " << (int)Mpu.timed << endl;
 		}
 	}
 	else {
@@ -356,20 +358,15 @@ string AutopilotClass::get_set(){
 
 void AutopilotClass::set(const float ar[]){
 	cout << "Autopilot set\n";
-	int error = 1;
-
 	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK){
 		int i = 0;
-		error = 0;
-		
-		
-		error += Settings._set(ar[i++], height_to_lift_to_fly_to_home);
-		error += Balance.set_min_max_throttle(ar[i++], ar[i++]);
+		Settings.set(ar[i++], height_to_lift_to_fly_to_home);
+		Balance.set_min_max_throttle(ar[i++], ar[i++]);
 		//i += 2;
-		error += Settings._set(ar[i++], sens_xy);
-		error += Settings._set(ar[i++], sens_z);
-		error += Settings._set(ar[i++], lowest_height);
-		error += Settings._set(ar[i++], shmPTR->fly_at_start);
+		Settings.set(ar[i++], sens_xy);
+		Settings.set(ar[i++], sens_z);
+		Settings.set(ar[i++], lowest_height);
+		Settings.set(ar[i++], shmPTR->fly_at_start);
 		if (shmPTR->fly_at_start + 1 < lowest_height)
 			shmPTR->fly_at_start = lowest_height + 1;
 		Debug.n_debug = (int)ar[i++];
@@ -377,19 +374,14 @@ void AutopilotClass::set(const float ar[]){
 		//gimBalPitchZero= -constrain(ar[i],-15,15);i++;
 		//gimBalRollZero = -constrain(ar[i],-15,15);i++;
 		mega_i2c.gimagl(gimBalPitchZero, gimBalRollZero);
-		if (error == 0){
-			int ii = 0;
-			cout << "Save set:\n";
-
-			for (ii = 0; ii < i; ii++){
-				cout << ar[ii] << ",";
-			}
-			cout << ar[ii] << endl;
+		int ii = 0;
+		cout << "Save set:\n";
+		for (ii = 0; ii < i; ii++){
+			cout << ar[ii] << ",";
 		}
+		cout << ar[ii] << endl;
 	}
-	if (error>0){
-		cout << "ERROR\n";
-	}
+	
 }
 
 
@@ -618,7 +610,7 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 #ifndef FLY_EMULATOR
 		cout << "on ";
 		if (Mpu.timed < CALIBRATION_TIMEOUT) {
-			cout << "\n!!!calibrating!!! to end:"<< CALIBRATION_TIMEOUT -millis()/1000 <<" sec." << "\t"<<Mpu.timed << endl;
+			cout << "\n!!!calibrating!!! to end:"<< CALIBRATION_TIMEOUT -(int)Mpu.timed <<" sec." << "\t"<<Mpu.timed << endl;
 			mega_i2c.beep_code(B_MS611_ERROR);
 			return false;
 		}

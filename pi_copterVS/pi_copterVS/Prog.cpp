@@ -53,14 +53,14 @@ long zoom_time=0;
 uint8_t zoom_cam, old_zoom = -1, old_zoom1 = -1;
 
 bool zoom_control() {
-	if (zoom_time > 0 && millis() < zoom_time)
+	if (zoom_time > 0 && (long)Mpu.timed < zoom_time)
 		return true;
 	if (zoom_cam != old_zoom1) {
 		shmPTR->fpv_zoom = zoom_cam+1;
 		shmPTR->fpv_code = 0;
 		cout << "do_zoom "<< (int)zoom_cam<<endl;
 		old_zoom1 = zoom_cam;
-		zoom_time = millis() + 5000;
+		zoom_time = (long)Mpu.timed + 5;
 		return true;
 	}
 	zoom_time = 0;
@@ -89,16 +89,16 @@ void ProgClass::takePhoto360() {
 	static long cam_time = 0;
 	static float cam_yaw = 0,cam_pitch = 0;
 	if (cam_time == 0) {
-		cam_time = millis() + 6000;
+		cam_time = (long)Mpu.timed + 6;
 		cam_yaw = cam_pitch = 0;
 		Autopilot.setYaw(cam_yaw);
 		Autopilot.set_gimBalPitch(cam_pitch);
 		return;
 	}
-	if (millis() >= cam_time) {
+	if ((long)Mpu.timed >= cam_time) {
 		if (takePhoto() == false) {
 			Autopilot.setYaw(cam_yaw);
-			cam_time = millis() + 4000;
+			cam_time = (long)Mpu.timed + 4;
 			cam_yaw += 22.5;
 			if (cam_yaw > 360) {
 				if (cam_pitch == 0) {
@@ -106,7 +106,7 @@ void ProgClass::takePhoto360() {
 					cam_pitch += 30;
 					Autopilot.setYaw(cam_yaw);
 					Autopilot.set_gimBalPitch(cam_pitch);
-					cam_time = millis() + 6000;
+					cam_time = (long)Mpu.timed + 6;
 				}
 				else {
 					cam_time = 0;

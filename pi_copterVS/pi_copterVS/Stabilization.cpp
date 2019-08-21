@@ -238,30 +238,25 @@ string StabilizationClass::get_z_set() {
 void StabilizationClass::setZ(const float  *ar) {
 
 	uint8_t i = 0;
-	int error = 1;
 	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK) {
-		error = 0;
 		float t;
-		error += Settings._set(ar[i++], alt2speedZ);
+		Settings.set(ar[i++], alt2speedZ);
 		t = pids[SPEED_Z_PID].kP();
-		if ((error += Settings._set(ar[i++], t)) == 0)
-			pids[SPEED_Z_PID].kP(t);
+		Settings.set(ar[i++], t);
+		pids[SPEED_Z_PID].kP(t);
 		t = pids[SPEED_Z_PID].kI();
-		if ((error += Settings._set(ar[i++], t)) == 0)
-			pids[SPEED_Z_PID].kI(t);
-		error += Settings._set(ar[i++], max_speedZ_P);
-		error += Settings._set(ar[i++], max_speedZ_M);
-		error += Settings._set(ar[i++], Z_FILTER);
+		Settings.set(ar[i++], t);
+		pids[SPEED_Z_PID].kI(t);
+		Settings.set(ar[i++], max_speedZ_P);
+		Settings.set(ar[i++], max_speedZ_M);
+		Settings.set(ar[i++], Z_FILTER);
 	}
-	if (error == 0) {
-		cout << "Stabilization Z set:\n";
-		for (uint8_t ii = 0; ii < i; ii++) {
-			cout << ar[ii] << ",";
-		}
-		cout << endl;
+
+	cout << "Stabilization Z set:\n";
+	for (uint8_t ii = 0; ii < i; ii++) {
+		cout << ar[ii] << ",";
 	}
-	else
-		cout << "ERROR to big or small. P=" << error;
+	cout << endl;
 }
 
 
@@ -280,49 +275,25 @@ string StabilizationClass::get_xy_set() {
 	return string(ret);
 }
 void StabilizationClass::setXY(const float  *ar){
-
-	int error = 1;
 	uint8_t i = 0;
 	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK){
-
-		error = 0;
 		float t;
-		
-
-		error += Settings._set(ar[i++], dist2speed_XY);
+		Settings.set(ar[i++], dist2speed_XY);
 		t = pids[SPEED_X_SPEED].kP();
-		if ((error += Settings._set(ar[i++], t))==0)
+		Settings.set(ar[i++], t);
 			set_acc_xy_speed_kp(t);
 		t = pids[SPEED_X_SPEED].kI();
-		if ((error += Settings._set(ar[i++], t))==0)
+		Settings.set(ar[i++], t);
 			set_acc_xy_speed_kI(t);
-		error += Settings._set(ar[i++], max_speed_xy);
-		error += Settings._set(ar[i++], XY_FILTER);
+		Settings.set(ar[i++], max_speed_xy);
+		Settings.set(ar[i++], XY_FILTER);
 
 	}
-	if (error == 0) {
-		cout << "Stabilization XY set : \n";
-
-		for (uint8_t ii = 0; ii < i; ii++) {
-			cout << ar[ii] << ",";
-		}
-		cout << endl;
+	for (uint8_t ii = 0; ii < i; ii++) {
+		cout << ar[ii] << ",";
 	}
-	else
-		cout << "ERROR to big or small. P=" << error;
+	cout << endl;
 
-	
 }
-
-
-
-
-
-
-
-
-
-
-
 
 StabilizationClass Stabilization;

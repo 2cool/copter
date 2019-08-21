@@ -167,7 +167,7 @@ bool SettingsClass::load_(string buf, bool any_ch) {
 		Autopilot.set(load(buf, filds,false));//secure
 		break;
 	case 4:
-		//Mpu.set(load(buf, filds));
+		Mpu.set(load(buf, filds,true));
 		break;
 	case 5:
 		Hmc.set(load(buf, filds,false));
@@ -198,10 +198,9 @@ int SettingsClass::read() {
 }
 
 #define MAX_CHANGE 0.2
-uint8_t SettingsClass::_set(const float  val_, float &set) {
+void SettingsClass::set(const float  val_, float &set) {
 	if (any_change) {
 		set = val_;
-		return 0;
 	}
 
 	bool neg = false;
@@ -232,9 +231,6 @@ uint8_t SettingsClass::_set(const float  val_, float &set) {
 		}
 	}
 
-
-
-	return 0;
 }
 
 int SettingsClass::read_all() {

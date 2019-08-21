@@ -30,7 +30,7 @@ void EmuClass::battery(float m_current[], float &voltage) {
 
 	float voltage_sag = 0;
 	if (false_time == 0 && Autopilot.motors_is_on()) {
-		false_time = millis();
+		false_time = uptime();
 		false_voltage = MAX_VOLTAGE_AT_START;
 	}
 	if (false_time>0) {
@@ -39,8 +39,8 @@ void EmuClass::battery(float m_current[], float &voltage) {
 		powerKl *= powerKl;
 		voltage_sag = 16;
 		const float drawSpeed = 46.0 * powerKl / FALSE_TIME_TO_BATERY_OFF;
-		float dt = 0.001*(float)(millis() - false_time);
-		false_time = millis();
+		float dt = (float)(uptime() - false_time);
+		false_time = uptime();
 		false_voltage -= drawSpeed*dt;
 	}
 	const float a = false_voltage - voltage_sag;
@@ -183,7 +183,7 @@ float  EmuClass::get_accZ() {return (float)((pos[Z]<0?0:acc[Z]));}
 
 
 
-uint32_t timet = millis();
+uint32_t timet = uptime();
 int cnt = 0;
 int mid_f_noise_cnt = 15;
 int low_f_noise_cnt = 511;
@@ -197,8 +197,8 @@ float  EmuClass::get_alt() {
 
 #ifdef NOISE_ON
 	cnt++;
-	const float dt = 0.2;// (millis() - timet)*0.001;
-	timet = millis();
+	const float dt = 0.2;// (uptime() - timet);
+	timet = uptime();
 
 	float high_noise = 0.2 - 0.4*(float)(rand()) / (float)RAND_MAX;
 	if (cnt&mid_f_noise_cnt == mid_f_noise_cnt) {

@@ -19,10 +19,6 @@
 
 */
 
-
-
-
-
 //#include "Mem.h"
 
 
@@ -120,7 +116,7 @@ void MpuClass::log_emu() {
 
 }
 //-----------------------------------------------------
-double newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.05, newR4xy = 1;
+double newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.01, newR4xy = 5;
 //-----------------------------------------------------
 void MpuClass::init()
 {
@@ -146,7 +142,7 @@ void MpuClass::init()
 	vibration = 0;
 
 	q.w = 1; q.x = q.y = q.z = 0;
-	oldmpuTimed = mpu_time_ = 0.000001*micros();
+	oldmpuTimed = mpu_time_ = uptime();
 
 
 	Eigen::MatrixXd A(mn, mn); // System dynamics matrix
@@ -249,41 +245,34 @@ string MpuClass::get_set(){
 }
 //-----------------------------------------------------
 void MpuClass::set(const float  *ar){
-
-	int i = 0;
-	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK){
-		int error = 0;
-		
-		float t;
-
-		t = (float)newQ4xy;
-		if (error += Settings._set(ar[i++], t) == 0)
-			newQ4xy = t;
-		t = newR4xy;
-		if (error += Settings._set(ar[i++], t) == 0)
-			newR4xy = t;
-		t = newQ4z;
-		if (error += Settings._set(ar[i++], t) == 0)
-			newQ4z = t;
-		t = newR4z;
-		if (error += Settings._set(ar[i++], t) == 0)
-			newR4z = t;
-
-		cout << "mpu set:\n";
-		if (error == 0) {
-			kf[X]->Q(0) = kf[X]->Q[1] = kf[X]->Q(3) = kf[X]->Q(4) = newQ4xy;
-			kf[X]->Q(0) = kf[X]->Q[1] = kf[X]->Q(3) = kf[X]->Q(4) = newQ4xy;
-			kf[Z]->Q(0) = kf[Z]->Q[1] = kf[Z]->Q(3) = kf[Z]->Q(4) = newQ4z;
-			kf[X]->R(0) = kf[Y]->R(0) = newR4xy;
-			kf[Z]->R(0) = newR4z;
-			for (uint8_t ii = 0; ii < i; ii++) 
-				cout << ar[ii] << ",";
-			}
-			else
-				cout << "ERROR to big or small. P=" << error << endl;
+	if (Autopilot.motors_is_on()) {
+		cout << "mpu settings denied at fly !!! \n";
+		return;
 	}
-	else{
-		cout << "ERROR\n";
+	int i = 0;
+	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK) {
+		float t;
+		t = (float)newQ4xy;
+		Settings.set(ar[i++], t);
+		newQ4xy = t;
+		t = newR4xy;
+		Settings.set(ar[i++], t);
+		newR4xy = t;
+		t = newQ4z;
+		Settings.set(ar[i++], t);
+		newQ4z = t;
+		t = newR4z;
+		Settings.set(ar[i++], t);
+		newR4z = t;
+		kf[X]->Q(0) = kf[X]->Q(1) = kf[X]->Q(3) = kf[X]->Q(4) = newQ4xy;
+		kf[X]->Q(0) = kf[X]->Q(1) = kf[X]->Q(3) = kf[X]->Q(4) = newQ4xy;
+		kf[Z]->Q(0) = kf[Z]->Q(1) = kf[Z]->Q(3) = kf[Z]->Q(4) = newQ4z;
+		kf[X]->R(0) = kf[Y]->R(0) = newR4xy;
+		kf[Z]->R(0) = newR4z;
+		cout << "mpu set:\n";
+		for (uint8_t ii = 0; ii < i; ii++)
+			cout << ar[ii] << ",";
+		cout << endl;
 	}
 }
 //-----------------------------------------------------
@@ -333,7 +322,7 @@ void MpuClass::calc_corrected_ang(){
 
 bool MpuClass::loop(){
 
-	timed = (0.000001*(double)micros());
+	timed = (0.000001*(double)micros_());
 	double ___dt = (float)(timed - oldmpuTimed);// *div;
 	if (___dt < 0.01)
 		return false;
@@ -504,8 +493,14 @@ double gravity = 1;
 bool MpuClass::loop() {//-------------------------------------------------L O O P-------------------------------------------------------------
 	
 	bool ret = true;
-	timed = 0.000001*(double)micros();
+	timed = uptime();
 	mpu_dt = timed - mpu_time_;
+	if (mpu_dt >= 1) {
+		cout << "MPU DT to long:" << mpu_dt<<". uptime:"<<timed<<"\n";
+		mega_i2c.beep_code(B_MPU_TOO_LONG);
+		double uptime = std::stod(exec("awk '{print $1}' /proc/uptime"));
+		cout << "UPTIME=" << uptime << endl;
+	}
 	mpu_dt = constrain(mpu_dt,0.005, 0.03);
 	mpu_time_ = timed;
 	double old_tied = timed;

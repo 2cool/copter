@@ -189,64 +189,54 @@ string BalanceClass::get_set(){
 
 void BalanceClass::set(const float *ar, int n){
 	int i = 0;
-	int error=1;
 	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK){
-		error=0;
 		float t;
 		if (n == 0) {
 			t = pids[PID_PITCH_RATE].kP();
-			if ((error += Settings._set(ar[i++], t)) == 0) {
-				pids[PID_PITCH_RATE].kP(t);
-				pids[PID_ROLL_RATE].kP(t);
-			}
+			Settings.set(ar[i++], t);
+			pids[PID_PITCH_RATE].kP(t);
+			pids[PID_ROLL_RATE].kP(t);
+			
 			t = pids[PID_PITCH_RATE].kI();
-			if ((error += Settings._set(ar[i++], t)) == 0) {
-				pids[PID_PITCH_RATE].kI(t);
-				pids[PID_ROLL_RATE].kI(t);
-			}
+			Settings.set(ar[i++], t);
+			pids[PID_PITCH_RATE].kI(t);
+			pids[PID_ROLL_RATE].kI(t);
+			
 			t = pids[PID_PITCH_RATE].imax();
-			if ((error += Settings._set(ar[i++], t)) == 0) {
-				pids[PID_PITCH_RATE].imax(-t,t);
-				pids[PID_ROLL_RATE].imax(-t,t);
-			}
+			Settings.set(ar[i++], t);
+			pids[PID_PITCH_RATE].imax(-t,t);
+			pids[PID_ROLL_RATE].imax(-t,t);
+			
 
-			error += Settings._set(ar[i++], pitch_roll_stabKP);
+			Settings.set(ar[i++], pitch_roll_stabKP);
 
 			t = pids[PID_YAW_RATE].kP();
-			if ((error += Settings._set(ar[i++], t)) == 0) {
-				pids[PID_YAW_RATE].kP(t);
-			}
-			t = pids[PID_YAW_RATE].kI();
-			if ((error += Settings._set(ar[i++], t)) == 0) {
-				pids[PID_YAW_RATE].kI(t);
-			}
-			t = pids[PID_YAW_RATE].imax();
-			if ((error += Settings._set(ar[i++], t)) == 0) {
-				pids[PID_YAW_RATE].imax(-t,t);
-			}
-			t = yaw_stabKP;
-			if ((error += Settings._set(ar[i++], t)) == 0) {
-				yaw_stabKP = t;
-			}
-			t = max_angle;
-			if ((error += Settings._set(ar[i++], t)) == 0) {
-				max_angle = constrain(t, 15, 35);
-				Stabilization.setMaxAng();
-			}
+			Settings.set(ar[i++], t);
+			pids[PID_YAW_RATE].kP(t);
 			
+			t = pids[PID_YAW_RATE].kI();
+			Settings.set(ar[i++], t);
+			pids[PID_YAW_RATE].kI(t);
+			
+			t = pids[PID_YAW_RATE].imax();
+			Settings.set(ar[i++], t);
+			pids[PID_YAW_RATE].imax(-t,t);
+			
+			t = yaw_stabKP;
+			Settings.set(ar[i++], t);
+			yaw_stabKP = t;
+			
+			t = max_angle;
+			Settings.set(ar[i++], t);
+			max_angle = constrain(t, 15, 35);
+			Stabilization.setMaxAng();
 		}
 	}
-	if (error == 0){
-		cout << "balance set:\n";
-		for (uint8_t ii = 0; ii < i; ii++) {
-			cout << ar[ii] << ",";
-		}
-		cout << endl;
+	cout << "balance set:\n";
+	for (uint8_t ii = 0; ii < i; ii++) {
+		cout << ar[ii] << ",";
 	}
-	else{
-		cout << "ERROR to big or small. P="<<error;
-	}
-
+	cout << endl;
 }
 
 float BalanceClass::powerK(){

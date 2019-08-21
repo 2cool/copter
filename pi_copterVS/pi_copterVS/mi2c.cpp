@@ -206,7 +206,7 @@ void Megai2c::set_led_color(uint8_t n, uint8_t r, uint8_t g, uint8_t b) {
 }
 void Megai2c::sim800_reset() {
 	char chBuf[] = { 1,16 };
-	shmPTR->sim800_reset_time = millis();
+	shmPTR->sim800_reset_time = (uint32_t)Mpu.timed;
 	if (write(fd, chBuf, 2) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 		cout << "arduino write sim800 error" << Mpu.timed << endl;

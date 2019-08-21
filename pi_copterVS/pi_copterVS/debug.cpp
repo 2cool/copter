@@ -22,7 +22,7 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 	 }
 	 void DebugClass::dump(const float f1, float f2, float f3, float f4) {
 
-		 uint32_t t = millis();
+		 uint32_t t = millis_();
 		 if (t - old_time < d_delay)//20)
 			 return;
 		 old_time = t;
@@ -45,10 +45,10 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 
 	 void DebugClass::load(const uint8_t i, const float x, const float y) {
 		 if (d_old_t == 0) {
-			 d_old_t = micros();
+			 d_old_t = micros_();
 			 return;
 		 }
-		 uint64_t t = micros();
+		 uint64_t t = micros_();
 		 double dt = (double)(t - d_old_t);
 		 d_old_t = t;
 		 dt *= 0.000001;
@@ -64,10 +64,10 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 
 	 void DebugClass::load(const uint8_t i, const float x, const float y,const float z) {
 		 if (d_old_t == 0) {
-			 d_old_t = micros();
+			 d_old_t = micros_();
 			 return;
 		 }
-		 uint64_t t = micros();
+		 uint64_t t = micros_();
 		 double dt = (double)(t - d_old_t);
 		 d_old_t = t;
 		 dt *= 0.000001;
@@ -86,7 +86,7 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 	 void DebugClass::dump(bool thre) {//--------------------------------------------------------------
 		 if (n_debug > 9)
 			 return;
-		 uint32_t t = millis();
+		 uint32_t t = millis_();
 		 if (t - old_time < d_delay)//20)
 			 return;
 		 old_time = t;

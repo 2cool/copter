@@ -62,7 +62,7 @@ void GPSClass::loop(){
 
 
 
-	gpsttime = millis()/100;
+	gpsttime = millis_()/100;
 	
 	if (loc.mseconds != gpsttime)
 		loc.mseconds = gpsttime;
@@ -155,10 +155,10 @@ void GPSClass::loop(){
 		mega_i2c.beep_code(B_GPS_TOO_LONG);
 	}
 	if (Autopilot.motors_is_on() && Mpu.timed - loc.last_gps_accurasy_okd > NO_GPS_DATA) {
-		//printf( "gps accuracy error  %i\n", millis() / 1000);
+		//printf( "gps accuracy error  %i\n", (int)Mpu.timed);
 	}
 		
-	Mpu.gps_timed = 0.000001*(double)micros();
+	Mpu.gps_timed = Mpu.timed;
 }
 #endif
 

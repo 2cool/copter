@@ -55,13 +55,12 @@ using namespace std;
 #define HIGH 1
 #define Serial2 Serial
 #define Serial1 Serial
-__time_t get_start_sec();
-void  init_millis_micros();
-uint32_t millis_g(void);
-uint32_t millis(void);
-int64_t micros(void);
+uint32_t millis_();
+uint64_t micros_();
+double uptime(bool init = false);
 void delay(unsigned long);
 std::string exec(const std::string s);
+
 
 /*
 const char * dtostre(float f, string ch[], int n, int fl=0){

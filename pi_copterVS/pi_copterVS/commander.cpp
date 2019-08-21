@@ -122,27 +122,7 @@ bool CommanderClass::ButtonMessage(string msg){
 #endif
 
 	bool command_correct = false;
-/*
-	
-	if (msg.find(BEGIN_CONVERSATION) == 0){
-		if (Autopilot.lost_conection_time > 0){
-				
-			Autopilot.lost_conection_time = 0;
-			Telemetry.beginConversation();
-			reset_old();
-			res = true;
-		}
-		else{
-			//Autopilot.lost_conection_time = millis();
-		//	Autopilot.connectionLost_();
-			return false;
-		}
 
-			
-	}
-	else */
-	
-	
 
 	if (msg.find("UP") == 0 && msg[2] >= '0' && msg[2] <= '9'){
 		int_fast8_t n = (int_fast8_t)(msg[2] - '0');

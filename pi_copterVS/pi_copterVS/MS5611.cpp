@@ -119,14 +119,14 @@ void MS5611Class::log_sens() {
 #include "Balance.h"
 
 
-long ttimet = millis();
+long ttimet = millis_();
 uint8_t MS5611Class::loop(){
-	if (millis() - ttimet < 200)
+	if (millis_() - ttimet < 200)
 		return 0;
 
 
-	const float dt = 0.2;// (millis() - timet)*0.001;
-	ttimet = millis();
+	const float dt = 0.2;// (millis_() - timet)*0.001;
+	ttimet = millis_();
 		const float new_altitude = Emu.get_alt();
 
 	speed = (new_altitude - altitude_) / dt;
@@ -171,7 +171,7 @@ uint8_t MS5611Class::loop(){
 	default:
 		phase2();
 	}
-	Mpu.ms5611_timed = 0.000001*(double)micros();
+	Mpu.ms5611_timed = Mpu.timed;
 	return 0;
 }
 
@@ -197,13 +197,13 @@ void MS5611Class::phase0() {
 		return;
 	}
 
-	b_timeDelay = micros() + ct;
+	b_timeDelay = micros_() + ct;
 	bar_task = 1;
 }
 #define fc C
 void MS5611Class::phase1()
 {
-	if (micros()  > b_timeDelay) {
+	if (micros_()  > b_timeDelay) {
 		if (writeReg(bar_zero) == -1) {
 			error(21);
 			return;
@@ -236,13 +236,13 @@ void MS5611Class::phase1()
 			error(23);
 			return;
 		}
-		b_timeDelay = micros() + ct;
+		b_timeDelay = micros_() + ct;
 		
 	}
 }
 
 void MS5611Class::phase2() {
-	if (micros()  > b_timeDelay)
+	if (micros_()  > b_timeDelay)
 	{
 		bar_task = 0;
 		//openDev();
@@ -332,14 +332,12 @@ float MS5611Class::get_pressure(float h) {
 //-------------------------------------------init-------------------------
 int MS5611Class::init() {
 	oldAltt = 100000;
-	old_timed = 0;
 	bar_task = 0;
 	bar_zero = 0x0;
 	ct = NORM_CT;
 	
 
 	wrong_altitude_cnt = 0;
-	speed = 0;
 	altitude_ = ALT_NOT_SET;
 	//altitude_error = ALT_NOT_SET;
 
