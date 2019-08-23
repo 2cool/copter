@@ -66,17 +66,12 @@ class MpuClass
 	 enum{ ax_offset, ay_offset, az_offset, gx_offset, gy_offset, gz_offset };
 	// int16_t offset_[6];
 	 ////////////////////////////////////////////////////////////////////////////////////////
-	 float fx, fy, fz;
-	// float const_gyroRoll0, const_gyroPitch0, const_gyroYaw0;
-	 uint32_t gyroTime;
-	 
-	 
+
 	MPU6050 accelgyro;
-	 float h_yaw;
+
 	uint8_t gLPF;
 	//-----------------
-	
-	//------------------
+
 	float yaw_off;
 	float pitch, roll;
 	float est_alt_, est_speedZ;
@@ -93,9 +88,10 @@ private:
 	void test_Est_XY();
 	void rotateCW(float &x, float &y);
 	void rotateCCW(float &x, float &y);
+	double dt;
  public:
-	 float dist2home_2() { return get_Est_X()*get_Est_X() + get_Est_Y()*get_Est_Y(); }
-
+	 inline double get_dt() { return dt; }
+	 float dist2home();
 	 void getXYRelative2Zero(float&x, float&y) { x -= XatZero; y -= YatZero; }
 	// void set_cos_sin_dir();
 	// double dir_angle_GRAD, cosDirection, sinDirection;
@@ -109,13 +105,14 @@ private:
 	 void set_XYZ_to_Zero();
 
 	 float vibration;
-	 double acc_callibr_timed;
+	 int64_t acc_callibr_time;
 	 
 
-	 double timed,mpu_timed, gps_timed, hmc_timed, autopilot_timed,  ms5611_timed,telem_timed,com_timed;
+	 int64_t time,mpu_time, gps_time, hmc_time, autopilot_time,  ms5611_time,telem_time,com_time;
+
 
 	 float cor_c_pitch, cor_c_roll;
-	 double oldmpuTimed;
+	 int64_t oldmpuTime;
 
 
 	 float cosYaw,sinYaw;
@@ -135,7 +132,7 @@ private:
 	float  gyroPitch, gyroYaw, gyroRoll;
 	string get_set();
 	void set(const float  *ar);
-	double dt,rdt;
+	
     int16_t getGX();
 	void init();
 	bool loop();

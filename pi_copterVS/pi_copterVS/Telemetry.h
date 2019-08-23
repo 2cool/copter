@@ -17,8 +17,6 @@ class TelemetryClass
 {
  protected:
 	 float battery_charge;
-	 float consumed_charge;
-	 uint32_t power_on_time;
 	 uint8_t *buf;
 
 	 void loadBUF32(int &i, int32_t val);
@@ -32,7 +30,7 @@ class TelemetryClass
 	 
 	// uint8_t inner_clock_old_sec;
 	
-	 double next_battery_test_timed;
+	 int32_t next_battery_test_time;
 	  uint32_t pressure;
 	 float voltage,voltage_at_start;
 	 float m_current[4];
@@ -42,8 +40,6 @@ class TelemetryClass
 	 float full_power;
  public:
 	 float get_full_power() { return full_power; }
-	uint32_t get_power_on_time() { return power_on_time; }
-
 
 	 uint8_t no_time_cnt = 0;
 	 void update_voltage();

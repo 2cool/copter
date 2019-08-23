@@ -28,7 +28,7 @@ class AutopilotClass
 
  protected:
 
-	 float dist2home_at_begin2;
+	 float dist2home_at_begin;
 #ifdef FALL_IF_GPS_ALT_NOT_MATCH_BAROM_ALT_
 	 float gps_alt_at_begin, bar_alt_at_begin;
 #endif
@@ -37,7 +37,7 @@ class AutopilotClass
 	 float sens_z, sens_xy;
 
 	 bool newData;
-	 double controlDeltaTimed;
+	 int32_t control_DeltaTime;
 	 uint8_t go2homeIndex;
 	 float f_go2homeTimer;
  
@@ -71,10 +71,10 @@ class AutopilotClass
 	 int reboot();
 	 int shutdown();
 	 int exit();
-	 double  time_at_startd,old_time_at_startd;
+	 int32_t  time_at__start,old_time_at__start;
 	 void gimBalRollCorrection();
 	 bool busy() { return (control_bits & (MPU_ACC_CALIBR | MPU_GYRO_CALIBR | COMPASS_CALIBR)); }
-	 volatile double last_time_data_recived;
+	 volatile int32_t last_time_data__recived;
 	 void setYaw(const float yaw){aYaw_ = yaw;}
 	 float getGimbalPitch(){ return gimbalPitch; }
 	 void control_falling(const string msg);
@@ -82,8 +82,7 @@ class AutopilotClass
 	 void set_gimBalPitch(const float angle);
 
 	 float corectedAltitude4tel();
-	
-	 float start_timed;
+
 	void reset_compas_motors_calibr_bit() {control_bits &= (~COMPASS_MOTOR_CALIBR);}
 
 	bool motors_onState(){ return control_bits&MOTORS_ON; }
@@ -119,7 +118,7 @@ class AutopilotClass
 	// bool get_smart_cntr_flag(){ return smart_ctrl; }
 
 	 float gimBalPitchZero, gimBalRollZero, gimbalPitch;
-	 float height_to_lift_to_fly_to_home;
+	 float height_to_lift_to_fly_to_home = HIGHT_TO_LIFT_ON_TO_FLY_TO_HOME;
 
 	 bool going2HomeON(const bool hower);
 	 bool going2HomeStartStop(const bool hower);

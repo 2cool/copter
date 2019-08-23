@@ -8,8 +8,8 @@ import android.graphics.Rect;
 public class FlightTextInfo {
 
     public static final int LOC=0,_2HM=1,THR=2,CUR=3,VIBR=4,BAT=5,YAW=6,CAM_ANG=7,CAM_ZOOM=8,VSPEED=9,M_ON_T=10, MESGE=11;
-    final private String name[]={"","2HM: ","THR: ","CUR: ","VBR: ","BAT: ","YAW:","CAM: ","ZOOM: ","VSP: ","TIM:",  "MSG:"};
-    final private String unt[]={""," m",""," mAh",""," v"," ang"," ang",""," m/s"," s",  ""};
+    final private String name[]={"","2HM: ","THR: ","CUR: ","VBR: ","BAT: ","YAW:","CAM: ","ZOOM: ","VSP: ","",  "MSG:"};
+    final private String unt[]={""," m",""," mAh",""," v"," ang"," ang",""," m/s","",  ""};
 
     Rect r;
     final int FIELDS=12;

@@ -49,22 +49,22 @@ void SettingsClass::init()
 }
 
 
-uint32_t SettingsClass::writeBuf(uint8_t adr, float buf[], uint8_t len) {
+void SettingsClass::writeBuf(uint8_t adr, float buf[], uint8_t len) {
 	for (uint8_t i = 0; i < len; i++) {
 		writeAnything(i * 4 + adr, buf[i]);
 	}
 }
-uint32_t SettingsClass::readBuf(uint8_t adr, float buf[], uint8_t len) {
+void SettingsClass::readBuf(uint8_t adr, float buf[], uint8_t len) {
 	for (uint8_t i = 0; i < len; i++) {
 		readAnything(i * 4 + adr, buf[i]);
 	}
 }
-uint32_t SettingsClass::writeBuf(uint8_t adr, int16_t buf[], uint8_t len) {
+void SettingsClass::writeBuf(uint8_t adr, int16_t buf[], uint8_t len) {
 	for (uint8_t i = 0; i < len; i++) {
 		writeAnything(i * 2 + adr, buf[i]);
 	}
 }
-uint32_t SettingsClass::readBuf(uint8_t adr, int16_t buf[], uint8_t len) {
+void SettingsClass::readBuf(uint8_t adr, int16_t buf[], uint8_t len) {
 	for (uint8_t i = 0; i < len; i++) {
 		readAnything(i * 2 + adr, buf[i]);
 	}
@@ -264,7 +264,7 @@ int SettingsClass::read_all() {
 //replace 0, to 0.0, end add 1s to end and endl;
 string r0(string str) {
 	string nstr =  (str[0] == 0 && str[1] == ',')? "0.0":str.substr(0,1);
-	int i = 1;
+	uint i = 1;
 	for (; i < str.length()-1; i++) {
 		if (str.at(i - 1) == ',' && str.at(i) == '0' && str.at(i + 1) == ',')
 			nstr += "0.0";

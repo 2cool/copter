@@ -105,7 +105,7 @@ private:
 	int32_t P;
 	float oldAltt;
 	int bar_task;
-	uint64_t b_timeDelay;
+	int64_t b_timeDelay;
 	uint8_t bar_D[3];
 	int  bar_h;
 	char bar_zero;

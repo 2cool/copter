@@ -49,21 +49,21 @@ shmPTR->fpv_code = *(int16_t*)(buf + i);
 
 
 
-long zoom_time=0;
+int32_t zoom__time=0;
 uint8_t zoom_cam, old_zoom = -1, old_zoom1 = -1;
 
 bool zoom_control() {
-	if (zoom_time > 0 && (long)Mpu.timed < zoom_time)
+	if (zoom__time > 0 && millis_() < zoom__time)
 		return true;
 	if (zoom_cam != old_zoom1) {
 		shmPTR->fpv_zoom = zoom_cam+1;
 		shmPTR->fpv_code = 0;
 		cout << "do_zoom "<< (int)zoom_cam<<endl;
 		old_zoom1 = zoom_cam;
-		zoom_time = (long)Mpu.timed + 5;
+		zoom__time = millis_() + 5e3;
 		return true;
 	}
-	zoom_time = 0;
+	zoom__time = 0;
 	return false;
 }
 bool ProgClass::do_cam_action(const uint16_t code) {
@@ -86,19 +86,20 @@ void ProgClass::cameraZoom() { shmPTR->fpv_code = zoom_cam; }
 
 
 void ProgClass::takePhoto360() {
-	static long cam_time = 0;
+	static int32_t cam__time = 0;
 	static float cam_yaw = 0,cam_pitch = 0;
-	if (cam_time == 0) {
-		cam_time = (long)Mpu.timed + 6;
+	const int32_t _ct = millis_();
+	if (cam__time == 0) {
+		cam__time = _ct + 6e3;
 		cam_yaw = cam_pitch = 0;
 		Autopilot.setYaw(cam_yaw);
 		Autopilot.set_gimBalPitch(cam_pitch);
 		return;
 	}
-	if ((long)Mpu.timed >= cam_time) {
+	if (_ct >= cam__time) {
 		if (takePhoto() == false) {
 			Autopilot.setYaw(cam_yaw);
-			cam_time = (long)Mpu.timed + 4;
+			cam__time = _ct + 4e3;
 			cam_yaw += 22.5;
 			if (cam_yaw > 360) {
 				if (cam_pitch == 0) {
@@ -106,10 +107,10 @@ void ProgClass::takePhoto360() {
 					cam_pitch += 30;
 					Autopilot.setYaw(cam_yaw);
 					Autopilot.set_gimBalPitch(cam_pitch);
-					cam_time = (long)Mpu.timed + 6;
+					cam__time = _ct + 6e3;
 				}
 				else {
-					cam_time = 0;
+					cam__time = 0;
 					do_action = false;
 				}
 			}
@@ -150,16 +151,9 @@ void ProgClass::Do_Action() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ProgClass::loop(){
-
-	double dt = Mpu.timed - begin_timed;
-
-
-	float rdt = dt - old_dt;
-	if (rdt < MIN_DT)
-		return;
-
-	old_dt = dt;
-
+	const int32_t _ct = millis_();
+	float dt = 0.001*(_ct - begin_time);
+	
 	if (do_action)
 		Do_Action();
 
@@ -190,7 +184,7 @@ void ProgClass::loop(){
 	if (go_next && !do_action){
 		go_next = distFlag = altFlag = do_action = false;
 		if (load_next(true) == false){
-			cout << "PROG END" << "\t"<<Mpu.timed << endl;
+			cout << "PROG END" << "\t"<<(millis_()/1000) << endl;
 			Autopilot.start_stop_program(false);
 		}
 	}
@@ -205,8 +199,7 @@ bool ProgClass::program_is_OK(){
 	if (prog_data_size >= 14 && prog_steps_count_must_be == steps_count){
 		prog_data_index = 0;
 		time4step2done = 0;
-		old_dt = 0;
-		begin_timed = 0;
+		begin_time = 0;
 		next_x = Mpu.get_Est_X();
 		next_y = Mpu.get_Est_Y();
 		alt = Mpu.get_Est_Alt();
@@ -224,8 +217,8 @@ bool ProgClass::program_is_OK(){
 				time += timer;
 				
 				fullTime += time;
-				if (fullTime>timeLeft){//MAX_TIME_LONG_FLIGHT){
-					cout << "to long fly for prog!" <<" fly time="<<fullTime<<". Time left="<<timeLeft<<".\t"<<Mpu.timed << endl;
+				if (false){//fullTime>timeLeft){//MAX_TIME_LONG_FLIGHT){
+					cout << "to long fly for prog!" <<" fly time="<<fullTime<<". Time left="<<timeLeft<<".\t"<<(millis_()/1000) << endl;
 					Telemetry.addMessage(e_PROG_TOO_LONG_DISTANCE);
 					return false;
 				}
@@ -241,11 +234,11 @@ bool ProgClass::program_is_OK(){
 		const float y2 = next_y - Mpu.get_Est_Y();
 		const float dist = (float)sqrt(x2*x2 + y2*y2);
 		if (dist >= 20 || alt  >= 20){
-			cout << "end poitn to far from star!!!" << "\t"<<Mpu.timed << endl;
+			cout << "end poitn to far from star!!!" << "\t"<<(millis_()/1000) << endl;
 			Telemetry.addMessage(e_PROG_TOO_LONG_FROM_START);
 			return false;
 		}
-		cout << "time for flyghy: " << (int)fullTime << "\t"<<Mpu.timed << endl;
+		cout << "time for flyghy: " << (int)fullTime << "\t"<<(millis_()/1000) << endl;
 		return true;
 	}
 else
@@ -260,8 +253,7 @@ bool ProgClass::start(){
 		step_index = 0;
 		prog_data_index = 0;
 		time4step2done = 0;
-		old_dt = 0;
-		begin_timed = 0;
+		begin_time = 0;
 		next_x = Mpu.get_Est_X();
 		next_y = Mpu.get_Est_Y();
 		alt = Mpu.get_Est_Alt();
@@ -286,7 +278,7 @@ bool ProgClass::getIntersection(float &x, float &y){
 		return false;
 	}
 
-	float ks = 1;
+	//float ks = 1;
 
 	const float dist_ = Stabilization.get_dist2goal();
 
@@ -352,7 +344,7 @@ bool ProgClass::getIntersection(float &x, float &y){
 					Autopilot.off_throttle(false, e_TOO_STRONG_WIND);
 					return true;
 				}
-				ks = r / dist2line;
+				//ks = r / dist2line;
 			}
 			r = dist2line;
 			discriminant = (r*r*l2) - (D*D);
@@ -507,8 +499,7 @@ bool ProgClass::load_next(bool loadf) {
 	}
 
 	prog_data_index = wi;
-	begin_timed = Mpu.timed;
-	old_dt = 0;
+	begin_time = millis_();
 	need_speedX = need_speedY = 0;
 	return true;
 
@@ -593,12 +584,12 @@ bool ProgClass::add(byte*buf)
 	if (steps_count == 0){
 		prog_steps_count_must_be = *(uint16_t*)&buf[i];
 		i+=2;
-		//cout << "prog steps=" << prog_steps_count_must_be << "\t"<<Mpu.timed << endl;
+		//cout << "prog steps=" << prog_steps_count_must_be << "\t"<<(millis_()/1000) << endl;
 	}
 	
 	prog_data_size = pi;
 	steps_count++;
-	cout << steps_count << ". dot added! " << prog_data_size << "\t"<<Mpu.timed << endl;
+	cout << steps_count << ". dot added! " << prog_data_size << "\t"<<(millis_()/1000) << endl;
 	//Autopilot.program_is_loaded(prog_steps_count_must_be == steps_count);
 	if (prog_steps_count_must_be == steps_count) {
 		Autopilot.program_is_loaded(true);

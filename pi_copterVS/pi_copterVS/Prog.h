@@ -29,8 +29,9 @@ class ProgClass
 	 byte prog[PROG_MEMORY_SIZE];
 	 float speed_X, speed_Y, speed_Z;
 	 bool program_is_OK();
-	 float r_time,time4step2done,speed_corected_delta, old_dt;
-	 double begin_timed;
+	 float r_time,time4step2done,speed_corected_delta;
+
+	 int32_t begin_time;
 	 float max_speed_xy,timer;
 	 float max_speedZ_P, max_speedZ_M;
 	 void takePhoto360();

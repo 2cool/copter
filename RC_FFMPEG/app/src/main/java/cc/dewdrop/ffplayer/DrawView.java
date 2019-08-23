@@ -93,8 +93,21 @@ public class DrawView extends View {
         ftx.p[ftx.YAW]=Integer.toString((int)Telemetry.heading);
         ftx.p[ftx.CAM_ANG]=Integer.toString(Telemetry.gimbalPitch);
         ftx.p[ftx.CAM_ZOOM]=Integer.toString(Commander.fpv_zoom-1);
-        ftx.p[ftx.CUR]=Integer.toString((int)(Telemetry.current*Telemetry.batVolt*0.00001f))+"W "+Integer.toString((int)(Telemetry.battery_consumption / 3.6));
-        ftx.p[ftx.M_ON_T]=Integer.toString((int)(Commander.motors_on_time/1000));
+        ftx.p[ftx.CUR]=Integer.toString((int)(Telemetry.current*Telemetry.batVolt*0.00001f))+"W "+Integer.toString((int)(Telemetry.battery_consumption ));
+        if (Telemetry.start_time==0)
+            ftx.p[ftx.M_ON_T]="00:00:00";
+        else {
+            double sec= 0.001 * (System.currentTimeMillis() - Telemetry.start_time);
+            int h=(int)Math.floor(sec/3600);
+            String sh=((h<10)?"0":"")+h;
+            sec-=h*3600;
+            int m=(int)Math.floor(sec/60);
+            String sm=((m<10)?"0":"")+m;
+            sec-=m*60;
+            int s=(int)sec;
+            String ss=((s<10)?"0":"")+s;
+            ftx.p[ftx.M_ON_T] = ""+sh+":"+sm+":"+ss;
+        }
         v_speed +=0.03*(Telemetry.v_speed- v_speed);
         ftx.p[ftx.VSPEED]=constStrLen(Double.toString(v_speed),5);
 

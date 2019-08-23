@@ -30,7 +30,7 @@
 #define MAX_FLY_TIME 600
 #define BAT_ZERO 350.0f
 #define BAT_50P 385.0f
-#define BAT_timeout 0.05
+#define BAT__timeout 50
 #define BAT_timeoutRep  2
 //#define BAT_100P 422
 #define MAX_UPD_COUNTER 100
@@ -38,10 +38,10 @@
 #define BAT_Ampere_hour 3.5
 
 static float  f_current = 0;
-
+static float fly_time_lef = 0;
 void TelemetryClass::addMessage(const string msg, bool and2sms){
 
-	cout << msg << "\t"<<Mpu.timed << endl;;
+	cout << msg << "\t"<<(millis_()/1000) << endl;;
 	if (message.length() < msg.length() || message.compare(msg) == -1) {
 		message += msg;
 	}
@@ -91,7 +91,7 @@ void TelemetryClass::getSettings(int n){
 	//Out.println(message);
 
 }
-
+static float full_battery_charge;
 void TelemetryClass::init_()
 {
 	
@@ -99,42 +99,36 @@ void TelemetryClass::init_()
 	init_shmPTR();
 
 	buf = shmPTR->telemetry_buf;
-	uint32_t power_on_time = 0;
-	
-	
 	powerK = 1;
 	minimumTelemetry = false;
 	lov_voltage_cnt = 0;
 
 	low_voltage = voltage50P=false;
 	message = "";
-	next_battery_test_timed = BAT_timeout;
+	next_battery_test_time = BAT__timeout;
 	update_voltage();
 	SN = ((voltage < 1200) ? 3 : 4);
-		
-
 	newGPSData = false;
 	//Out.println("TELEMETRY INIT");
 	voltage_at_start = 0;
 	full_power = 0;
-	consumed_charge = 0;
-
-
-
-	battery_charge = BAT_Ampere_hour * 3600*  ((voltage- (BAT_ZERO*SN))/(70*SN));
+	double cur = ((voltage - (BAT_ZERO * SN)) / (70 * SN));
+	if (cur > 1)
+		cur = 1;
+	full_battery_charge=battery_charge = BAT_Ampere_hour *  cur ;
 }
 
 uint16_t data[5];
 
 void TelemetryClass::loop()
 {
-	
-	if (next_battery_test_timed<Mpu.timed){
-		next_battery_test_timed = Mpu.timed + BAT_timeout;
+	const int32_t _ct = millis_();
+	if (next_battery_test_time<_ct){
+		next_battery_test_time = _ct + BAT__timeout;
 		testBatteryVoltage();
 		uint16_t time_left = check_time_left_if_go_to_home();
 		if (Autopilot.progState() && time_left < 60 && ++no_time_cnt>3){ 
-			cout << "too far from HOME!" << "\t"<<Mpu.timed << endl;
+			cout << "too far from HOME!" << "\t"<<(millis_()/1000) << endl;
 			addMessage(e_BATERY_OFF_GO_2_HOME);
 			Autopilot.going2HomeStartStop(false);
 		}	
@@ -157,22 +151,18 @@ void TelemetryClass::loop()
 
 int TelemetryClass::get_voltage4one_cell() { return (int)(voltage / SN); }
 int TelemetryClass::fly_time_left() {
-	int fly_time=fmax(0,  battery_charge-consumed_charge);
-	fly_time = fmin(MAX_FLY_TIME, fly_time);
-	return fly_time;
+	return fly_time_lef;
 }
 int TelemetryClass::check_time_left_if_go_to_home(){
-	float time_left = fly_time_left();
+	float time_left=0;
 
 	if (Autopilot.motors_is_on()) {
-		const float dist2home = (float)sqrt(Mpu.dist2home_2());
+		const float dist2home = Mpu.dist2home();
 		const float time2home = dist2home * (1.0f / MAX_HOR_SPEED);
 		const float time2down = fabs((Mpu.get_Est_Alt()) * (1.0f / MAX_VER_SPEED_MINUS));
-		time_left -= (time2home + time2down);
+		time_left += (time2home + time2down);
 	}
-
-	return (int)time_left;
-
+	return fly_time_lef-time_left;
 }
 
 
@@ -263,19 +253,34 @@ Max Continuous Power 220 Watts
 }
 
 
-void TelemetryClass::testBatteryVoltage(){
-	static double old_timed = 0;
+void TelemetryClass::testBatteryVoltage() {
+	static int32_t old_time = millis_();
 	update_voltage();
 	//const double time_nowd = Mpu.timed;
-	double dt = Mpu.timed - old_timed;
-	if (dt > 1)
-		dt = 1;
-	old_timed = Mpu.timed;
+	const int32_t _ct = millis_();
+
+	double dt = 0.001 * (_ct - old_time);
+	old_time = _ct;
+	if (dt > 0.5)
+		dt = 0.5;
 	float current = (m_current[0] + m_current[1] + m_current[2] + m_current[3] + 0.64);
 
-	f_current += (current - f_current)*0.03;
-	consumed_charge += current *dt;
+	f_current += (current - f_current) * 0.03;
 
+
+	battery_charge -= (current * dt / 3600);
+	if (battery_charge < 0)
+		battery_charge = 0;
+
+
+	if (Autopilot.time_at__start) {
+		float fly_time = 0.001 * (millis_() - Autopilot.time_at__start);
+		if (fly_time > 15)
+			fly_time_lef = fly_time / (1 - (battery_charge / full_battery_charge)) - fly_time;
+		else
+			fly_time_lef = MAX_FLY_TIME - fly_time;
+		//cout << predict_fly_time << endl;
+	}
 	//printf("charge=%f, cons ch=%f, bat ch=%f\n", current,consumed_charge, battery_charge);
 
 	if (!Autopilot.motors_is_on())
@@ -341,7 +346,7 @@ bool gps_or_acuracy = false;
 
 
 
-uint32_t last_update_time=0;
+int32_t last_update_time=0;
 void TelemetryClass::update_buf() {
 	if (shmPTR->connected == 0 || shmPTR->telemetry_buf_len > 0)
 		return;
@@ -375,7 +380,7 @@ void TelemetryClass::update_buf() {
 
 
 	//----
-	loadBUF16(i, consumed_charge);
+	loadBUF16(i, battery_charge*1000);
 	loadBUF16(i, f_current *1000);
 	loadBUF16(i, Mpu.vibration * 1000);
 

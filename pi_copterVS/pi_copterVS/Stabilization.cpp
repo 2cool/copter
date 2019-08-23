@@ -112,7 +112,6 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 	if (speedX == 0) {
 		if (flagzx == false) {
 			flagzx = true;
-			float x, y;
 			needXR = needXV = Mpu.get_Est_X();
 		}
 	}
@@ -126,7 +125,6 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 	if (speedY == 0) {
 		if (flagzy == false) {
 			flagzy = true;
-			float x, y; 
 			needYV = needYR = Mpu.get_Est_Y();
 		}
 	}
@@ -148,7 +146,6 @@ float StabilizationClass::get_dist2goal(){
 //float old_gps_bearing = 0, cos_bear = 1,  sin_bear = 0;
 void StabilizationClass::XY(float &pitch, float&roll){//dont work 
 		float need_speedX, need_speedY;
-		static float naccXF = 0, naccYF = 0;
 		float tx, ty;
 		if (Autopilot.progState() && Prog.intersactionFlag) {
 			need_speedX = -Prog.need_speedX;
@@ -170,8 +167,8 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 	//	const float accX_C =  ((d_speedX * speed_2_acc_XY) - Mpu.w_accX)*acc_2_angle;
 	//	const float accY_C = ((d_speedY * speed_2_acc_XY) - Mpu.w_accY)*acc_2_angle;
 
-		const float w_pitch = -(pids[SPEED_X_SPEED].get_pid(d_speedX, Mpu.dt));
-		const float w_roll = pids[SPEED_Y_SPEED].get_pid(d_speedY, Mpu.dt);
+		const float w_pitch = -(pids[SPEED_X_SPEED].get_pid(d_speedX, Mpu.get_dt()));
+		const float w_roll = pids[SPEED_Y_SPEED].get_pid(d_speedY, Mpu.get_dt());
 
 		
 
@@ -196,7 +193,7 @@ float StabilizationClass::Z(){
 
 
 
-	float fZ = HOVER_THROTHLE +  pids[SPEED_Z_PID].get_pid(mc_z, Mpu.dt)*Balance.powerK();
+	float fZ = HOVER_THROTHLE +  pids[SPEED_Z_PID].get_pid(mc_z, Mpu.get_dt())*Balance.powerK();
 	return fZ;
 }
 

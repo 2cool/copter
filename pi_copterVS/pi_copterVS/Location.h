@@ -42,8 +42,7 @@ public:
 	double dX, dY, speedX, speedY,speedZ,startAlt,old_alt;
 	double dist2zero_2, x_from_zero_2_home, y_from_zero_2_home;
 	//---------------
-	double last_gps_data_timed;
-	double last_gps_accurasy_okd;
+	int32_t last_gps_data__time, last_gps_accuracy_ok;
 	
 	double bearing_(const double lat, const double lon, const double lat2, const double lon2);
 	void sin_cos(double &x, double &y, const double lat, const double lon, const double lat2, const double lon2);
@@ -72,7 +71,7 @@ private:
 	double set_cos_sin_dir();
 	void xy();
 	//double lat_needV_, lon_needV_, lat_needR_, lon_needR_;
-	double old_iTOWd;
+	int32_t old_time;
 	double mspeedx, mspeedy;
 
 

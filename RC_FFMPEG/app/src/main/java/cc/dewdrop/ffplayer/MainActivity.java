@@ -96,7 +96,11 @@ public class MainActivity extends Activity  implements SensorEventListener {
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-        Disk.close_();
+
+        Disk.save_location_("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt,((Telemetry.lost_time>0)?Telemetry.lost_time:System.currentTimeMillis()));
+         Disk.close_();
+
+
 
         super.finish();
         System.exit(0);
@@ -283,6 +287,7 @@ public static void verifyPermissions(Activity activity){
     }
 
 
+    static boolean dataloaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -328,8 +333,19 @@ public static void verifyPermissions(Activity activity){
         Telemetry.init();
         Telemetry.logThread_f=true;
         Telemetry.startlogThread();
-        Net.net_runing=true;
 
+
+        if (dataloaded == false) {
+            dataloaded = true;
+            if (Disk.load_location_("/sdcard/RC/lostCon_location.save")) {
+                Telemetry.lat = Disk._lat;
+                Telemetry.lon = Disk._lon;
+                Telemetry._alt = (float) Disk._alt;
+                Telemetry.start_time=Telemetry.lost_time=Disk._time;
+            }
+        }
+
+        Net.net_runing=true;
         // setWifiTetheringEnabled(true);
         Net.context=this;
         net=new Net(9876,1000);

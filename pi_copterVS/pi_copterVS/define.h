@@ -8,7 +8,7 @@
 //#define OFF_MOTOR_IF_LOST_CONNECTION  
 //#define OFF_TIMELAG
 //-----------------------------------------------------------------
-//#define FLY_EMULATOR
+#define FLY_EMULATOR
 //----------------------------------------------------------------
 //#define ALWAYS_SOUND
 //#define YAW_OFF
@@ -44,7 +44,7 @@
 
 //#define MAX_HIGHT_ERROR_TO_FALL 100
 #define MAX_DIST_ERROR_TO_FALL 200
-#define NO_GPS_DATA 10
+#define NO_GPS__DATA 10e3
 
 #define MIN_ACUR_HOR_POS_2_START 5
 #define MIN_ACUR_HOR_POS_4_JAMM 20
@@ -72,8 +72,8 @@
 #define OVER_THROTTLE 0.9f
 
 
-#define CONNECTION_LOST_TIMEOUT 5
-#define TIMEOUT_LAG 0.5
+#define CONNECTION_LOST__TIMEOUT 5e3
+#define TIMEOUT__LAG 500
 
 #define MIDDLE_POSITION 0.5f
 #define HOVER_THROTHLE 0.5

@@ -7,10 +7,9 @@ public class Telemetry {
     private static int  telemetry_couter=0;
     public static int get_counter(){return telemetry_couter;}
     static public int batVolt,current;
-    static public int motorsONtimer=0;
-    static public String motors_on_timer="00:00";
-    static private long oldTimeMS=0;
-    static private boolean hom_pos_is_loaded=false;
+    static public long start_time=0,lost_time=0;
+   // static public String motors_on_timer="00:00";
+    static public boolean hom_pos_is_loaded=false;
     static public double lat=0;
     static public double lon=0;
     static public int r_accuracy_hor_pos=99,r_acuracy_ver_pos=99;//когда включаем смартконтрол мощность меняестя. (исправить)
@@ -397,10 +396,11 @@ public class Telemetry {
         
         if (MainActivity.motorsOnF()){
             if (hom_pos_is_loaded == false) {
-                Disk.load_location("/sdcard/RC/start_location.save");
+                Disk.load_location_("/sdcard/RC/start_location.save");
                 start_lat=Disk._lat;
                 start_lon=Disk._lon;
-                motorsONtimer=(int)((System.currentTimeMillis()-Disk._time)/1000);
+                start_time=Disk._time;
+                Log.i("LOAD_LOC","tel="+start_time);
             }
         }else if (hom_pos_is_loaded==false)
             dist=0;
@@ -411,25 +411,15 @@ public class Telemetry {
             if (start_lat==0 && start_lon==0){
                 start_lat =  lat;
                 start_lon =  lon;
-                Disk.save_location("/sdcard/RC/start_location.save", lat, lon, _alt,System.currentTimeMillis());
+                start_time=System.currentTimeMillis();
+                Disk.save_location_("/sdcard/RC/start_location.save", lat, lon, _alt,start_time);
             }
-        }else
-            start_lat=start_lon=0;
-
-//fly time
-        if ((cur_time-oldTimeMS)>=1000) {
-            if (oldTimeMS == 0) {
-                oldTimeMS = cur_time;
-            }else {
-                if (MainActivity.motorsOnF()) {
-                    motorsONtimer += (int) ((cur_time - oldTimeMS) / 1000);
-                    int minutes=(int)Math.ceil(motorsONtimer/60);
-                    int seconds=motorsONtimer-minutes*60;
-                    motors_on_timer=minutes+":"+((seconds<10)?"0":"")+seconds;
-                }
-                oldTimeMS = cur_time;
-            }
+        }else {
+            start_lat = start_lon = 0;
+            start_time=0;
         }
+//fly time
+
 
 //dist speed
         if (old_Lat==0 && old_Lon==0) {

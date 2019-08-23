@@ -55,9 +55,9 @@ using namespace std;
 #define HIGH 1
 #define Serial2 Serial
 #define Serial1 Serial
-uint32_t millis_();
-uint64_t micros_();
-double uptime(bool init = false);
+int32_t millis_();
+int64_t micros_();
+
 void delay(unsigned long);
 std::string exec(const std::string s);
 

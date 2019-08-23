@@ -25,7 +25,7 @@
 #define delay_ms(a)    usleep(a*1000)
 
 
-double  mpu_time_ ;
+int64_t  mpu_time_ ;
 
 
 
@@ -41,11 +41,19 @@ const int mn = 3; // Number of states
 const int m = 1; // Number of measurements
 KalmanFilter* kf[3];
 
-static const float f_constrain(const float v, const float min, const float max){
-	return constrain(v, min, max);
-}
+//static const float f_constrain(const float v, const float min, const float max){
+//	return constrain(v, min, max);
+//}
 #define DIM 3
 //WiFiClass wi_fi;
+
+
+float MpuClass::dist2home() {
+	double x = get_Est_X();
+	double y = get_Est_Y();
+	double dist = sqrt(x * x + y * y);
+	return (float)dist;
+}
 
 float MpuClass::get_yaw() { return yaw; }
 //-----------------------------------------------------
@@ -71,7 +79,7 @@ void MpuClass::log() {
 	if (Log.writeTelemetry) {
 		Log.block_start(LOG::MPU_SENS);
 
-		Log.loaduint64t(timed *1000);//new
+		Log.loaduint64t(time / 1E3L);//new
 		Log.loadMem((uint8_t*)g, 6, false);
 		Log.loadMem((uint8_t*)a, 6, false);
 
@@ -116,7 +124,11 @@ void MpuClass::log_emu() {
 
 }
 //-----------------------------------------------------
+#ifdef FLY_EMULATOR
+double newQ4z = 0.1, newR4z = 0.2, newQ4xy = 0.1, newR4xy = 5;
+#else
 double newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.01, newR4xy = 5;
+#endif
 //-----------------------------------------------------
 void MpuClass::init()
 {
@@ -125,9 +137,9 @@ void MpuClass::init()
 	tiltPower_CF = 0.05;
 	altitude_at_zero = XatZero = YatZero = 0;
 	_0007=0.007;
-	acc_callibr_timed = 0;
+	acc_callibr_time = 0;
 	w_accX = w_accY = yaw_off = 0;
-	fx = fy = fz = sinPitch = sinRoll = 0;
+	sinPitch = sinRoll = 0;
 	yaw_offset = yaw = pitch = roll = gyroPitch = gyroRoll = gyroYaw = accX = accY = accZ = 0;
 
 	max_g_cnt = 0;
@@ -142,7 +154,7 @@ void MpuClass::init()
 	vibration = 0;
 
 	q.w = 1; q.x = q.y = q.z = 0;
-	oldmpuTimed = mpu_time_ = uptime();
+	oldmpuTime = mpu_time_ = micros_();
 
 
 	Eigen::MatrixXd A(mn, mn); // System dynamics matrix
@@ -322,19 +334,18 @@ void MpuClass::calc_corrected_ang(){
 
 bool MpuClass::loop(){
 
-	timed = (0.000001*(double)micros_());
-	double ___dt = (float)(timed - oldmpuTimed);// *div;
-	if (___dt < 0.01)
+	time = micros_();
+	double ___dt = (double)(time - oldmpuTime)*1e-6;
+	if (___dt < 0.005)
 		return false;
+	mpu_dt = dt;
+	oldmpuTime = time;
 	Hmc.loop();
 	MS5611.loop();
 	GPS.loop();
 	dt = 0.01;
-	rdt = 1.0 / dt;
-	mpu_dt = dt;
-	oldmpuTimed = timed;
-	if (dt > 0.02)
-		dt = 0.01;
+	if (dt > 0.01)
+		dt = 0.005;
 
 
 	pitch=Emu.get_pitch();
@@ -356,7 +367,7 @@ bool MpuClass::loop(){
 
 	yaw_offset += (wrap_PI(g_yaw - head) - yaw_offset)*0.0031f;
 
-	yaw = wrap_PI(g_yaw - yaw_offset+ yaw_correction_angle );
+	yaw = wrap_PI(g_yaw - yaw_offset);// +yaw_correction_angle );
 
 
 	sin_cos(pitch, sinPitch, cosPitch);
@@ -418,8 +429,6 @@ uint8_t GetGravity(VectorFloat *v, Quaternion_ *q) {
 
 float agpitch = 0, agroll = 0, agyaw = 0;
 int32_t cal_g_pitch = 0, cal_g_roll = 0, cal_g_yaw = 0,  cal_g_cnt = 0;
-uint64_t maxG_firs_time = 0;
-
 
 bool compas_flip = false;
 #define _2PI 6.283185307179586476925286766559
@@ -464,7 +473,7 @@ void MpuClass::test_vibration( float x,  float y,  float z){
 void MpuClass::gyro_calibr() {
 	if (Autopilot.motors_is_on() == false) {
 
-		if (timed < 30 || acc_callibr_timed > timed) {
+		if (time < 30E6L || acc_callibr_time > time) {
 
 			AHRS.setBeta(0.1);
 			if (cal_g_cnt == 0) {
@@ -484,33 +493,28 @@ void MpuClass::gyro_calibr() {
 		}
 	}
 }
-double gravity = 1;
-
-
-
-
 
 bool MpuClass::loop() {//-------------------------------------------------L O O P-------------------------------------------------------------
 	
 	bool ret = true;
-	timed = uptime();
-	mpu_dt = timed - mpu_time_;
+	time = micros_();
+	mpu_dt = (float)(time - mpu_time_) * 1e-6;
 	if (mpu_dt >= 1) {
-		cout << "MPU DT to long:" << mpu_dt<<". uptime:"<<timed<<"\n";
+		cout << "MPU DT to long:" << mpu_dt<<". uptime:"<<(time/1e6)<<"\n";
 		mega_i2c.beep_code(B_MPU_TOO_LONG);
 		double uptime = std::stod(exec("awk '{print $1}' /proc/uptime"));
 		cout << "UPTIME=" << uptime << endl;
 	}
-	mpu_dt = constrain(mpu_dt,0.005, 0.03);
-	mpu_time_ = timed;
-	double old_tied = timed;
+	mpu_dt = constrain(mpu_dt,0.002, 0.03);
+	mpu_time_ = time;
+	//double old_tied = timed;
 
-	double _dt = (timed - oldmpuTimed);
-	if (ret=(_dt >= 0.01)) {
+	double _dt = (double)(time - oldmpuTime) * 1e-6;
+	ret = (_dt >= 0.01);
+	if (ret) {
 		Hmc.loop();
-		oldmpuTimed = timed;
+		oldmpuTime = time;
 		dt = constrain(_dt, 0.01, 0.03);
-		rdt = 1.0 / dt;
 
 		static uint cnt2l = 0;
 		if (dt > 0.03) {
@@ -536,14 +540,6 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	float ax = n305 * 2 * (float)a[0];
 	float ay = n305 * 2 * (float)a[1];
 	float az = n305 * 2 * (float)a[2];
-	//if (az > 3)
-	//	cout<<"AZM\n" ;//??????????????????????????????????????
-
- 	gravity+=(sqrt(ax * ax + ay * ay + az * az)-gravity)*0.05;
-	if (gravity > 1.1 || gravity < 0.9) {
-		static int cntttttsss = 0;
-		//cout << cntttttsss++ << " gravity error\n";
-	}
 
 	AHRS.MadgwickAHRSupdate(q, GRAD2RAD * gyroRoll, GRAD2RAD * gyroPitch, GRAD2RAD * gyroYaw, ax, ay, az,  Hmc.fmx, Hmc.fmy, Hmc.fmz, mpu_dt);
 	//AHRS.MadgwickAHRSupdate(q, GRAD2RAD * gyroRoll, GRAD2RAD * gyroPitch, GRAD2RAD * gyroYaw, 0, 0, 10, Hmc.fmx, Hmc.fmy, -Hmc.fmz, mpu_dt);
@@ -596,7 +592,7 @@ void MpuClass::setDLPFMode_(uint8_t bandwidth){
 
 void MpuClass::new_calibration(const bool onlyGyro){
 
-	acc_callibr_timed = timed+10;
+	acc_callibr_time = time+10E6L;
 	gyro_calibratioan = true;
 }
 

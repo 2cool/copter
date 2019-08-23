@@ -148,7 +148,7 @@ public class Net {
 
     final int IP = 0;
     final int PORT = 1;
-    boolean dataloaded = false;
+
     static int threads_=0;
 
     public boolean runTCPClient(String ip_port) {
@@ -157,17 +157,7 @@ public class Net {
         boolean run =true;
         threads_++;
         DatagramSocket udpSocket=null;
-        if (dataloaded == false) {
-            dataloaded = true;
-            Disk.load_location("/sdcard/RC/lostCon_location.save");
-            Telemetry.lat=Disk._lat;
-            Telemetry.lon=Disk._lon;
-            Telemetry._alt=(float)Disk._alt;
-            Telemetry.motorsONtimer=(int)((System.currentTimeMillis()-Disk._time)/1000);
-            Disk.load_location("/sdcard/RC/start_location.save");
-            Telemetry.dist=Telemetry.dist(Disk._lat,Disk._lon,Telemetry.lat,Telemetry.lon);
 
-        }
         if (ip_port == null)
             return false;
         String s[] = ip_port.split(":");
@@ -204,7 +194,8 @@ public class Net {
                         if (offline_cnt++>3) {
                             run=false;
                             if (Commander.link)
-                                Disk.save_location("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt,System.currentTimeMillis());
+                                Telemetry.hom_pos_is_loaded=false;
+                                Disk.save_location_("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt,(Telemetry.lost_time=System.currentTimeMillis()));
                             Commander.link = false;
                             Log.d("UDP", "Error1:");
                         }
@@ -220,8 +211,8 @@ public class Net {
             Log.d("UDP", "Finally:");
             if (udpSocket!=null)
                 udpSocket.close();
-            if (Commander.link)
-                Disk.save_location("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt,System.currentTimeMillis());
+          //  if (Commander.link)
+
             Commander.link = false;
             if (MainActivity.drawView != null)
                 MainActivity.drawView.postInvalidate();

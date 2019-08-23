@@ -105,7 +105,7 @@ long oldtttttttttttt = 0;
 int cntttttttttt = 0;
 
 //bool tempp1 = false;
-//uint32_t taim0;
+//int32_t taim0;
 static const float f_constrain(const float v, const float min, const float max){
 	return constrain(v, min, max);
 }
@@ -138,7 +138,7 @@ void BalanceClass::init()
 	pitch_roll_stabKP = 2;
 	propeller_lost[0]= propeller_lost[1] = propeller_lost[2] = propeller_lost[3] = false;
 	//set_pitch_roll_pids(0.0017,  0.0001, 0.2);  //very old
-
+	old_time = micros_();
 
 	//set_pitch_roll_pids(0.001, 0.001, 0.3);  // 10
 	set_pitch_roll_pids(0.0012, 0.001, 0.3);//9
@@ -294,8 +294,7 @@ bool BalanceClass::set_min_max_throttle(const float max, const float min) {
 
 bool BalanceClass::loop()
 {
-	
-	//double c_timed = Mpu.timed;
+
 	if (!Mpu.loop()) {
 		MS5611.loop();
 		GPS.loop();
@@ -374,12 +373,15 @@ bool BalanceClass::loop()
 			const float yaw_max_delta = 0.2;
 			static float correction = 1;
 			//correction += (0.5 / fmin(throttle,0.5) - correction)*0.2;
-		
-			float pitch_output = pK*pids[PID_PITCH_RATE].get_pid(correction*(pitch_stab_output + Mpu.gyroPitch), Mpu.dt);
+			const int64_t _ct = micros_();
+			double dt = (_ct - old_time) * 1e-6;
+			dt = constrain(dt, 0.001, 0.03);
+			old_time = _ct;
+			float pitch_output = pK*pids[PID_PITCH_RATE].get_pid(correction*(pitch_stab_output + Mpu.gyroPitch), dt);
 			pitch_output = constrain(pitch_output, -max_delta, max_delta);
-			float roll_output = pK*pids[PID_ROLL_RATE].get_pid(correction*(roll_stab_output + Mpu.gyroRoll), Mpu.dt);
+			float roll_output = pK*pids[PID_ROLL_RATE].get_pid(correction*(roll_stab_output + Mpu.gyroRoll), dt);
 			roll_output = constrain(roll_output, -max_delta, max_delta);
-			float yaw_output = pK*pids[PID_YAW_RATE].get_pid(correction*(yaw_stab_output - Mpu.gyroYaw), Mpu.dt);
+			float yaw_output = pK*pids[PID_YAW_RATE].get_pid(correction*(yaw_stab_output - Mpu.gyroYaw), dt);
 			yaw_output = constrain(yaw_output, -yaw_max_delta, yaw_max_delta);
 
 #ifdef YAW_OFF
@@ -398,7 +400,7 @@ bool BalanceClass::loop()
 			}
 			else {
 #ifndef FLY_EMULATOR
-				if (Mpu.timed - Autopilot.time_at_startd < 5 || Autopilot.time_at_startd - Autopilot.old_time_at_startd > 8) {
+				if ((_ct - Autopilot.time_at__start) < 5e3L || (Autopilot.time_at__start - Autopilot.old_time_at__start) > 8e3L) {
 					f_[0] = f_[1] = f_[2] = f_[3] = throttle = true_throttle = 0.3;//
 					//if (Mpu.vibration > 3)
 						//Autopilot.off_throttle(true, "VBR");

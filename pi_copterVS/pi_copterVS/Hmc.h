@@ -97,7 +97,7 @@ class HmcClass
 
 	 float fmz, fmx, fmy;
 	 void start_motor_compas_calibr();
-	 double startTimed;
+	 int32_t startTime;
 	 int motor_index;
 	 bool do_compass_motors_calibr;
 	 float base[12];

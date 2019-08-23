@@ -21,8 +21,7 @@ THG out of Perimetr high
 //при shift yaw на 180 грудусов летает в обратном направление при управлении наклоном телефона
 //при старте его кидает в сторону. наверное проблема в необнулении стаб спид
 
-#define CALIBRATION_TIMEOUT 60
-static double oldTimed = 0;
+#define CALIBRATION__TIMEOUT 60e3
 
 #define WIND_X 10
 #define WIND_Y 10
@@ -84,9 +83,9 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	Emu.init(WIND_X, WIND_Y, WIND_Z);
 #endif
 	shmPTR->sim800_reset = false;
-	time_at_startd = old_time_at_startd = 0;
+	time_at__start = old_time_at__start = 0;
 	lowest_height = shmPTR->lowest_altitude_to_fly;
-	last_time_data_recived = 0;
+	last_time_data__recived = 0;
 	
 	Balance.init();
 	MS5611.init();
@@ -108,14 +107,7 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	old_control_bits = 0;
 	aPitch = aRoll = 0;
 
-//	for (int i = 0; i < 10; i++)
-//	while (MS5611.loop() != 0)
-//		delay(10);
-
-	controlDeltaTimed = 0;
-
 	gimBalPitchZero = gimBalRollZero= gimbalPitch=0;
-
 	mega_i2c.gimagl(gimBalPitchZero, gimBalRollZero);
 
 }
@@ -186,7 +178,7 @@ void AutopilotClass::smart_commander(const float dt){
 	//}
 }
 
-static double last_beep_timed = 0;
+static int32_t last_beep__time = 0;
 
 
 
@@ -194,12 +186,12 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 
 	
 	
-	
-	const float dt = Mpu.timed - controlDeltaTimed; 
-	if (dt < 0.05)
+	const int32_t _ct = millis_();
+	float dt = (float)((_ct - control_DeltaTime)*1e-3); 
+	if (dt < 0.033)
 		return;
-
-	controlDeltaTimed = Mpu.timed;
+	dt= constrain(dt, 0.033, 0.1);
+	control_DeltaTime = _ct;
 
 	if (shmPTR->control_bits_4_do)
 		set_control_bits(shmPTR->control_bits_4_do);
@@ -215,9 +207,9 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 
 #ifdef LOST_BEEP
 	
-	if (last_time_data_recived &&  GPS.loc.lat_zero!=0 && GPS.loc.lon_zero!=0  && Mpu.timed - last_time_data_recived>3 && Mpu.timed - last_beep_timed > 3) {
-		last_beep_timed = Mpu.timed;
-		if (Mpu.timed - last_time_data_recived < 5)
+	if (last_time_data__recived &&  GPS.loc.lat_zero!=0 && GPS.loc.lon_zero!=0  && (_ct - last_time_data__recived)>3e3 && (_ct - last_beep__time) > 3e3) {
+		last_beep__time = _ct;
+		if ((_ct - last_time_data__recived) < 5e3)
 			Telemetry.addMessage(e_LOST_CONNECTION);
 		mega_i2c.beep_code(B_CONNECTION_LOST);
 	}
@@ -253,17 +245,17 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 				go2HomeProc(dt);
 			}
 			else{
-				double timelag = Mpu.timed - last_time_data_recived;
-				if (last_time_data_recived && motors_is_on() && timelag > CONNECTION_LOST_TIMEOUT) {
+				int32_t timelag = _ct - last_time_data__recived;
+				if (last_time_data__recived && motors_is_on() && timelag > CONNECTION_LOST__TIMEOUT) {
 					connectionLost_();
 					return;
 				}
 #ifndef OFF_TIMELAG
-				if (timelag > TIMEOUT_LAG) {
-					float _timeout_LAG = TIMEOUT_LAG;
-					if (Mpu.get_Est_Alt() > 15 || Mpu.get_Est_Alt() / Mpu.get_Est_SpeedZ() > 5)
-						_timeout_LAG = 2;
-					if (timelag > _timeout_LAG)
+				if (timelag > TIMEOUT__LAG) {
+					int32_t _timeout__LAG = TIMEOUT__LAG;
+					if (Mpu.get_Est_Alt() > 15 || Mpu.get_Est_Alt() / (-Mpu.get_Est_SpeedZ()) > 5)
+						_timeout__LAG = 2e3;
+					if (timelag > _timeout__LAG)
 						Commander.data_reset();
 				}
 #endif
@@ -288,18 +280,9 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 		}
 			
 	}
-	static double old_loop_time = 0;
-	if (Mpu.timed - old_loop_time > 0.07 && old_loop_time > 0)
-			cout << "loop delta:" << Mpu.timed - old_loop_time << " timeIS:" << Mpu.timed << endl;
 
-	old_loop_time = Mpu.timed;
-
-	if (Mpu.timed<CALIBRATION_TIMEOUT || Mpu.acc_callibr_timed > Mpu.timed) {
+	if (_ct < CALIBRATION__TIMEOUT || Mpu.acc_callibr_time > micros_()) {
 		mega_i2c.set_led_mode(2, 5, true);
-		if (Mpu.timed > oldTimed) {
-			oldTimed = Mpu.timed + 1;
-			//cout << "calibration 60s: now is - " << (int)Mpu.timed << endl;
-		}
 	}
 	else {
 
@@ -349,17 +332,17 @@ string AutopilotClass::get_set(){
 		sens_z << "," << \
 		lowest_height << "," << \
 		shmPTR->fly_at_start << "," << \
-		Debug.n_debug;// << "," << \
-		-gimBalPitchZero << "," << \
-		-gimBalRollZero;
+		Debug.n_debug;// << "," << 
+	//	-gimBalPitchZero << "," << 
+	//	-gimBalRollZero;
 	string ret = convert.str();
 	return string(ret);
 }
 
 void AutopilotClass::set(const float ar[]){
 	cout << "Autopilot set\n";
+	int i = 0;
 	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK){
-		int i = 0;
 		Settings.set(ar[i++], height_to_lift_to_fly_to_home);
 		Balance.set_min_max_throttle(ar[i++], ar[i++]);
 		//i += 2;
@@ -374,8 +357,7 @@ void AutopilotClass::set(const float ar[]){
 		//gimBalPitchZero= -constrain(ar[i],-15,15);i++;
 		//gimBalRollZero = -constrain(ar[i],-15,15);i++;
 		mega_i2c.gimagl(gimBalPitchZero, gimBalRollZero);
-		int ii = 0;
-		cout << "Save set:\n";
+		int ii;
 		for (ii = 0; ii < i; ii++){
 			cout << ar[ii] << ",";
 		}
@@ -399,7 +381,7 @@ bool AutopilotClass::holdAltitude(float alt){
 	tflyAtAltitude = flyAtAltitude = alt;
 	control_bits |= Z_STAB;
 	//setbuf(stdout, NULL);
-	cout << "FlyAt: " << flyAtAltitude << "\t"<<Mpu.timed << endl;
+	cout << "FlyAt: " << flyAtAltitude << "\t"<<(millis_()/1000) << endl;
 
 	return true;
 }
@@ -429,7 +411,7 @@ enum{ JUMP = 0, HOWER = 1, GO_UP_OR_NOT = 2, TEST_ALT1 = 3, GO2HOME_LOC = 4, TES
 bool AutopilotClass::go2HomeProc(const float dt){
 	 switch (go2homeIndex){
 		case JUMP:{	
-			dist2home_at_begin2 = Mpu.dist2home_2();
+			dist2home_at_begin = Mpu.dist2home();
 			if (Mpu.get_Est_Alt() < 3)
 				holdAltitude(3);
 			go2homeIndex=HOWER;
@@ -444,7 +426,7 @@ bool AutopilotClass::go2HomeProc(const float dt){
 		}
 		case GO_UP_OR_NOT:{
 			const float accuracy = ACCURACY_XY + GPS.loc.accuracy_hor_pos_;
-			if (fabs(Mpu.get_Est_X()) <= accuracy && fabs(Mpu.get_Est_Y()) <= accuracy){
+			if (fabs(Mpu.get_Est_X()) <= accuracy && fabs(Mpu.get_Est_Y()) <= accuracy){ // if at home now
 				f_go2homeTimer = 6; //min time for stab
 				go2homeIndex = (Mpu.get_Est_Alt() <= (FAST_DESENDING_TO_HIGH)) ? SLOW_DESENDING : START_FAST_DESENDING;
 				Stabilization.setNeedPos2Home();
@@ -516,9 +498,10 @@ bool AutopilotClass::go2HomeProc(const float dt){
 			break;
 		}
 	 }
-
-	if (Mpu.dist2home_2() - dist2home_at_begin2 > (MAX_DIST_ERROR_TO_FALL*MAX_DIST_ERROR_TO_FALL)){
-		Autopilot.off_throttle(false, e_TOO_STRONG_WIND);
+	const float dist2H = Mpu.dist2home();
+	if (dist2H - dist2home_at_begin > MAX_DIST_ERROR_TO_FALL){
+		cout << dist2H-dist2home_at_begin<<" STRONG_WIND\n";
+		// Autopilot.off_throttle(false, e_TOO_STRONG_WIND);
 	}
 
 	return true;
@@ -535,7 +518,7 @@ bool AutopilotClass::going2HomeON(const bool hower){
 		control_bits |= GO2HOME;
 		f_go2homeTimer = 0;
 		//Out.println("Hanging on the site!");
-		cout << "go2home" << "\t"<<Mpu.timed << endl;
+		cout << "go2home" << "\t"<< (millis_() / 1000) << endl;
 		go2homeIndex=JUMP;
 	}
 	return res;
@@ -567,7 +550,7 @@ bool AutopilotClass::holdLocation(const long lat, const long lon){
 
 	
 		//GPS.loc.setNeedLoc(lat,lon);
-		cout << "Hower at: " << GPS.loc.lat_ << " " << GPS.loc.lon_ << "\t"<<Mpu.timed << endl;;
+		cout << "Hower at: " << GPS.loc.lat_ << " " << GPS.loc.lon_ << "\t"<< (millis_() / 1000) << endl;;
 
 		//Stabilization.init_XY(0, 0);
 		Stabilization.setNeedPos(Mpu.get_Est_X(), Mpu.get_Est_Y());
@@ -602,6 +585,7 @@ beep codes
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 bool AutopilotClass::motors_do_on(const bool start, const string msg){////////////////////////  M O T O R S  D O  ON  /////////////////////////////////////////////////////////////////////////
+	const int32_t _ct = millis_();
 
 	cout << msg << "-";
 	
@@ -609,8 +593,8 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 		//printf( "\MS5611 err: %f\n",MS5611.getErrorsK());
 #ifndef FLY_EMULATOR
 		cout << "on ";
-		if (Mpu.timed < CALIBRATION_TIMEOUT) {
-			cout << "\n!!!calibrating!!! to end:"<< CALIBRATION_TIMEOUT -(int)Mpu.timed <<" sec." << "\t"<<Mpu.timed << endl;
+		if (_ct < CALIBRATION__TIMEOUT) {
+			cout << "\n!!!calibrating!!! to end:"<< CALIBRATION__TIMEOUT -(int)(_ct / 1000) <<" sec." << "\t"<< (_ct / 1000) << endl;
 			mega_i2c.beep_code(B_MS611_ERROR);
 			return false;
 		}
@@ -623,25 +607,25 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 
 			if (Telemetry.low_voltage){
 				Telemetry.addMessage(e_LOW_VOLTAGE);
-				cout << " LOW VOLTAGE" << "\t"<<Mpu.timed << endl;
+				cout << " LOW VOLTAGE" << "\t"<< (_ct / 1000) << endl;
 				mega_i2c.beep_code(B_LOW_VOLTAGE);
 				return false;
 			}
 
 			if (Hmc.do_compass_motors_calibr==false && GPS.loc.accuracy_hor_pos_ > MIN_ACUR_HOR_POS_2_START ){
-				cout << " GPS error" << "\t"<<Mpu.timed << endl;
+				cout << " GPS error" << "\t"<< (_ct / 1000) << endl;
 				mega_i2c.beep_code(B_GPS_ACCURACY_E);
 				Telemetry.addMessage(e_GPS_ERROR);
 
 				if (not_start_motors_if_gps_error)
 					return false;
 			}
-			time_at_startd = Mpu.timed;
+			time_at__start = _ct;
 			Telemetry.update_voltage();
 			
 			control_bits |= MOTORS_ON;
 
-			cout << "OK" << "\t"<<Mpu.timed<<endl;
+			cout << "OK" << "\t"<< (_ct / 1000) <<endl;
 
 			GPS.loc.setHomeLoc();
 			Mpu.set_XYZ_to_Zero();  // все берем из мпу. при  старте x y z = 0;
@@ -658,8 +642,6 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 			Stabilization.resset_z();
 			Stabilization.resset_xy_integrator();
 			aYaw_ = -Mpu.get_yaw();
-			//fflush(Debug.out_stream);
-			start_timed = Mpu.timed;
 
 #ifdef DEBUG_MODE
 			printf( "\nhome loc: %i %i \nhome alt set %i\n", GPS.loc.lat_, GPS.loc.lon_, (int)flyAtAltitude);
@@ -685,18 +667,18 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 				mega_i2c.beep_code(5);
 
 			}
-			cout << " calibr FALSE" << "\t"<<Mpu.timed<<endl;
+			cout << " calibr FALSE" << "\t"<< (_ct / 1000) <<endl;
 		}
 	}//------------------------------OFF----------------
 	else {
-		old_time_at_startd = Mpu.timed;
-		
+		old_time_at__start = _ct;
+		time_at__start = 0;
 
 		cout << "off ";
 		Telemetry.addMessage(i_OFF_MOTORS);
 		off_throttle(true, msg);
 
-		cout << "OK" << "\t"<<Mpu.timed<<endl;
+		cout << "OK" << "\t"<< (_ct / 1000) <<endl;
 
 		//if (camera_mode) {//----------------------------------
 		//	thread t(stop_video);
@@ -721,12 +703,9 @@ void AutopilotClass::control_falling(const string msg){
 }
 
 bool AutopilotClass::off_throttle(const bool force, const string msg){/////////////////////////////////////////////////////////////////////////////////////////////////
-	
 	if ( force)
 	{
-
-
-		cout << "force motors_off " << msg << ", alt: " << (int)Mpu.get_Est_Alt() << ", time " << (int)Mpu.timed << endl;
+		cout << "force motors_off " << msg << ", alt: " << (int)Mpu.get_Est_Alt() << ", time " << (int)(millis_() / 1000) << endl;
 		Balance.set_off_th_();
 		Telemetry.addMessage(msg);
 		control_bits = DEFAULT_STATE;
@@ -750,6 +729,7 @@ bool AutopilotClass::off_throttle(const bool force, const string msg){//////////
 }
 
 void AutopilotClass::connectionLost_(){ ///////////////// LOST
+	const int32_t _ct = millis_();
 #ifdef FLY_EMULATOR
 	//if (true)
 	//	return;
@@ -759,7 +739,7 @@ void AutopilotClass::connectionLost_(){ ///////////////// LOST
 	shmPTR->commander_buf_len = 0;
 	shmPTR->telemetry_buf_len = 0;
 
-	cout << "connection lost" << "\t"<<Mpu.timed<<endl;
+	cout << "connection lost" << "\t"<<(_ct/1000)<<endl;
 	Telemetry.addMessage(e_LOST_CONNECTION);
 	Commander.controls2zero();
 
@@ -773,7 +753,7 @@ return;
 		if (go2homeState() == false && progState() == false) {
 			aPitch = aRoll = 0;
 
-			if (going2HomeON(true) == false && (Mpu.timed - last_time_data_recived) > (CONNECTION_LOST_TIMEOUT*3)) {
+			if (going2HomeON(true) == false && (_ct - last_time_data__recived) > (CONNECTION_LOST__TIMEOUT*3)) {
 				off_throttle(false, e_NO_GPS_2_LONG);
 			}
 		}
@@ -832,7 +812,7 @@ bool AutopilotClass::start_stop_program(const bool stopHere){
 				res &= holdLocation(GPS.loc.lat_, GPS.loc.lon_);
 				if (res) {
 					control_bits |= PROGRAM;
-					cout << "prog started" << "\t"<<Mpu.timed << endl;;
+					cout << "prog started" << "\t"<< (millis_() / 1000) << endl;;
 					return true;
 				}
 			}
@@ -857,7 +837,7 @@ bool AutopilotClass::set_control_bits(uint32_t bits) {
 		bool on = motors_is_on() == false;
 		on = motors_do_on(on, m_START_STOP);
 		if (on == false) {
-			cout << "motors on denied!"<< "\t"<<Mpu.timed<<endl;
+			cout << "motors on denied!"<< "\t"<<(millis_()/1000)<<endl;
 		}
 	}
 
@@ -886,7 +866,7 @@ bool AutopilotClass::set_control_bits(uint32_t bits) {
 	
 	//-----------------------------------------------
 	if (bits & (MPU_ACC_CALIBR | MPU_GYRO_CALIBR)) {
-		if (Mpu.timed > CALIBRATION_TIMEOUT) {
+		if (millis_() > CALIBRATION__TIMEOUT) {
 			control_bits |= (MPU_ACC_CALIBR | MPU_GYRO_CALIBR);
 			Mpu.new_calibration(!(bits&MPU_ACC_CALIBR));
 			control_bits &= (0xffffffff ^ (MPU_ACC_CALIBR | MPU_GYRO_CALIBR));
@@ -918,7 +898,7 @@ bool AutopilotClass::set_control_bits(uint32_t bits) {
 
 int  AutopilotClass::reboot() {
 	if (motors_is_on() == false) {
-		cout << "REBOOT" << "\t"<<Mpu.timed << endl;
+		cout << "REBOOT" << "\t"<<(millis_()/1000) << endl;
 		shmPTR->reboot = 1;
 		shmPTR->run_main = false;
 		return 0;
@@ -927,7 +907,7 @@ int  AutopilotClass::reboot() {
 }
 int  AutopilotClass::shutdown() {
 	if (motors_is_on() == false) {
-		cout << "SHUTD" << "\t"<<Mpu.timed << endl;
+		cout << "SHUTD" << "\t"<< (millis_() / 1000) << endl;
 		shmPTR->reboot = 2;
 		shmPTR->run_main = false;
 		return 0;
@@ -937,7 +917,7 @@ int  AutopilotClass::shutdown() {
 }
 int  AutopilotClass::exit() {
 	if (motors_is_on() == false) {
-		cout << "EXIT" << "\t"<<Mpu.timed << endl;
+		cout << "EXIT" << "\t"<< (millis_() / 1000) << endl;
 		shmPTR->reboot = 3;
 		shmPTR->run_main = false;
 		return 0;

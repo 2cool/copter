@@ -115,27 +115,17 @@ public class Disk {
     }
 
 
-    public static void saveLost_location(String fname,double lat, double lon, double alt){
-        // final File file = new File("/sdcard/RC/start_location.save");
-        try {
-            OutputStream os = new FileOutputStream(fname);//"/sdcard/RC/lost_location.save");
 
-            String t=lat+","+lon+","+alt+","+ _time;
-            os.write(t.getBytes());
-
-            os.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public static void save_location(String fname, double lat, double lon, double alt, long start_time){
+    public static void save_location_(String fname, double lat, double lon, double alt, long _time){
+        if (Telemetry.lat==0 && Telemetry.lon==0)
+            return;
         // final File file = new File("/sdcard/RC/start_location.save");
         try {
             OutputStream os = new FileOutputStream(fname);//"/sdcard/RC/start_location.save");
 
-            String t=lat+","+lon+","+alt+","+start_time;
+            String t=lat+","+lon+","+alt+","+_time;
             os.write(t.getBytes());
-
+            Log.i("LOAD_LOC","Save "+fname+" "+lat+" "+lon+" "+alt+" "+_time);
             os.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -145,7 +135,7 @@ public class Disk {
     public static double _lat, _lon, _alt;
     public static long _time;
 
-    public static boolean load_location(String fname){
+    public static boolean load_location_(String fname){
         final File file = new File(fname);//"/sdcard/RC/start_location.save");
         if (!file.exists()) {
             return false;
@@ -169,7 +159,7 @@ public class Disk {
             _lon =Double.parseDouble(s[1]);
             _alt =Double.parseDouble(s[2]);
             _time =Long.parseLong(s[3]);
-
+            Log.i("LOAD_LOC","LOAD "+fname+" "+_lat+" "+_lon+" "+_alt+" "+_time);
             is.close();
 
         } catch (Exception e) {
@@ -279,7 +269,7 @@ public class Disk {
 
     public static int close_(){
         try {
-
+            Disk.save_location_("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt,Telemetry.lost_time>0?Telemetry.lost_time:System.currentTimeMillis());
             Log.i("MSGG", "disk close");
 
 

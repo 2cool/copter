@@ -122,17 +122,17 @@ void LocationClass::updateXY(){
 }
 //////////////////////////////////////////////////////////////
 void LocationClass::proceed(SEND_I2C *d) {
-	last_gps_data_timed = Mpu.timed;
-	dt = last_gps_data_timed - old_iTOWd;
-	dt = (dt < 1.6) ? 0.1 : 0.2;
-	old_iTOWd = last_gps_data_timed;
+	last_gps_data__time = millis_();
+	dt = 0.001*(last_gps_data__time - old_time);
+	dt = (dt < 0.2) ? 0.1 : 0.2;
+	old_time = last_gps_data__time;
 
 #define REAL_GPS
 #ifdef REAL_GPS
 	shmPTR->accuracy_hor_pos_ = accuracy_hor_pos_ = (accuracy_hor_pos_ > 99) ? 99 : d->hAcc;
 	shmPTR->accuracy_ver_pos_ = accuracy_ver_pos_ = (accuracy_ver_pos_ > 99) ? 99 : d->vAcc;
 	if (accuracy_hor_pos_ < MIN_ACUR_HOR_POS_4_JAMM)
-		last_gps_accurasy_okd = Mpu.timed;
+		last_gps_accuracy_ok = last_gps_data__time;
 	shmPTR->gps_altitude_ = d->height;
 	altitude = 0.001*(double)d->height;
 	shmPTR->lat_ = lat_ = d->lat;
@@ -209,7 +209,7 @@ int LocationClass::init(){
 	
 #endif
 	mspeedx =  mspeedy = 0;
-	old_iTOWd = 0;
+	old_time = last_gps_data__time = last_gps_accuracy_ok = 0;
 	oldDist_2 = MAX_DIST2UPDATE + MAX_DIST2UPDATE;
 
 	dt = 0.1f;
@@ -227,10 +227,8 @@ int LocationClass::init(){
 	dt = 0.1f;
 	rdt = 10;
 	speedX = speedY = 0;
-	last_gps_data_timed = 10;
-	last_gps_accurasy_okd = 0;
-	
 	cout << "loc init\n";
+	return 0;
 }
 
 void LocationClass::setHomeLoc(){
@@ -273,7 +271,7 @@ double LocationClass::set_cos_sin_dir(){
 	//ErrorLog.println(angle*RAD2GRAD);
 //	cosDirection = fabs(cos(angle));
 //	sinDirection = fabs(sin(angle));
-	
+	return 0;
 }
 
 double LocationClass::bearing_(const double lat, const double lon, const double lat2, const double lon2){

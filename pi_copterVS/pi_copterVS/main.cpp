@@ -58,7 +58,7 @@ Igor Toocool, [27.06.17 00:15]
 root@skx:~# update-rc.d pi_copter defaults
 */
  
-#define PROG_VERSION "ver 3.190821\n"
+#define PROG_VERSION "ver 3.190822\n"
 #define SIM800_F
 
 //при стартре замерять вибрацию после чего делать корекцию или вообще запрещать полет при сильной вибрации
@@ -77,8 +77,6 @@ root@skx:~# update-rc.d pi_copter defaults
 #include  <stdio.h>
 #include  <stdlib.h>
 #include <sys/types.h>
-
-#include <stdio.h>
 
 #include "define.h"
 
@@ -136,11 +134,6 @@ int zzz = 1;
 
 int setup(int cnt) {////--------------------------------------------- SETUP ------------------------------
 	Log.init(cnt);
-	
-
-	Settings.read();
-	
-
 	cout << "___setup___\n";
 
 #ifdef WORK_WITH_WIFI
@@ -163,9 +156,6 @@ int setup(int cnt) {////--------------------------------------------- SETUP ----
 
 #endif
 
-
-
-	Settings.read_all();
 	return 0;
 
 }
@@ -175,13 +165,10 @@ uint8_t teil = 0, maxTeilN = 3;
 
 #ifndef WORK_WITH_WIFI
 bool foo_flag = false;
-uint32_t ttiimer = 0;
+int32_t ttiimer = 0;
 #endif
 
 
-int cccccc_ss = 0;
-
-//uint64_t old_time4loop;
 bool temp4test = true;
 
 
@@ -210,14 +197,14 @@ bool loop()
 
 #ifdef WORK_WITH_WIFI
 		Telemetry.loop();
-		Mpu.telem_timed = Mpu.timed;
+		//Mpu.telem_time = Mpu.timed;
 #endif
 		Commander.input();
-		Mpu.com_timed = Mpu.timed;
+		//Mpu.com_timed = Mpu.timed;
 		Autopilot.loop();
-		Mpu.autopilot_timed = Mpu.timed;
+		//Mpu.autopilot_timed = Mpu.timed;
 		//mega_i2c.gsm_loop();
-		if (shmPTR->sim800_reset_time > 0 && shmPTR->sim800_reset_time + 40 < (uint32_t)Mpu.timed)
+		if (shmPTR->sim800_reset_time > 0 && shmPTR->sim800_reset_time + 40e3 < millis_())
 			shmPTR->sim800_reset_time = 0;
 
 #ifdef FLY_EMULATOR
@@ -237,7 +224,7 @@ void handler(int sig) { // can be called asynchronously
 	flag = 1; // set flag
 }
 void pipe_handler(int sig) {
-	cout << "pipe error" << "\t"<<Mpu.timed << endl;
+	cout << "pipe error" << "\t"<<(millis_()/1000) << endl;
 }
 
 
@@ -251,7 +238,7 @@ int printHelp() {
 	cout << "example to write in stdout   : pi_copter 300 100 s n y y y y\n";
 	return -1;
 }
-double last_wifi_reloaded = 0, inet_start_cnt=0;
+int32_t last_wifi__reloaded = 0, inet_start__cnt=0;
 string stdout_file_ext = "";
 //-----------------------------------------------------------------------------------------
 bool start_wifi = false, start_inet = false, start_loger = false, start_telegram = false;;
@@ -272,23 +259,24 @@ void watch_dog() {
 			cout << "fpv started\n";
 			system("nice -n -20 /root/projects/fpv_ &");
 		}
+		const int32_t _ct = millis_();
 		if (start_wifi)
-			if (wifi_cnt == shmPTR->wifi_cnt || ( Mpu.timed - Autopilot.last_time_data_recived > 60 && Mpu.timed - last_wifi_reloaded > 60)) {
-				last_wifi_reloaded = Mpu.timed;
-				cout << "--------------wifi killed:\t" << Mpu.timed << endl;
+			if (wifi_cnt == shmPTR->wifi_cnt || (Autopilot.last_time_data__recived && (_ct - Autopilot.last_time_data__recived) > 60e3 && (_ct - last_wifi__reloaded) > 60e3)) {
+				last_wifi__reloaded = _ct;
+				cout << "--------------wifi killed:\t" << (_ct/1000) << endl;
 				shmPTR->wifi_run = false;
 				system("nice -n -20 pkill wifi_p");
 				delay(1000);
 				shmPTR->wifi_run = true;
-				cout << "--------------wifi started:\t" << Mpu.timed << endl;;
+				cout << "--------------wifi started:\t" << (_ct / 1000) << endl;;
 				string t = "nice -n -20 /root/projects/wifi_p ";
 				t += " &";
-				int ret = system(t.c_str());
+				system(t.c_str());
 			}
 
 		if (start_inet)
 			if (internet_cnt == shmPTR->internet_cnt) {
-				cout << "--------------ppp starting" << "\t" << Mpu.timed << endl;
+				cout << "--------------ppp starting" << "\t" << (_ct / 1000) << endl;
 				shmPTR->internet_run = false;
 				system("nice -n -20 pkill ppp_p");
 				delay(1000);
@@ -299,9 +287,9 @@ void watch_dog() {
 				t += (start_telegram ? "y" : "n");
 				t += " ";
 				if (stdout_file_ext.length()) 
-					t += stdout_file_ext + "i" + to_string(inet_start_cnt++) + ".txt";
+					t += stdout_file_ext + "i" + to_string(inet_start__cnt++) + ".txt";
 				t += " &";
-				int ret = system(t.c_str());
+				system(t.c_str());
 
 			}
 
@@ -414,7 +402,7 @@ int main(int argc, char *argv[]) {
 				std::cout.rdbuf(out.rdbuf()); //и теперь все будет в файл!
 			}
 			cout << "UPTIME=" << d_uptime << endl;
-			uptime(true);
+			
 			Log.writeTelemetry = (argv[4][0] == 'y' || argv[4][0] == 'Y');
 			shmPTR->wifi_run = start_wifi = (argv[5][0] == 'y' || argv[5][0] == 'Y');
 			start_inet = (argv[6][0] == 'y' || argv[6][0] == 'Y');
@@ -439,55 +427,25 @@ int main(int argc, char *argv[]) {
 	if (signal(SIGPIPE, pipe_handler) == SIG_ERR) {
 		return EXIT_FAILURE;
 	}
+
+
+
+	const bool debug_run = Autopilot.not_start_motors_if_gps_error = (string(argv[0]).find("out") == string::npos) ? true : false;
 #ifdef ALWAYS_SOUND
 	mega_i2c.DO_SOUND = 1;
 #else
-	mega_i2c.DO_SOUND = Autopilot.not_start_motors_if_gps_error= (string(argv[0]).find("out") == -1) ? 1 : 0;
+	mega_i2c.DO_SOUND = Autopilot.not_start_motors_if_gps_error= (debug_run) ? 1 : 0;
 #endif
 	mega_i2c.init();
-	string str = string(argv[0]);
-	str = str.substr(str.length() - 4, str.length());
-
-
-	if (str.compare("pter") == 0) {
-		
-	}
 
 	if (setup(counter) == 0) {
-		
-
-	//	old_time4loop = micros_();
-
-		
+#ifndef FLY_EMULATOR
+		Settings.read_all();
+#endif
 		shmPTR->reboot = 0;
-
-
-		//video_stream();
-		//thread t(video_stream);
-		//t.detach();
-
-
-
-		static uint32_t ppp_delay=0;
-
-		
-
 		while (shmPTR->run_main){
 			if (loop()) {
 				shmPTR->main_cnt++;
-				//usleep(5400);
-			//	int ttt = micros_();
-			//	dfr += ((1000000 / (ttt - old_time4loop)) - dfr)*0.01;
-			//	Debug.load(0, dfr, 0);
-			//	old_time4loop = ttt;
-			//	int64_t t = micros_();
-			//	int32_t time_past = (int32_t)(t - old_time4loop);
-			//	old_time4loop = t;
-				//if (time_past > 15000)
-				//	printf("too long %i\n",time_past);
-
-				//Debug.load(0, time_past, 0);
-				//Debug.dump();
 			}
 			if (flag)
 				shmPTR->run_main = false;
@@ -496,7 +454,7 @@ int main(int argc, char *argv[]) {
 
 
 	if (flag!=0)
-		cout<< "\n main Signal caught!" << "\t"<<Mpu.timed << endl;
+		cout<< "\n main Signal caught!" << "\t"<<(millis_()/1000) << endl;
 	//WiFi.stopServer();
 	Settings.write();
 	
@@ -516,11 +474,13 @@ int main(int argc, char *argv[]) {
 		switch (shmPTR->reboot) {
 		case 1:
 			Settings.write_all();
-			if (string(argv[0]).find("out") == -1)
+			if (string(argv[0]).find("out") == string::npos)
 				system("reboot");
 			break;
 		case 2:
+#ifndef FLY_EMULATOR
 			Settings.write_all();
+#endif
 			system("shutdown now");
 			break;
 

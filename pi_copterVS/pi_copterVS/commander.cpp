@@ -187,7 +187,7 @@ bool CommanderClass::input(){
 		return true;
 	}
 
-	Autopilot.last_time_data_recived = Mpu.timed;
+	Autopilot.last_time_data__recived = millis_();
 	uint8_t *buf = shmPTR->commander_buf;
 	if (shmPTR->commander_buf_len >= 12) {
 

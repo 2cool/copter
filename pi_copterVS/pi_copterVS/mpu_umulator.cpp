@@ -10,7 +10,7 @@
 
 #define MOTOR_FORCE 0.5
 
-//#define NOISE_ON
+#define NOISE_ON
 
 //#define TEST_4_FULL_VOLTAGE
 
@@ -23,24 +23,24 @@
 //батареи хватает на 
 #define FALSE_TIME_TO_BATERY_OFF 1500.0f
 
-float false_time = 0;
+int64_t _time = 0;
 float false_voltage = BAT_100P;
 
 void EmuClass::battery(float m_current[], float &voltage) {
 
 	float voltage_sag = 0;
-	if (false_time == 0 && Autopilot.motors_is_on()) {
-		false_time = uptime();
+	if (_time == 0 && Autopilot.motors_is_on()) {
+		_time = micros_();
 		false_voltage = MAX_VOLTAGE_AT_START;
 	}
-	if (false_time>0) {
+	if (_time>0) {
 		float powerKl = (Balance.get_throttle() * 2);
 
 		powerKl *= powerKl;
 		voltage_sag = 16;
 		const float drawSpeed = 46.0 * powerKl / FALSE_TIME_TO_BATERY_OFF;
-		float dt = (float)(uptime() - false_time);
-		false_time = uptime();
+		float dt = 1e-6*(float)(micros_() - _time);
+		_time = micros_();
 		false_voltage -= drawSpeed*dt;
 	}
 	const float a = false_voltage - voltage_sag;
@@ -150,7 +150,7 @@ float  EmuClass::get_pitch() { return (float)(ang[PITCH]); }
 float  EmuClass::get_roll() { return (float)(ang[ROLL]); }
 float  EmuClass::get_yaw() { return (float)(ang[YAW]); }
 
-#define wrap_PI(x) (x < -M_PI ? x+2*M_PI : (x > M_PI ? x - 2*M_PI: x))
+//#define wrap_PI(x) (x < -M_PI ? x+2*M_PI : (x > M_PI ? x - 2*M_PI: x))
 float  EmuClass::get_heading() {
 
 	double head = ang[YAW];
@@ -181,9 +181,6 @@ float  EmuClass::get_accZ() {return (float)((pos[Z]<0?0:acc[Z]));}
 
 
 
-
-
-uint32_t timet = uptime();
 int cnt = 0;
 int mid_f_noise_cnt = 15;
 int low_f_noise_cnt = 511;
@@ -197,8 +194,8 @@ float  EmuClass::get_alt() {
 
 #ifdef NOISE_ON
 	cnt++;
-	const float dt = 0.2;// (uptime() - timet);
-	timet = uptime();
+	const float dt = 0.2;
+
 
 	float high_noise = 0.2 - 0.4*(float)(rand()) / (float)RAND_MAX;
 	if (cnt&mid_f_noise_cnt == mid_f_noise_cnt) {

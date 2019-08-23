@@ -30,7 +30,7 @@ public class Commander {
     static final double GRAD2RAD = 0.01745329251994329576923690768489;
     static final double RAD2GRAD = 57.295779513082320876798154814105;
     static private long last_time=0;
-    static public long motors_on_time=0;
+   // static public long motors_on_time=0;
     static private void init(){
 
         settings=false;
@@ -191,10 +191,10 @@ public class Commander {
         if (_dt_>1000)
             _dt_=1000;
 
-        if ((MainActivity.control_bits & MainActivity.MOTORS_ON)!=0){
-            motors_on_time+=_dt_;
+       // if ((MainActivity.control_bits & MainActivity.MOTORS_ON)!=0){
+        //    motors_on_time+=_dt_;
             //Log.d("ONTIME",Integer.toString((int)motors_on_time));
-        }
+       // }
       //  Log.d ("COMM",Float.toString(throttle));
         MainActivity.command_bits_=0;
 

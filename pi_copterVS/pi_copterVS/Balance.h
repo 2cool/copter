@@ -35,7 +35,7 @@ class BalanceClass
  protected:
 	 void reset();
 	 void log();
-
+	 int64_t old_time;
 	 void set_pitch_roll_pids(const float kp, const float ki, const float imax);
 	float throttle,true_throttle;
 	//float pitch_roll_stabKP, pitch_roll_rateKP, yaw_rateKP,yaw_stabKP,pitch_roll_rateKI,pitch_roll_rateIMAX,yaw_rateKI,yaw_rateIMAX;

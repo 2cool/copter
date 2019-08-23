@@ -3,11 +3,11 @@
 // 
 
 #include "debug.h"
-	 uint64_t d_old_t = 0;
+	 int64_t d_old_t = 0;
 	 int d_delay = 50;
 	 double d_dt = (double)d_delay *0.001;
 	 // int cnt = 0;
-	 uint32_t old_time = 0;
+	 int32_t old_time = 0;
 void DebugClass::graphic(const int n, const float x, const float y) {
 	printf("%i,%f,%f\n", (unsigned int)n, x, y);
 
@@ -18,11 +18,11 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 }
 	 void DebugClass::init() { i = 0; }
 	 void DebugClass::dump(const long f1, long f2, long f3, long f4) {
-		 printf("\n%i,%i,%i,%i\n", f1, f2, f3, f4);
+		 printf("\n%q,%q,%q,%q\n", f1, f2, f3, f4);
 	 }
 	 void DebugClass::dump(const float f1, float f2, float f3, float f4) {
 
-		 uint32_t t = millis_();
+		 int32_t t = millis_();
 		 if (t - old_time < d_delay)//20)
 			 return;
 		 old_time = t;
@@ -48,7 +48,7 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 			 d_old_t = micros_();
 			 return;
 		 }
-		 uint64_t t = micros_();
+		 int64_t t = micros_();
 		 double dt = (double)(t - d_old_t);
 		 d_old_t = t;
 		 dt *= 0.000001;
@@ -67,7 +67,7 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 			 d_old_t = micros_();
 			 return;
 		 }
-		 uint64_t t = micros_();
+		 int64_t t = micros_();
 		 double dt = (double)(t - d_old_t);
 		 d_old_t = t;
 		 dt *= 0.000001;
@@ -86,7 +86,7 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 	 void DebugClass::dump(bool thre) {//--------------------------------------------------------------
 		 if (n_debug > 9)
 			 return;
-		 uint32_t t = millis_();
+		 int32_t t = millis_();
 		 if (t - old_time < d_delay)//20)
 			 return;
 		 old_time = t;

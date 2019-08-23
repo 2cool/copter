@@ -26,7 +26,7 @@ void HmcClass::init()
 {
 	do_compass_motors_calibr = false;
 	motor_index = 0;
-	startTimed = 10;
+	startTime = 10e3;
 
 #ifdef COMPAS_MOTORS_OFF
 	motors_power_on = false;
@@ -48,7 +48,11 @@ void HmcClass::init()
 	initialize();
 	cout << "Testing device connections...\n";
 	ok = testConnection();
-	cout << ok ? "HMC5883L connection successful\n" : "HMC5883L connection failed\n";
+	if (ok)
+		cout << "HMC5883L connection successful\n";
+	else
+		cout << "HMC5883L connection failed\n";
+
 	if (ok) {
 		calibration(false);
 	}
@@ -107,7 +111,7 @@ void HmcClass::start_motor_compas_calibr(){
 		do_compass_motors_calibr = true;
 		motors_is_on_ = false;
 		c_base[X] = c_base[Y] = c_base[Z] = 0;
-		startTimed = Mpu.timed + 5;
+		startTime = millis_() + 5e3;
 		motor_index = 0;
 
 	}
@@ -118,7 +122,7 @@ void HmcClass::start_motor_compas_calibr(){
 float _base[3];
 float current = 0;
 void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
-	if (Mpu.timed > startTimed){
+	if (millis_() > startTime){
 		if (baseI < 1000){
 			current  += Telemetry.get_current(motor_index);
 			_base[0] += fmx;
@@ -152,7 +156,7 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 
 				if (motor_index < 3){
 					motor_index++;
-					startTimed = Mpu.timed + 3;
+					startTime = millis_() + 3e3;
 				}
 				else{
 					do_compass_motors_calibr = false;
@@ -168,7 +172,7 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 				printf(" MOTOR OFF\n");
 				printf("compas test: 4 m %i\n",motor_index);
 				printf("%f\t%f\t%f\n",base[0],base[1],base[2]);
-				startTimed = Mpu.timed + 3;
+				startTime = millis_() + 3e3;
 				Autopilot.motors_do_on(true, "CMT");
 				motors_is_on_ = true;
 			}
@@ -183,11 +187,11 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 
 
 void HmcClass::loop(){
-static double comTimed = 0;
+static int32_t comTime = 0;
 ///#define wrap_180(x) (x < -180 ? x+360 : (x > 180 ? x - 360: x))
-	if (Mpu.timed - comTimed < 0.05)
+	if (millis_() - comTime < 50)
 		return;
-	comTimed = Mpu.timed;
+	comTime = millis_();;
 	//heading = Emu.get_heading();
 	
 //	headingGrad = 0;
@@ -270,7 +274,7 @@ void HmcClass::loop(){
 	
 
 
-	Mpu.hmc_timed = Mpu.timed;
+//	Mpu.hmc_timed = Mpu.timed;
 }
 
 #endif

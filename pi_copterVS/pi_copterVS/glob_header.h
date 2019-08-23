@@ -44,7 +44,7 @@ struct Memory {
 
 	uint8_t sms_at_work;
 	bool inet_ok, ppp_run, sim800_reset,telegram_run, loger_run, stop_ppp_read_sms_start_ppp;
-	uint32_t sim800_reset_time;
+	int32_t sim800_reset_time;
 
 
 

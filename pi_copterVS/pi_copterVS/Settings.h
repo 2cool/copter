@@ -33,10 +33,10 @@ class SettingsClass
 {
  protected:
 
-	 uint32_t writeBuf(uint8_t adr, float buf[], uint8_t len);
-	 uint32_t readBuf(uint8_t adr, float buf[], uint8_t len);
-	 uint32_t writeBuf(uint8_t adr, int16_t buf[], uint8_t len);
-	 uint32_t readBuf(uint8_t adr, int16_t buf[], uint8_t len);
+	 void writeBuf(uint8_t adr, float buf[], uint8_t len);
+	 void readBuf(uint8_t adr, float buf[], uint8_t len);
+	 void writeBuf(uint8_t adr, int16_t buf[], uint8_t len);
+	 void readBuf(uint8_t adr, int16_t buf[], uint8_t len);
 
 
  public: 

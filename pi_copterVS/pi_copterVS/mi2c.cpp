@@ -78,7 +78,7 @@ static int sms_received = 0;
 			}
 			else {
 				sms_received = smsN;
-				cout << "SMS " << sms_received << "\t"<<Mpu.timed << endl;
+				cout << "SMS " << sms_received << "\t"<<(millis_()/1000) << endl;
 				smsN ^= smsN;
 
 			//	sim.readSMS(sms_received,  true, true);
@@ -98,7 +98,7 @@ static int sms_received = 0;
 				if (str[i] == ring[ringi++]) {
 					if (ringi == sizeof(ring) - 1) {
 						ring_received = true;
-						cout << "RING" << "\t"<<Mpu.timed << endl;
+						cout << "RING" << "\t"<< (millis_() / 1000) << endl;
 						ringi ^= ringi;
 					}
 				}
@@ -109,7 +109,7 @@ static int sms_received = 0;
 				if (str[i] == no_carrier[no_carrieri++]) {
 					if (no_carrieri == sizeof(no_carrier) - 1) {
 						ring_received = false;
-						cout << "NO CARRIER" << "\t"<<Mpu.timed << endl;
+						cout << "NO CARRIER" << "\t"<< (millis_() / 1000) << endl;
 						no_carrieri ^= no_carrieri;
 					}
 				}
@@ -127,11 +127,11 @@ int Megai2c::init()
 	current_led_mode = 100;
 	ring_received = false;
 	if ((fd = open("/dev/i2c-0", O_RDWR)) < 0) {
-		cout << "Failed to open /dev/i2c-0" << "\t"<<Mpu.timed << endl;
+		cout << "Failed to open /dev/i2c-0" << "\t"<< (millis_() / 1000) << endl;
 		return -1;
 	}
 	if (ioctl(fd, I2C_SLAVE, ARDUINO_ADDR) < 0) {
-		cout << "Failed to acquire /dev/i2c-0 access and/or talk to slave." << "\t"<<Mpu.timed << endl;
+		cout << "Failed to acquire /dev/i2c-0 access and/or talk to slave." << "\t"<< (millis_() / 1000) << endl;
 		return -1;
 	}
 	//--------------------------------init sound & colors 
@@ -155,10 +155,17 @@ int Megai2c::init()
 }
 
 void Megai2c::beep_code(uint8_t c) {
-	cout << "BEEP:" << (int)c << endl;
-	if (DO_SOUND) {
-		char chBuf[] = { 1,c };
-		write(fd, chBuf, 2);
+	static uint8_t old_code = 255;
+	static int32_t old_beep_time = 0;
+	const int32_t _ct = millis_();
+	if (c != old_code || (_ct - old_beep_time) >= 500) {
+		old_beep_time = _ct;
+		old_code = c;
+		cout << "BEEP:" << (int)c << endl;
+		if (DO_SOUND) {
+			char chBuf[] = { 1,c };
+			write(fd, chBuf, 2);
+		}
 	}
 }
 
@@ -175,7 +182,7 @@ uint16_t Megai2c::correct(const float n) {    //0-это
 
 void Megai2c::throttle(const float n[]) {
 #ifdef FLY_EMULATOR
-	Emu.update(n, Mpu.dt);
+	Emu.update(n, Mpu.get_dt());
 #else
 	uint16_t pwm_out[5];
 	pwm_out[0] = 0;
@@ -186,7 +193,7 @@ void Megai2c::throttle(const float n[]) {
 	char* chBuf = (char*)pwm_out;
 	if (write(fd, chBuf + 1, 9) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-		cout << "arduino write power error" <<  Mpu.timed  << endl;
+		cout << "arduino write power error" << (millis_() / 1000) << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
 #endif
@@ -200,16 +207,16 @@ void Megai2c::set_led_color(uint8_t n, uint8_t r, uint8_t g, uint8_t b) {
 	buf[3] = *(char*)&b;
 	if (write(fd, buf, 4) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-		cout << "arduino write LED error" << Mpu.timed << endl;
+		cout << "arduino write LED error" << (millis_() / 1000) << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
 }
 void Megai2c::sim800_reset() {
 	char chBuf[] = { 1,16 };
-	shmPTR->sim800_reset_time = (uint32_t)Mpu.timed;
+	shmPTR->sim800_reset_time = millis_();
 	if (write(fd, chBuf, 2) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-		cout << "arduino write sim800 error" << Mpu.timed << endl;
+		cout << "arduino write sim800 error" << (millis_() / 1000) << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
 }
@@ -227,7 +234,7 @@ bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с к
 		((uint16_t*)buf)[2] = (uint16_t)roll;
 		if (write(fd, buf + 1, 5) == -1) {
 			Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-			cout << "arduino write gimbal error" << Mpu.timed << endl;
+			cout << "arduino write gimbal error" << (millis_() / 1000) << endl;
 			mega_i2c.beep_code(B_I2C_ERR);
 		}
 		return true;
@@ -243,33 +250,33 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 	char bit_field;
 	if (write(fd, &reg, 1) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-		cout << "arduino write get_gps error" << Mpu.timed << endl;
+		cout << "arduino write get_gps error" << (millis_() / 1000) << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 		return -1;
 	}
 	int res = read(fd, &bit_field, 1);
 	if (res == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-		cout << "arduino read get_gps error" << Mpu.timed << endl;
+		cout << "arduino read get_gps error" << (millis_() / 1000) << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 		return -1;
 	}
 
 
-	static double last_ring_time = 0;
+	static int32_t last_ring_time = 0;
 
-	if (last_ring_time > 0 && last_ring_time + 10 < Mpu.timed) {
+	if (last_ring_time > 0 && last_ring_time + 10e3 < millis_()) {
 		last_ring_time = 0;
 		shmPTR->stop_ppp_read_sms_start_ppp = true;
-		cout << "RING_BIT sended..." << "\t"<<Mpu.timed << endl;
+		cout << "RING_BIT sended..." << "\t"<< (millis_() / 1000) << endl;
 		
 	}
 
 
 	if (bit_field & 1 && shmPTR->sim800_reset_time == 0) {
 		if (last_ring_time==0)
-			cout << "RING_BIT" << "\t"<<Mpu.timed << endl;//при заходе смс при ppp
-		last_ring_time = Mpu.timed;
+			cout << "RING_BIT" << "\t"<< (millis_() / 1000) << endl;//при заходе смс при ppp
+		last_ring_time = millis_();
 		
 		///stop servises, stop ppp? read sms and do. start ppp and services again
 		
@@ -279,7 +286,7 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 		res = read(fd, (char*)gps_d, sizeof(SEND_I2C));
 		if (res == -1) {
 			Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-			cout << "arduino write bit_field & 2 error" << Mpu.timed << endl;
+			cout << "arduino write bit_field & 2 error" << (millis_() / 1000) << endl;
 			mega_i2c.beep_code(B_I2C_ERR);
 		}
 		return res;
@@ -294,14 +301,14 @@ int Megai2c::getiiiiv(char *iiiiv) {
 	char reg = 0;
 	if (write(fd, &reg, 1) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-		cout << "arduino write iiiiv error" << Mpu.timed << endl;
+		cout << "arduino write iiiiv error" << (millis_() / 1000) << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 		return -1;
 	}
 	
 	if (read(fd, (char*)iiiiv, 10) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-		cout << "arduino read iiiiv error" << Mpu.timed << endl;
+		cout << "arduino read iiiiv error" << (millis_() / 1000) << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 		return -1;
 	}
@@ -331,7 +338,7 @@ void Megai2c::set_led_mode(uint8_t n, uint8_t briht, bool pulse) {
 	static uint32_t old_led_mode = 0;
 	static uint8_t pulse_f0 = 1;
 	static int cur_led_n = 8;
-	static double last_timed = 0;
+	static int32_t last_timed = 0;
 	static uint8_t pulse_f = 1;
 
 	if (cur_led_n < 8) {
@@ -348,28 +355,18 @@ void Megai2c::set_led_mode(uint8_t n, uint8_t briht, bool pulse) {
 		if (t != old_led_mode){
 			old_led_mode = t;
 			//cout << "LED "<<t << endl;
-			float dt = Mpu.timed - last_timed;
-			if (current_led_mode != n || dt > 0.1) {
+			const int32_t _ct = millis_();
+			const int32_t dt = _ct - last_timed;
+			if (current_led_mode != n || dt > 100) {
 				if (pulse)
 					pulse_f ^= 1;
 				else
 					pulse_f = 1;
-				last_timed = Mpu.timed;
+				last_timed = _ct;
 				cur_led_n = 0;
 				current_led_mode = n;
 			}
 		}
-		
-		
-		
-		
-
-
-
-
-
-
-
 	}
 }
 void Megai2c::sound(const float f) {

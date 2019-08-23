@@ -16,11 +16,11 @@ unsigned int PROM_read(int DA, char PROM_CMD)
 	uint8_t r8b[] = { 0, 0 };
 
 	if (write(DA, &PROM_CMD, 1) != 1){
-		cout << "read set reg Failed to write to the i2c bus." << "\t"<<Mpu.timed << endl;
+		cout << "read set reg Failed to write to the i2c bus." << "\t"<<(millis_()/1000) << endl;
 	}
 
 	if (read(DA, r8b, 2) != 2){
-		cout << "Failed to read from the i2c bus." << "\t"<<Mpu.timed << endl;
+		cout << "Failed to read from the i2c bus." << "\t"<<(millis_()/1000) << endl;
 	}
 
 	ret = r8b[0] * 256 + r8b[1];
@@ -30,16 +30,13 @@ unsigned int PROM_read(int DA, char PROM_CMD)
 
 
 char RESET = 0x1E;
-#define ALT_NOT_SET 0
-
-
 
 //int MS5611Class::error(int e) {	return -1;}
 
 
 int MS5611Class::writeReg(char bar_zero) {
 	if (write(fd4S, &bar_zero, 1) != 1) {
-		cout << "write reset 8 bit Failed to write to the i2c bus." << "\t"<<Mpu.timed << endl;
+		cout << "write reset 8 bit Failed to write to the i2c bus." << "\t"<<(millis_()/1000) << endl;
 		bar_task = 0;
 		return -1;
 	}
@@ -119,17 +116,17 @@ void MS5611Class::log_sens() {
 #include "Balance.h"
 
 
-long ttimet = millis_();
+int32_t ttimet = 0;
 uint8_t MS5611Class::loop(){
-	if (millis_() - ttimet < 200)
+	if (millis_() - ttimet < 50)
 		return 0;
 
 
-	const float dt = 0.2;// (millis_() - timet)*0.001;
+	const float dt = 0.05;// (millis_() - timet)*0.001;
 	ttimet = millis_();
 		const float new_altitude = Emu.get_alt();
 
-	speed = (new_altitude - altitude_) / dt;
+	//speed = (new_altitude - altitude_) / dt;
 	shmPTR->altitude_ = altitude_ = new_altitude;
 	shmPTR->pressure = pressure = get_pressure(altitude_);
 
@@ -171,7 +168,7 @@ uint8_t MS5611Class::loop(){
 	default:
 		phase2();
 	}
-	Mpu.ms5611_timed = Mpu.timed;
+	//Mpu.ms5611_timed = Mpu.timed;
 	return 0;
 }
 
@@ -184,7 +181,7 @@ void MS5611Class::error(const int n) {
 	Telemetry.addMessage(e_BAROMETR_RW_ERROR);
 	mega_i2c.beep_code(B_I2C_ERR);
 	bar_task = 0;
-	cout << "Failed to read-write from the i2c barometr bus #" <<n<<" "<< Mpu.timed << endl;
+	cout << "Failed to read-write from the i2c barometr bus #" <<n<<" "<< (millis_()/1000) << endl;
 	wrong_altitude_cnt++;
 	ct = NORM_CT + NORM_CT;
 }
@@ -293,7 +290,7 @@ void MS5611Class::phase2() {
 		int32_t tP = ((((int64_t)D1*SENS) / 2097152 - OFF) / 32768);
 
 		if (tP < 80000 || tP > 107000) {
-			cout << "PRESSURE ERROR " << tP << "\t"<<Mpu.timed << endl;
+			cout << "PRESSURE ERROR " << tP << "\t"<<(millis_()/1000) << endl;
 			error(33);
 			return;
 		}
