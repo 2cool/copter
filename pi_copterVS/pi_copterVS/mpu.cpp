@@ -138,7 +138,7 @@ void MpuClass::init()
 	altitude_at_zero = XatZero = YatZero = 0;
 	_0007=0.007;
 	acc_callibr_time = 0;
-	w_accX = w_accY = yaw_off = 0;
+	w_accX = w_accY = 0;
 	sinPitch = sinRoll = 0;
 	yaw_offset = yaw = pitch = roll = gyroPitch = gyroRoll = gyroYaw = accX = accY = accZ = 0;
 
@@ -583,7 +583,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 
 
 void MpuClass::setDLPFMode_(uint8_t bandwidth){
-	gLPF = bandwidth;
+	//gLPF = bandwidth;
 	accelgyro.setDLPFMode(bandwidth);
 }
 

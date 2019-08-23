@@ -45,34 +45,14 @@ class MpuClass
 
 	 int16_t a[3];              // [x, y, z]            accel vector
 	 int16_t g[3];              // [x, y, z]            gyro vector
-	 int32_t t;
 	 int16_t c[3];
 	 float mpu_dt;
-
-	 int r;
-	 int initialized = 0;
-	 int dmpReady = 0;
-	 float lastval[3];
-	 int16_t sensors;
 	 Quaternion_ q;
-	 //calibration offsets for MPU6050
-	 ///////////////////////////////////   CONFIGURATION   /////////////////////////////
-	 //Change this 3 variables if you want to fine tune the skecth to your needs.
-	 const int buffersize = 1000;     //Amount of readings used to average, make it higher to get more precision but sketch will be slower  (default:1000)
-	 const int acel_deadzone = 8;     //Acelerometer error allowed, make it lower to get more precision, but sketch may not converge  (default:8)
-	 const int giro_deadzone = 1;     //Giro error allowed, make it lower to get more precision, but sketch may not converge  (default:1)
 	 
 	 int mean_ax, mean_ay, mean_az, mean_gx, mean_gy, mean_gz;
-	 enum{ ax_offset, ay_offset, az_offset, gx_offset, gy_offset, gz_offset };
-	// int16_t offset_[6];
-	 ////////////////////////////////////////////////////////////////////////////////////////
-
 	MPU6050 accelgyro;
-
-	uint8_t gLPF;
 	//-----------------
 
-	float yaw_off;
 	float pitch, roll;
 	float est_alt_, est_speedZ;
 	float estX, estY, est_speedX, est_speedY;

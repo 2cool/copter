@@ -8,7 +8,7 @@
 //#define OFF_MOTOR_IF_LOST_CONNECTION  
 //#define OFF_TIMELAG
 //-----------------------------------------------------------------
-#define FLY_EMULATOR
+//#define FLY_EMULATOR
 //----------------------------------------------------------------
 //#define ALWAYS_SOUND
 //#define YAW_OFF

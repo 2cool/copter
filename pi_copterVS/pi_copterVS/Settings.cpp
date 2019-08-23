@@ -235,7 +235,7 @@ void SettingsClass::set(const float  val_, float &set) {
 
 int SettingsClass::read_all() {
 
-
+#ifndef FLY_EMULATOR
 
 
 
@@ -258,7 +258,7 @@ int SettingsClass::read_all() {
 
 	fclose(f);
 
-	
+#endif
 	return 0;
 }
 //replace 0, to 0.0, end add 1s to end and endl;
@@ -280,8 +280,7 @@ string r0(string str) {
 	return nstr;
 }
 int SettingsClass::write_all() {
-
-
+#ifndef FLY_EMULATOR
 
 	FILE *f = fopen("/home/igor/copter_set.txt", "w");
 	if (f == NULL)
@@ -289,13 +288,10 @@ int SettingsClass::write_all() {
 		cout << "Error opening settings file!\n";
 		return -1;
 	}
-
 	//HMC
 
 	//0 - error ; 0.0 is ok
-	
-	
-	
+
 	fprintf(f, "0,%s", (r0(Balance.get_set())).c_str());
 	fprintf(f, "1,%s", (r0(Stabilization.get_z_set())).c_str());
 	fprintf(f, "2,%s", (r0(Stabilization.get_xy_set())).c_str());
@@ -310,13 +306,14 @@ int SettingsClass::write_all() {
 	//(f, "9,%s", (Hmc.get_calibr_set() + end).c_str());
 	
 	fclose(f);
+#endif
 	return 0;
 
 }
 
 
 int SettingsClass::write() {
-
+#ifndef FLY_EMULATOR
 	ofstream f;
 	f.open("/home/igor/eeprom.set", fstream::in | fstream::out | fstream::trunc);
 	if (f.is_open()) {
@@ -325,6 +322,7 @@ int SettingsClass::write() {
 		return 0;
 	}
 	cout << "\n cant write settings \n";
+#endif
 	return -1;
 }
 

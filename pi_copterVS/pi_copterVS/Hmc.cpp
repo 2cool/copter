@@ -280,6 +280,8 @@ void HmcClass::loop(){
 #endif
 
 void HmcClass::newCalibration(int16_t sh[]){
+
+	const int if_no_change_cnt_to_stop = 2500;
 	//wdt_enable(WDTO_4S);
 	sh[0] = sh[1] = sh[2] = sh[3] = sh[4] = sh[5] = 0;
 	printf("START ROTATION\n");
@@ -287,9 +289,10 @@ void HmcClass::newCalibration(int16_t sh[]){
 	delay(2000);
 	int16_t mx, my, mz;
 	long cnt = 0;
-
+	long fcnt = 0;
+	int print_time = millis_();
 	while (true){
-		
+		fcnt++;
 		bool new_val = false;
 		readBytes(devAddr, HMC5883L_RA_DATAX_H, 6, buffer);
 		if (mode == HMC5883L_MODE_SINGLE) writeByte(devAddr, HMC5883L_RA_MODE, HMC5883L_MODE_SINGLE << (HMC5883L_MODEREG_BIT - HMC5883L_MODEREG_LENGTH + 1));
@@ -298,46 +301,59 @@ void HmcClass::newCalibration(int16_t sh[]){
 		mz = (((int16_t)buffer[2]) << 8) | buffer[3];
 
 		if (mx > sh[0]){
-			sh[0] = (int16_t)mx;
-			printf("max_X: %i\n",mx);
+			sh[0] = mx;
+			//printf("max_X: %i\n",mx);
 			new_val = true;
 		}
 		if (mx < sh[1]){
-			sh[1] = (int16_t)mx;
-			printf("min_X: %i\n", mx);
+			sh[1] = mx;
+			//printf("min_X: %i\n", mx);
 			new_val = true;
 		}
 
 		if (my > sh[2]){
-			sh[2] = (int16_t)my;
-			printf("max_Y: %i\n", my);
+			sh[2] = my;
+			//printf("max_Y: %i\n", my);
 			new_val = true;
 		}
 		if (my < sh[3]){
-			sh[3] = (int16_t)my;
-			printf("min_Y: %i\n", my);
+			sh[3] = my;
+			//printf("min_Y: %i\n", my);
 			new_val = true;
 		}
 		if (mz > sh[4]){
-			sh[4] = (int16_t)mz;
-			printf("max_Z: %i\n", mz);
+			sh[4] = mz;
+			//printf("max_Z: %i\n", mz);
 			new_val = true;
 		}
 		if (mz < sh[5]){
-			sh[5] = (int16_t)mz;
-			printf("min_Z: %i\n", mz);
+			sh[5] = mz;
+			//printf("min_Z: %i\n", mz);
 			new_val = true;
 		}
+
 		delay(10);
-		if (new_val)
+		if (new_val) {
+			print_time = millis_()+1000;
+			int i = 0;
+			cout <<"X: "<< sh[i++] << "\t" << sh[i++] << endl;
+			cout <<"Y: "<< sh[i++] << "\t" << sh[i++] << endl;
+			cout <<"Z: "<< sh[i++] << "\t" << sh[i++] << endl;
+			cout <<fcnt<<"\t------------"<< endl;
 			cnt = 0;
-		else
-			cnt++;
-		if (cnt>5000)
+		}
+		else {
+			if (millis_() > print_time) {
+				cout << if_no_change_cnt_to_stop - cnt << endl;
+				print_time += 1000;
+			}
+		}
+		if (cnt++ > if_no_change_cnt_to_stop)
 			break;
 		//wdt_reset();
 	}
-	printf("Stop Rottation\nx %i,%i\ny %i,%i\nz %i,%i\n", sh[0], sh[1], sh[2], sh[3], sh[4], sh[5]);
+	cout << "Stop Rottation\n";
+	
 }
 
 bool HmcClass::calibration(const bool newc){

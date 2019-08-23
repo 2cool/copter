@@ -1,0 +1,3 @@
+git log --oneline
+git reset --hard c14809fa
+

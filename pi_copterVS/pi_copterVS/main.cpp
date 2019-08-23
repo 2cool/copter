@@ -1,62 +1,4 @@
-//убрать нафиг ограничения на висоту спуска
-//поставить мпу на старое место под орандж пи
-//разобратся с переменкой на двигателях.
 
-//сравнить показания барометрами  с показаниями на старой конфигурации. походу старая конфигурация била куда более гладкой может из за єтого вся хуита
-//также напомню что надо перекомпилить ардуину єту и инет
-
-/*
-удаллить 
-/lib/modules/3.4.113-sun8i/kernel/drivers/misc/bmp085.ko
-
-Виставить максимальние показатели
-Some boards allow to adjust CPU speed.
-
-nano /etc/default/cpufrequtils
-Alter min_speed or max_speed variable.
-
-service cpufrequtils restart
-
-/////////////////////////////////////////////////////////////////////////////////////
-
-
-# /etc/init.d/pi_copter
-#
-#! /bin/sh
-# Some things that run always
-touch /var/lock/pi_copter
-
-# Carry out specific functions when asked to by the system
-case "$1" in
-  start)
-		echo "Starting pi_copter "
-		start-stop-daemon -Sbvx /home/start-stop-daemon -Sbvx /root/projects/pi_copter 300 100 f y y y y y $
-		;;
-  stop)
-		echo "Stopping pi_copter"
-
-				start-stop-daemon -Kvx /root/projects/pi_copter
-		;;
-  *)
-		echo "Usage: /etc/init.d/blah {start|stop}"
-		exit 1
-		;;
-esac
-
-exit 0
-
-
-Once you've saved your file into the correct location make sure that it's executable by running "chmod 755 /etc/init.d/blah".
-
-update-rc.d blah defaults
-
-
-If you wish to remove the script from the startup sequence in the future run:
-root@skx:/etc/rc2.d# update-rc.d -f  blah remove
-
-Igor Toocool, [27.06.17 00:15]
-root@skx:~# update-rc.d pi_copter defaults
-*/
  
 #define PROG_VERSION "ver 3.190822\n"
 #define SIM800_F
@@ -134,14 +76,8 @@ int zzz = 1;
 
 int setup(int cnt) {////--------------------------------------------- SETUP ------------------------------
 	Log.init(cnt);
+	Settings.read();
 	cout << "___setup___\n";
-
-#ifdef WORK_WITH_WIFI
-//	printf("wifi init...\n");
-//	if (WiFi.init())
-//		return -1;
-#endif
-
 	cout << "commander init...\n";
 	Commander.init();
 	cout << "Autopilot init...\n";
@@ -149,13 +85,8 @@ int setup(int cnt) {////--------------------------------------------- SETUP ----
 	Telemetry.init_();
 	Telemetry.testBatteryVoltage();
 	cout << "telemetry init OK \n";
-
 	GPS.init();
-
-#ifdef SIM800_F
-
-#endif
-
+	Settings.read_all();
 	return 0;
 
 }
@@ -246,10 +177,17 @@ bool start_wifi = false, start_inet = false, start_loger = false, start_telegram
 void watch_dog() {
 	delay(1000);
 	while (shmPTR->run_main) {
+		
+
 		const uint8_t wifi_cnt = shmPTR->wifi_cnt;
 		const uint8_t internet_cnt = shmPTR->internet_cnt;
 		const uint8_t fpv_cnt = shmPTR->fpv_cnt;
 		delay(3000);
+
+		if (Autopilot.busy())
+			continue;
+
+
 		if (fpv_cnt == shmPTR->fpv_cnt) {
 			cout << "fpv killed\n";
 			shmPTR->fpv_run = false;
@@ -301,8 +239,16 @@ void watch_dog() {
 
 
 
+bool is_clone() {
+	uint8_t temp = shmPTR->main_cnt;
 
-
+	usleep(51123);
+	if (temp != shmPTR->main_cnt) {
+		cout << "clone\n";
+		return true;
+	}
+	return false;
+}
 
 std::ofstream out;
 std::streambuf *coutbuf;// старый буфер
@@ -310,15 +256,8 @@ std::streambuf *coutbuf;// старый буфер
 int main(int argc, char *argv[]) {
 	if (init_shmPTR())
 		return 0;
-	{
-		uint8_t temp = shmPTR->main_cnt;
-
-		usleep(51123);
-		if (temp != shmPTR->main_cnt) {
-			cout << "clone\n";
-			return 0;
-		}
-	}
+	if (is_clone())
+		return 0;
 
 	const double d_uptime = std::stod(exec("awk '{print $1}' /proc/uptime"));
 	
@@ -330,14 +269,15 @@ int main(int argc, char *argv[]) {
 	shmPTR->fpv_zoom = 1;
 	shmPTR->fpv_adr = 0;
 	shmPTR->fpv_port = 0;
+	shmPTR->connected = 0;
+	shmPTR->fly_at_start = 3;
+	shmPTR->lowest_altitude_to_fly = 1.6f;
 
 
 	thread tl(watch_dog);
 	tl.detach();
 	string fname;
-	shmPTR->connected = 0;
-	shmPTR->fly_at_start = 3;
-	shmPTR->lowest_altitude_to_fly = 1.6f;
+	
 	Debug.n_debug = 0;
 
 	int counter = 0;
@@ -438,10 +378,10 @@ int main(int argc, char *argv[]) {
 #endif
 	mega_i2c.init();
 
+
+
+	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	if (setup(counter) == 0) {
-#ifndef FLY_EMULATOR
-		Settings.read_all();
-#endif
 		shmPTR->reboot = 0;
 		while (shmPTR->run_main){
 			if (loop()) {
@@ -451,7 +391,7 @@ int main(int argc, char *argv[]) {
 				shmPTR->run_main = false;
 		}
 	}
-
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 	if (flag!=0)
 		cout<< "\n main Signal caught!" << "\t"<<(millis_()/1000) << endl;
@@ -478,9 +418,7 @@ int main(int argc, char *argv[]) {
 				system("reboot");
 			break;
 		case 2:
-#ifndef FLY_EMULATOR
 			Settings.write_all();
-#endif
 			system("shutdown now");
 			break;
 

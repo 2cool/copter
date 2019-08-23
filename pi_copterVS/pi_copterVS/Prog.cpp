@@ -217,7 +217,7 @@ bool ProgClass::program_is_OK(){
 				time += timer;
 				
 				fullTime += time;
-				if (false){//fullTime>timeLeft){//MAX_TIME_LONG_FLIGHT){
+				if (fullTime>timeLeft){//MAX_TIME_LONG_FLIGHT){
 					cout << "to long fly for prog!" <<" fly time="<<fullTime<<". Time left="<<timeLeft<<".\t"<<(millis_()/1000) << endl;
 					Telemetry.addMessage(e_PROG_TOO_LONG_DISTANCE);
 					return false;
