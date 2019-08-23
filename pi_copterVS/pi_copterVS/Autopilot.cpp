@@ -332,7 +332,7 @@ string AutopilotClass::get_set(){
 		sens_z << "," << \
 		lowest_height << "," << \
 		shmPTR->fly_at_start << "," << \
-		Debug.n_debug;// << "," << 
+		Telemetry.get_bat_capacity();// << "," << 
 	//	-gimBalPitchZero << "," << 
 	//	-gimBalRollZero;
 	string ret = convert.str();
@@ -352,7 +352,8 @@ void AutopilotClass::set(const float ar[]){
 		Settings.set(ar[i++], shmPTR->fly_at_start);
 		if (shmPTR->fly_at_start + 1 < lowest_height)
 			shmPTR->fly_at_start = lowest_height + 1;
-		Debug.n_debug = (int)ar[i++];
+		if (motors_is_on()==false)
+			Telemetry.set_bat_capacity(ar[i++]);
 
 		//gimBalPitchZero= -constrain(ar[i],-15,15);i++;
 		//gimBalRollZero = -constrain(ar[i],-15,15);i++;

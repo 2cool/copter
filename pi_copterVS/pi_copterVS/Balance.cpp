@@ -40,49 +40,12 @@ public:
 
 
 };
-
-
-
-
-
-
 void correct(float & f){
 	if (f < 0)
 		f = 0;
 	else if (f>1)
 		f = 1;
 }
-
-
-
-
-/*
-
-
-
-если скорость радиан в секунду то 0.11
-
-63 грама
-
-2.24-3.01 за 108.088 милесекунды
-
-*/
-
-
-
-
-/*
-
-0         1
-
-+
-
-2    +    3
-
-*/
-
-
-
 
 
 
@@ -97,15 +60,6 @@ float nTime[2];
 #define MIN_SPEED 0.2f
 float const predTime = 0.009f;
 
-
-
-//float dt = 0.009f;
-
-long oldtttttttttttt = 0;
-int cntttttttttt = 0;
-
-//bool tempp1 = false;
-//int32_t taim0;
 static const float f_constrain(const float v, const float min, const float max){
 	return constrain(v, min, max);
 }
@@ -118,11 +72,6 @@ void BalanceClass::set_pitch_roll_pids(const float kp, const float ki, const flo
 	pids[PID_ROLL_RATE].kI(ki);
 	pids[PID_ROLL_RATE].imax(-imax,imax);
 }
-
-
-//P_R_rateKP","P_R_rateKI","P_R_rateIMAX","P_R_stabKP","YAW_rate_KP","YAW_rateE_KI","YAW_rate_IMAX","YAW_stab_KP","MAX_ANGLE"},
-
-
 
 
 void BalanceClass::init()
@@ -399,18 +348,14 @@ bool BalanceClass::loop()
 				f_[Hmc.motor_index] = 0.5;
 			}
 			else {
-#ifndef FLY_EMULATOR
-				if ((_ct - Autopilot.time_at__start) < 5e3L || (Autopilot.time_at__start - Autopilot.old_time_at__start) > 8e3L) {
-					f_[0] = f_[1] = f_[2] = f_[3] = throttle = true_throttle = 0.3;//
-					//if (Mpu.vibration > 3)
-						//Autopilot.off_throttle(true, "VBR");
-
-				}
-#endif
-				if (throttle < MIN_THROTTLE) {
+				const int32_t speedup_time = 5e3;
+				const int32_t _ct32 = _ct / 1e3;
+				if ((_ct32 - Autopilot.time_at__start) < speedup_time || (Autopilot.time_at__start - Autopilot.old_time_at__start) > 8e3) {
+					float thr = FALLING_THROTTLE *(_ct32 - Autopilot.time_at__start) / speedup_time;
+					true_throttle = constrain(thr, STOP_THROTTLE_, FALLING_THROTTLE);
+					f_[0] = f_[1] = f_[2] = f_[3] = throttle = true_throttle;
 					reset();
 				}
-
 			}
 
 		}

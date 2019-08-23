@@ -140,15 +140,18 @@ int init_shmPTR() {
 	return 0;
 }
 //////////////////////////////////////////////////////////////////////////////////////
-uint32_t start_seconds = 0;
-uint32_t millis() {
-	timespec t;
-	clock_gettime(CLOCK_REALTIME, &t);
-	uint32_t ret;
-	if (start_seconds == 0)
-		start_seconds = t.tv_sec;
-	ret = ((t.tv_sec - start_seconds) * 1000) + (t.tv_nsec / 1000000);
-	return ret;
+#include <chrono>
+
+static auto start = chrono::steady_clock::now();
+
+int64_t micros() {
+
+	auto end = chrono::steady_clock::now();
+	return chrono::duration_cast<chrono::microseconds>(end - start).count();
+}
+int32_t millis() {
+	auto end = chrono::steady_clock::now();
+	return (int32_t)chrono::duration_cast<chrono::milliseconds>(end - start).count();
 }
 
 void delay(unsigned long t) {
@@ -231,7 +234,7 @@ string down_case(string &str) {
 	}
 	return str;
 }
-const static int  com_bit[] = { MOTORS_ON ,GO2HOME,CONTROL_FALLING,REBOOT,SHUTDOWN,GIMBAL_PLUS,GIMBAL_MINUS,PROGRAM,Z_STAB,XY_STAB,COMPASS_ON,HORIZONT_ON,MPU_GYRO_CALIBR,COMPASS_CALIBR };
+const static int  com_bit[] = { MOTORS_ON ,GO2HOME,CONTROL_FALLING,REBOOT,SHUTDOWN,GIMBAL_PLUS,GIMBAL_MINUS,PROGRAM,Z_STAB,XY_STAB,NOT_USED1,NOT_USED2,MPU_GYRO_CALIBR,COMPASS_CALIBR };
 const static string str_com[] = { "motorson","go2home","cntrf","reboot","shutdown","gimbp","gimbm","prog","zstab","xystab","compason","horizonton","mpugyrocalibr","compasscalibr","stat", "help","image" };
 const static int arr_size = sizeof(com_bit) / 4;
 //-----------------------------------------------------------------------------
@@ -546,8 +549,8 @@ void telegram_send_video_frame(string name) {
 
 void telegram_loop() {
 	static uint old_message_len = 0;
-	static uint32_t last_update = 0;
-	static uint32_t last_message_t = millis();
+	static int32_t last_update = 0;
+	static int32_t last_message_t = millis();
 
 	shmPTR->telegram_run = true;
 
@@ -563,9 +566,9 @@ void telegram_loop() {
 		
 			
 		delay(100);
-		uint32_t time = millis();
+		int32_t time = millis();
 		//commander
-		const uint32_t interval = ((time - last_message_t) < 20) ? 1000 : 10000;
+		const int32_t interval = ((time - last_message_t) < 20) ? 1000 : 10000;
 		if (time - last_update > interval) {
 			//printf("upd\n");
 			last_update = time;
@@ -666,78 +669,94 @@ void getCommunication() {
 srv1.livegpstracks.com" или "5.9.136.109",
 порт: 3335
 */
+double distance_(const double lat, const double lon, const double lat2, const double lon2) {
+	double R = 6371000;
+	double f1 = (lat);
+	double f2 = (lat2);
+	double df = (lat2 - lat);
+	double dq = (lon2 - lon);
 
+	double a = (sin(df / 2) * sin(df / 2) + cos(f1) * cos(f2) * sin(dq / 2) * sin(dq / 2));
+	return R * 2 * atan2(sqrt(a), sqrt(1 - a));
+
+}
 
 
 void loger_loop() {
-
-
-
+	static double old_lat = 0, old_lon = 0;
 	int sockfd_loger=0;
 	shmPTR->loger_run = true;
 
 	while (true) {
 		delay(1000);
-
-		while (shmPTR->inet_ok == false || shmPTR->loger_run == false) {
-			loger_inet_ok = false;
-			delay(100);
-			if (serial_n > 1) {
-				cout << "loger stoped\n";
-				if (sockfd_loger != 0) {
-					close(sockfd_loger);
-					sockfd_loger = 0;
+		double lat = 1.74532925199433e-9 * (double)shmPTR->lat_;  //radians
+		double lon = 1.74532925199433e-9 * (double)shmPTR->lon_;
+		//bearing = bearing_(lat, lon, lat + DELTA_A_RAD, lon + DELTA_A_RAD);
+		const double distance = distance_(lat, lon, old_lat, old_lon);
+		if (distance>10) {
+			//cout << "sended" << endl;
+			old_lat = lat;
+			old_lon = lon;
+			while (shmPTR->inet_ok == false || shmPTR->loger_run == false) {
+				loger_inet_ok = false;
+				delay(100);
+				if (serial_n > 1) {
+					cout << "loger stoped\n";
+					if (sockfd_loger != 0) {
+						close(sockfd_loger);
+						sockfd_loger = 0;
+					}
 				}
-			}
-			serial_n = 1;
-		}
-		if (serial_n <= 1)
-			cout << "loger started\n";
-
-	//	if (false)//GPS.loc.accuracy_hor_pos_>MIN_ACUR_HOR_POS_4_JAMM || abs(GPS.loc.dist2home_2 - last_dist2home2) < max(625, GPS.loc.accuracy_hor_pos_*GPS.loc.accuracy_hor_pos_))
-	//		continue;
-
-		if (serial_n == 1) {
-			struct sockaddr_in serv_addr;
-			struct hostent *server;
-			int portno = 3335;
-			sockfd_loger = socket(AF_INET, SOCK_STREAM, 0);
-
-			if (sockfd_loger < 0) {
-				//printf( "ERROR opening socket\n");
 				serial_n = 1;
+			}
+			if (serial_n <= 1)
+				cout << "loger started\n";
+
+			//	if (false)//GPS.loc.accuracy_hor_pos_>MIN_ACUR_HOR_POS_4_JAMM || abs(GPS.loc.dist2home_2 - last_dist2home2) < max(625, GPS.loc.accuracy_hor_pos_*GPS.loc.accuracy_hor_pos_))
+			//		continue;
+
+			if (serial_n == 1) {
+				struct sockaddr_in serv_addr;
+				struct hostent* server;
+				int portno = 3335;
+				sockfd_loger = socket(AF_INET, SOCK_STREAM, 0);
+
+				if (sockfd_loger < 0) {
+					//printf( "ERROR opening socket\n");
+					serial_n = 1;
+					continue;
+				}
+
+				server = gethostbyname("srv1.livegpstracks.com");
+				if (server == NULL) {
+					//printf( "ERROR, no such host\n");
+					serial_n = 1;
+					continue;
+				}
+
+				bzero((char*)& serv_addr, sizeof(serv_addr));
+				serv_addr.sin_family = AF_INET;
+				bcopy((char*)server->h_addr, (char*)& serv_addr.sin_addr.s_addr, server->h_length);
+				serv_addr.sin_port = htons(portno);
+				if (connect(sockfd_loger, (struct sockaddr*) & serv_addr, sizeof(serv_addr)) < 0) {
+					//printf( "ERROR connecting");
+					serial_n = 1;
+					continue;
+				}
+				//------------------------------------------------------
+			}
+
+			getCommunication();
+			int n = write(sockfd_loger, com, 42);
+			loger_inet_ok = n >= 42;
+			if (n < 42) {
+				cout << "loger: ERROR writing to socket\n";
+				serial_n = 1;
+				close(sockfd_loger);
 				continue;
 			}
 
-			server = gethostbyname("srv1.livegpstracks.com");
-			if (server == NULL) {
-				//printf( "ERROR, no such host\n");
-				serial_n = 1;
-				continue;
-			}
-
-			bzero((char *)&serv_addr, sizeof(serv_addr));
-			serv_addr.sin_family = AF_INET;
-			bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
-			serv_addr.sin_port = htons(portno);
-			if (connect(sockfd_loger, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-				//printf( "ERROR connecting");
-				serial_n = 1;
-				continue;
-			}
-			//------------------------------------------------------
 		}
-
-		getCommunication();
-		int n = write(sockfd_loger, com, 42);
-		loger_inet_ok = n >= 42;
-		if (n < 42) {
-			cout << "loger: ERROR writing to socket\n";
-			serial_n = 1;
-			close(sockfd_loger);
-			continue;
-		}
-
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

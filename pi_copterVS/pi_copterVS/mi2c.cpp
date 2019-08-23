@@ -161,7 +161,7 @@ void Megai2c::beep_code(uint8_t c) {
 	if (c != old_code || (_ct - old_beep_time) >= 500) {
 		old_beep_time = _ct;
 		old_code = c;
-		cout << "BEEP:" << (int)c << endl;
+		//cout << "BEEP:" << (int)c << endl;
 		if (DO_SOUND) {
 			char chBuf[] = { 1,c };
 			write(fd, chBuf, 2);

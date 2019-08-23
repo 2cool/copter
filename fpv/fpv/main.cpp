@@ -123,39 +123,18 @@ void handler(int sig) { // can be called asynchronously
 void pipe_handler(int sig) {
 	cout << "fpv pipe error\n";
 }
+#include <chrono>
 
+static auto start = chrono::steady_clock::now();
 
+int64_t micros() {
 
-
-uint32_t start_seconds = 0;
-uint32_t millis_g() {
-	timespec t;
-	clock_gettime(CLOCK_REALTIME, &t);
-	uint32_t ret;
-
-	ret = ((t.tv_sec) * 1000) + (t.tv_nsec / 1000000);
-	return ret;
+	auto end = chrono::steady_clock::now();
+	return chrono::duration_cast<chrono::microseconds>(end - start).count();
 }
-uint32_t millis() {
-	timespec t;
-	clock_gettime(CLOCK_REALTIME, &t);
-	uint32_t ret;
-	if (start_seconds == 0)
-		start_seconds = t.tv_sec;
-	ret = ((t.tv_sec - start_seconds) * 1000) + (t.tv_nsec / 1000000);
-	return ret;
-}
-
-
-
-int64_t micros(void) {
-	timespec t;
-	clock_gettime(CLOCK_REALTIME, &t);
-	int64_t ret;
-	if (start_seconds == 0)
-		start_seconds = t.tv_sec;
-	ret = ((int64_t)(t.tv_sec - start_seconds) * 1000000) + (t.tv_nsec / 1000);
-	return ret;
+int32_t millis() {
+	auto end = chrono::steady_clock::now();
+	return (int32_t)chrono::duration_cast<chrono::milliseconds>(end - start).count();
 }
 void delay(unsigned long t) {
 	usleep(t * 1000);

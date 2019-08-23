@@ -35,8 +35,10 @@
 //#define BAT_100P 422
 #define MAX_UPD_COUNTER 100
 #define MAX_VOLTAGE_AT_START 406
-#define BAT_Ampere_hour 3.5
 
+
+
+static float BAT_Ampere_hour = 3.5;
 static float  f_current = 0;
 static float fly_time_lef = 0;
 void TelemetryClass::addMessage(const string msg, bool and2sms){
@@ -92,10 +94,23 @@ void TelemetryClass::getSettings(int n){
 
 }
 static float full_battery_charge;
+static float bat_chargedK;
+
+float TelemetryClass::get_bat_capacity() {
+	return BAT_Ampere_hour;
+}
+
+void TelemetryClass::set_bat_capacity(float a_ch) {
+	BAT_Ampere_hour = a_ch;
+	float lost = full_battery_charge - battery_charge;
+
+	full_battery_charge = battery_charge = BAT_Ampere_hour * bat_chargedK;
+	battery_charge -= lost;
+}
+
 void TelemetryClass::init_()
 {
-	
-	
+	BAT_Ampere_hour = 3.5;
 	init_shmPTR();
 
 	buf = shmPTR->telemetry_buf;
@@ -112,10 +127,10 @@ void TelemetryClass::init_()
 	//Out.println("TELEMETRY INIT");
 	voltage_at_start = 0;
 	full_power = 0;
-	double cur = ((voltage - (BAT_ZERO * SN)) / (70 * SN));
-	if (cur > 1)
-		cur = 1;
-	full_battery_charge=battery_charge = BAT_Ampere_hour *  cur ;
+	bat_chargedK = ((voltage - (BAT_ZERO * SN)) / (70 * SN));
+	if (bat_chargedK > 1)
+		bat_chargedK = 1;
+	full_battery_charge=battery_charge = BAT_Ampere_hour * bat_chargedK;
 }
 
 uint16_t data[5];
@@ -246,7 +261,7 @@ Max Continuous Power 220 Watts
 
 
 //	Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);
-	shmPTR->voltage = voltage = 1.725*(float)(data[4]);
+	shmPTR->voltage = voltage = 1.733*(float)(data[4]);
 	full_power += ( (m_current[0] + m_current[1] + m_current[2] + m_current[3]) * voltage - full_power)*0.2;  //152 вата  - 274, 9.24 amper
 	
 #endif
