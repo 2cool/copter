@@ -10,7 +10,6 @@
 //-----------------------------------------------------------------
 //#define FLY_EMULATOR
 //----------------------------------------------------------------
-//#define ALWAYS_SOUND
 //#define YAW_OFF
 //#define XY_SAFE_AREA 200
 //#define Z_SAFE_AREA 40

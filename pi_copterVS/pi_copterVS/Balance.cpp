@@ -352,7 +352,7 @@ bool BalanceClass::loop()
 				const int32_t _ct32 = _ct / 1e3;
 				if ((_ct32 - Autopilot.time_at__start) < speedup_time || (Autopilot.time_at__start - Autopilot.old_time_at__start) > 8e3) {
 					float thr = FALLING_THROTTLE *(_ct32 - Autopilot.time_at__start) / speedup_time;
-					true_throttle = constrain(thr, STOP_THROTTLE_, FALLING_THROTTLE);
+					true_throttle = constrain(thr, 0.1, 0.35);
 					f_[0] = f_[1] = f_[2] = f_[3] = throttle = true_throttle;
 					reset();
 				}
@@ -367,7 +367,7 @@ bool BalanceClass::loop()
 #ifdef MOTORS_OFF
 		f_[0] = f_[1] = f_[2] = f_[3] = 0;
 #endif
-		//f_[0] = f_[1] = f_[2] = f_[3] = 0.51;
+	//	f_[0] = f_[1] = f_[2] = f_[3] = throttle;
 		//f_[0] = f_[1] = 0.502;
 		//отключить двигатели при слабом токе
 		//if (propeller_lost[0] || propeller_lost[3]) 	f_[0]=f_[3] = 0;

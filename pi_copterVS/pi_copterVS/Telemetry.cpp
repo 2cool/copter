@@ -221,7 +221,7 @@ Max Continuous Power 220 Watts
 	shmPTR->m_current[2] = m_current[2] = 1.024 * (20 - (float)(data[2]-24) / CUR_K);
 	shmPTR->m_current[3] = m_current[3] = 1.024 * (20 - (float)(data[3]-24) / CUR_K);
 
-
+	//Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);
 
 	/*/////////////
 	static float mc0 = 0, mc1 = 0, mc2 = 0, mc3 = 0;

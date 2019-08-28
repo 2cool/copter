@@ -370,15 +370,15 @@ int main(int argc, char *argv[]) {
 
 
 
-	const bool debug_run = Autopilot.not_start_motors_if_gps_error = (string(argv[0]).find("out") == string::npos) ? true : false;
-#ifdef ALWAYS_SOUND
-	mega_i2c.DO_SOUND = 1;
+
+
+#ifdef DEBUG
+	mega_i2c.DO_SOUND = 0;
 #else
-	mega_i2c.DO_SOUND = Autopilot.not_start_motors_if_gps_error= (debug_run) ? 1 : 0;
-#endif
+	mega_i2c.DO_SOUND = 1;
+#endif;
+
 	mega_i2c.init();
-
-
 
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	if (setup(counter) == 0) {
@@ -414,8 +414,9 @@ int main(int argc, char *argv[]) {
 		switch (shmPTR->reboot) {
 		case 1:
 			Settings.write_all();
-			if (string(argv[0]).find("out") == string::npos)
-				system("reboot");
+#ifndef DEBUG
+			system("reboot");
+#endif
 			break;
 		case 2:
 			Settings.write_all();

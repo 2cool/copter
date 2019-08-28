@@ -21,7 +21,17 @@ THG out of Perimetr high
 //при shift yaw на 180 грудусов летает в обратном направление при управлении наклоном телефона
 //при старте его кидает в сторону. наверное проблема в необнулении стаб спид
 
+
+
+
+
+//    Addition options -DDEBUG
+#ifdef DEBUG
+#define CALIBRATION__TIMEOUT 6e3
+#else
 #define CALIBRATION__TIMEOUT 60e3
+#endif
+
 
 #define WIND_X 10
 #define WIND_Y 10

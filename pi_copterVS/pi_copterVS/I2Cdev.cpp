@@ -180,9 +180,7 @@ int8_t readWord(uint8_t devAddr, uint8_t regAddr, uint16_t *data) {
  */
 int8_t readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data) {
     int8_t count = 0;
-#ifdef DEBUG
-    printf("read %#x %#x %u\n",devAddr,regAddr,length);
-#endif
+
     int fd = open("/dev/i2c-0", O_RDWR);
 
     if (fd < 0) {
@@ -358,9 +356,6 @@ int writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t* data) 
     uint8_t buf[128];
     int fd;
 
-#ifdef DEBUG
-    printf("write %#x %#x\n",devAddr,regAddr);
-#endif
     if (length > 127) {
         fprintf(stderr, "Byte write count (%d) > 127\n", length);
         return -1;
