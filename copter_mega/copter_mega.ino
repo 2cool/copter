@@ -6,9 +6,18 @@
 #include <stdint.h>
 #include <Wire.h>
 #include "Adafruit_NeoPixel-master\Adafruit_NeoPixel.h"
+#include <EEPROM.h>
 #ifdef __AVR__
 #include <avr/power.h>
 #endif
+
+
+
+
+//#define PRINT
+
+
+
 
 
 #define PIN           27
@@ -53,6 +62,7 @@ volatile uint8_t beep_code = 0;
 uint8_t beeps_coder[] = { 0, B00001000,B00001001,B00001010,B00001011,B00001100,B00001101,B00001110,B00001111,B00000001,B00000010,B00000011,B00000100,B00000101,B00000110,B00000111 };//4 beeps if 0 short 1 long beep
 
 
+#define ESC_CALIBR_ADR	0
 #define b10 {100,0,0}
 #define b01 {0,100,0}
 #define b00 {0,0,0}
@@ -61,16 +71,10 @@ uint8_t beeps_led[][2][3]{ {b00,b00}, { b10,b00},{b10,b01},{ b10,b01 },{b10,b11}
 
 volatile bool ring=false,ring_to_send=false;
 
+volatile uint16_t overloadVal=0;
 
-
-unsigned  long owerload_time_start;
-volatile uint16_t overloadVal;
-volatile uint64_t overloadTime;
-volatile uint8_t overloadCnt;
 volatile bool gps_status = false;
 volatile uint8_t pi_copter_color[8][3]={ {0,1,0},{ 0,1,0 },{ 0,1,0 },{ 0,1,0 },{ 0,1,0 },{ 0,1,0 },{ 0,1,0 },{ 0,1,0 } };
-
-volatile bool shutdown = false;
 
 enum {eNO_CON,eRING};
 volatile uint8_t col[][3] = { { 1,0,0 },{255,0,0} };
@@ -85,6 +89,15 @@ bool ring_was = false;
 #define PAUSE_TIME 100
 #define LONG_BEEP 600
 #define SHORT_BEEP 200
+
+
+
+
+#ifdef PRINT
+#define printf(args) Serial.println (args);
+#else
+#define printf(args) 
+#endif
 
 uint8_t beep_bit_n = 0;
 uint32_t beep_time = 0;
@@ -232,21 +245,17 @@ void receiveEvent(int countToRead) {
 		uint8_t len = inBuf[0] >> 3;
 		uint16_t temp = *((uint16_t*)&inBuf[1]);
 		if (len == 0) {
-			if (!shutdown) {
-
-				OCR0 = constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE);
-				bool pow_on = temp > pwm_OFF_THROTTLE;
-				temp = *((uint16_t*)&inBuf[3]);
-				pow_on |= temp > pwm_OFF_THROTTLE;
-				OCR1 = constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE);
-				temp = *((uint16_t*)&inBuf[5]);
-				pow_on |= temp > pwm_OFF_THROTTLE;
-				OCR2 = constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE);
-				temp = *((uint16_t*)&inBuf[7]);
-				pow_on |= temp > pwm_OFF_THROTTLE;
-				OCR3 = constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE);
-				
-			}
+			OCR0 = constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE);
+			bool pow_on = temp > pwm_OFF_THROTTLE;
+			temp = *((uint16_t*)&inBuf[3]);
+			pow_on |= temp > pwm_OFF_THROTTLE;
+			OCR1 = constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE);
+			temp = *((uint16_t*)&inBuf[5]);
+			pow_on |= temp > pwm_OFF_THROTTLE;
+			OCR2 = constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE);
+			temp = *((uint16_t*)&inBuf[7]);
+			pow_on |= temp > pwm_OFF_THROTTLE;
+			OCR3 = constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE);
 		}
 		else {
 			OCR_GP = constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE);
@@ -272,11 +281,11 @@ void receiveEvent(int countToRead) {
 	}
 	case 2: 
 	{
-		overloadTime = *((uint16_t*)&inBuf[1]);
-		overloadVal = *((uint16_t*)&inBuf[3]);
-		overloadCnt = inBuf[5];
-		shutdown = false;
-		overloadF = 0;
+		overloadVal = *((uint16_t*)&inBuf[1]);
+		//printf(overloadVal);
+		//printf(inBuf[3]);
+		if (inBuf[3])
+			EEPROM.write(ESC_CALIBR_ADR, inBuf[3]);
 		break;
 	}
 	case 3: 
@@ -337,6 +346,7 @@ void requestEvent() {
 	}
 	case 1: 
 	{
+		//bit 0 - ring; 1 - gps is ready; 2 - m1-overload; 3 -m2-overload ...4,5
 		ret = ring_to_send;
 		ring_to_send = false;
 		if (gps_status == false && gps_cnt != 0 && gps_cnt != old_gps_c) {
@@ -344,37 +354,16 @@ void requestEvent() {
 			reg = 2;
 			ret |= 2;
 		}
+		ret |= (overloadF << 2);
+		overloadF ^= overloadF;
+
 		Wire.write(ret);
 		break;
 	}
+	//--------------------------------------------------------------
 	case 2: 
-	//	Serial.println(gps_data()->lon);
-	//	Serial.println("send");
 		Wire.write((char*)gps_data(), sizeof(SEND_I2C));
 		break;
-	//case 3:
-	//{
-	/*	if (ret = SIM800.available()) {
-			if (ret > 16)
-				ret = 16;
-			Wire.write(ret);
-			reg = 4;
-			//Serial.print("sim ");
-			//Serial.println((int)ret);
-		}*/
-	//	break;
-	//}
-	//case 4: 
-	//{
-
-		//SIM800.readBytes(simbuf, ret);
-		//Wire.write(simbuf, ret);
-		
-		//Serial.println("sended");
-	//	break;
-	//}
-	
-
 	}
 }
 
@@ -383,27 +372,25 @@ void requestEvent() {
 
 void setup()
 {
-	owerload_time_start = 0;
+	on(48000);
 	overloadVal = 1000; //shutdown 
-	overloadTime = 1;
-	overloadCnt = 1;
-#ifdef ESC_CALIBR
-	on(48000);
-	OCR0 = OCR1 = OCR2 = OCR3 = pwm_MAX_THROTTLE;
-//	OCR0 = pwm_MAX_THROTTLE;
-//	OCR1 = OCR2 = OCR3 = pwm_OFF_THROTTLE;
-
-
-	delay(5000);
-	OCR0 = OCR1 = OCR2 = OCR3 = pwm_OFF_THROTTLE;
-#else
-	on(48000);
-	OCR0 = OCR1 = OCR2 = OCR3 = pwm_OFF_THROTTLE;
-#endif
-	//Serial.begin(115200);
+	const byte esc_calibr=EEPROM.read(ESC_CALIBR_ADR);
+	if (esc_calibr) {
+		EEPROM.write(ESC_CALIBR_ADR, 0);
+		OCR0 = OCR1 = OCR2 = OCR3 = pwm_MAX_THROTTLE;
+		delay((long)esc_calibr * 1000L);
+		OCR0 = OCR1 = OCR2 = OCR3 = pwm_OFF_THROTTLE;
+	}
+	else {
+		OCR0 = OCR1 = OCR2 = OCR3 = pwm_OFF_THROTTLE;
+	}
+#ifdef PRINT
+	Serial.begin(115200);
 	//while (!Serial);
 	//SIM800.begin(9600);
-	//Serial.println("HI");
+	printf("HI");
+	Serial.println("_____________________");
+#endif
 	gps_setup();
 	pinMode(BUZZER, OUTPUT);
 	pinMode(RING, INPUT);
@@ -455,38 +442,18 @@ void loop()
 	const float CF = 0.01;
 
 	int ar = analogRead(MI0);
-	overloadF += (ar < overloadVal);
+	overloadF |= (ar < overloadVal);
 	fb[0] += ((float)(ar)-fb[0])*CF;
 	ar = analogRead(MI1);
-	overloadF += (ar < overloadVal);
+	overloadF |= ((ar < overloadVal)<<1);
 	fb[1] += ((float)(ar)-fb[1])*CF;
 	ar = analogRead(MI2);
-	overloadF += (ar < overloadVal);
+	overloadF |= ((ar < overloadVal)<<2);
 	fb[2] += ((float)(ar)-fb[2])*CF;
 	ar = analogRead(MI3);
-	overloadF += (ar < overloadVal);
+	overloadF |= ((ar < overloadVal)<<3);
 	fb[3] += ((float)(analogRead(ar)) - fb[3])*CF;
-
-	if (overloadF) {
-		const unsigned long t = millis();
-		if (owerload_time_start == 0) {
-			owerload_time_start = t;
-		}
-		else {
-			if (t - owerload_time_start > overloadTime) {
-				if (overloadF > overloadCnt) {
-					shutdown = true;
-					stop_motors();
-				}
-				else
-					overloadF = 0;
-			}
-		}
-	}
-	if (owerload_time_start > 0 && millis() - owerload_time_start > (overloadTime+100))
-		owerload_time_start = 0;
-
-
+	
 	fb[4] += ((float)(analogRead(BAT)) - fb[4])*CF;  //volt
 
 

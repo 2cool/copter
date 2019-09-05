@@ -126,7 +126,9 @@ public:
 	 void sound(const float);
 	 void beep_code(uint8_t);
 	 void sim800_reset();
-	 void settings(uint16_t overloadTime, uint16_t overloadVal, uint8_t overloadCnt);
+	 
+	 //esc_calibr = time betwen max_throtthle and zero_throtthle is seconds If zero no calibration it work in next power on;
+	 void settings(float overCurrentVal, uint8_t esc_calibr);
 	 void throttle(const float n[]);
 
 	 int getiiiiv(char *iiiiv);

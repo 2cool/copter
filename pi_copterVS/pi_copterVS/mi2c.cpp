@@ -31,14 +31,18 @@ int Megai2c::getsim(char * str) {
 */
 
 
-
-void Megai2c::settings(uint16_t overloadTime, uint16_t overloadVal, uint8_t overloadCnt) {
+//add flag for next poweron start with full throthle
+void Megai2c::settings(float overCurrentVal, uint8_t esc_calibr) {
 	char send_buf[6];
 	send_buf[0] = 2;
-	*((uint16_t*)&send_buf[1]) = overloadTime;
-	*((uint16_t*)&send_buf[3]) = overloadVal;
-	send_buf[5] = overloadCnt;
-	write(fd, send_buf, 6);
+
+	if (overCurrentVal > 20)
+		overCurrentVal = 20;
+	uint16_t overloadVal = (uint16_t)1024 - ((overCurrentVal / 20) * 1024);
+	*((uint16_t*)&send_buf[1]) = overloadVal;
+	send_buf[3] = esc_calibr;
+
+	write(fd, send_buf, 4);
 }
 /*
 int Megai2c::send2sim(const char *str, int len) {
@@ -119,7 +123,7 @@ static int sms_received = 0;
 		}
 	}
 }
-
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ init @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 int Megai2c::init()
 {
 	if (init_shmPTR())
@@ -149,8 +153,7 @@ int Megai2c::init()
 	write(fd, buf, 7);
 	shmPTR->sim800_reset_time = 0;
 
-	//mega_i2c.settings(300, 10, 5); упал 2019 07 10 при збое и резком  рывке
-	mega_i2c.settings(300, 10, 15);   //if not execute/ copters motors not start;
+	mega_i2c.settings(10, 0);
 	return 0;
 }
 
@@ -261,7 +264,10 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 		mega_i2c.beep_code(B_I2C_ERR);
 		return -1;
 	}
-
+	if (res <  1) {
+		cout << "GPS_ERROR___\n";
+		return -1;
+	}
 
 	static int32_t last_ring_time = 0;
 
@@ -271,7 +277,6 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 		cout << "RING_BIT sended..." << "\t"<< (millis_() / 1000) << endl;
 		
 	}
-
 
 	if (bit_field & 1 && shmPTR->sim800_reset_time == 0) {
 		if (last_ring_time==0)
@@ -289,12 +294,15 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 			cout << "arduino write bit_field & 2 error" << (millis_() / 1000) << endl;
 			mega_i2c.beep_code(B_I2C_ERR);
 		}
-		return res;
-	}
-	else {
-		return 0;
 	}
 
+	if (bit_field & 0b00111100) {
+		for (int i=0;i<4;i++)
+		if (bit_field & (0b00000100<<i))
+			cout << "-----MOTOR "<<i+1<<" IS OVERLOAD------\n";
+	}
+	
+	return res;
 }
 
 int Megai2c::getiiiiv(char *iiiiv) {

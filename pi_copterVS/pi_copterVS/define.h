@@ -91,6 +91,7 @@
 #define wrap_180(x) (x < -180 ? x+360 : (x > 180 ? x - 360: x))
 #define wrap_PI(x) (x < -PI ? x+TWO_PI : (x > PI ? x - TWO_PI: x))
 
+#define HALL_EFFECT_SENSOR_MAX_CURRENT 20
 
 #define e_ARDUINO_RW_ERROR "ARW"
 #define e_TOO_STRONG_WIND "TSW"

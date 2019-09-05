@@ -206,64 +206,20 @@ Max Continuous Current 14 Amps
 Max Continuous Power 220 Watts
 */
 
-/*
 
-	shmPTR->m_current[0] = m_current[0] = 0.027 *(float)(1004- data[0]);
-	shmPTR->m_current[1] = m_current[1] = 0.027 *(float)(995 - data[1]);
-	shmPTR->m_current[2] = m_current[2] = 0.022 *(float)(999 - data[2]);
-	shmPTR->m_current[3] = m_current[3] = 0.025 *(float)(996 - data[3]);
-*/	
-	
+#define CUR_K ((float)HALL_EFFECT_SENSOR_MAX_CURRENT / 1024)
 
-#define CUR_K 51.15
-	shmPTR->m_current[0] = m_current[0] = 1.024 *( 20 - (float)(data[0]-24) / CUR_K);
-	shmPTR->m_current[1] = m_current[1] = 1.024 * (20 - (float)(data[1]-24) / CUR_K);
-	shmPTR->m_current[2] = m_current[2] = 1.024 * (20 - (float)(data[2]-24) / CUR_K);
-	shmPTR->m_current[3] = m_current[3] = 1.024 * (20 - (float)(data[3]-24) / CUR_K);
-
-	//Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);
-
-	/*/////////////
-	static float mc0 = 0, mc1 = 0, mc2 = 0, mc3 = 0;
-	mc0 += (m_current[0] - mc0)*0.03;
-	mc1 += (m_current[1] - mc1)*0.03;
-	mc2 += (m_current[2] - mc2)*0.03;
-	mc3 += (m_current[3] - mc3)*0.03;
-	Debug.dump(mc0, mc1, mc2, mc3);
-
-	/////////////
-
-
-
-	static float d[4] = { 1000,1000,1000,1000 };
-	for (int i=0; i<4; i++)
-		d[i] += (data[i] - d[i]) * 1;
-
-*/
-
-	//Debug.dump((float)d[0], d[1], d[2], d[3]);
-	//Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);
-
-
-/*
-
-#define WORK_I 1.5
-
-	if (Autopilot.motors_is_on() && Autopilot.get_throttle()>Balance.get_min_throttle() && (m_current[0] > WORK_I || m_current[1] > WORK_I || m_current[2] > WORK_I || m_current[3] > WORK_I)) {
-		Balance.propeller_lost[0] = (m_current[0] < WORK_I);
-		Balance.propeller_lost[1] = (m_current[1] < WORK_I);
-		Balance.propeller_lost[2] = (m_current[2] < WORK_I);
-		Balance.propeller_lost[3] = (m_current[3] < WORK_I);
-		//printf("propeller lost\n");
-	}
-
-*/
-
-
-//	Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);
+	shmPTR->m_current[0] = m_current[0] = 0.1 + HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[0] * CUR_K;
+	shmPTR->m_current[1] = m_current[1] = 0.1 + HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[1] * CUR_K;
+	shmPTR->m_current[2] = m_current[2] = 0.1 + HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[2] * CUR_K;
+	shmPTR->m_current[3] = m_current[3] = 0.1 + HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[3] * CUR_K;
 	shmPTR->voltage = voltage = 1.733*(float)(data[4]);
-	full_power += ( (m_current[0] + m_current[1] + m_current[2] + m_current[3]) * voltage - full_power)*0.2;  //152 вата  - 274, 9.24 amper
-	
+	full_power = (m_current[0] + m_current[1] + m_current[2] + m_current[3]) * voltage;
+
+
+
+	Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);  
+	//Debug.dump((float)data[0], (float)data[1], (float)data[2], (float)data[3]);
 #endif
 }
 
