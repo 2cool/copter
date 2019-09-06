@@ -116,6 +116,7 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	control_bits = DEFAULT_STATE;
 	old_control_bits = 0;
 	aPitch = aRoll = 0;
+	control_DeltaTime = 0;
 
 	gimBalPitchZero = gimBalRollZero= gimbalPitch=0;
 	mega_i2c.gimagl(gimBalPitchZero, gimBalRollZero);

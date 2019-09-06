@@ -88,7 +88,7 @@ private:
 	 int64_t acc_callibr_time;
 	 
 
-	 int64_t time,mpu_time, gps_time, hmc_time, autopilot_time,  ms5611_time,telem_time,com_time;
+	 int64_t time,mpu_time, hmc_time, autopilot_time,  ms5611_time,telem_time,com_time;
 
 
 	 float cor_c_pitch, cor_c_roll;

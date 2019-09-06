@@ -191,7 +191,7 @@ static int32_t comTime = 0;
 ///#define wrap_180(x) (x < -180 ? x+360 : (x > 180 ? x - 360: x))
 	if (millis_() - comTime < 50)
 		return;
-	comTime = millis_();
+	comTime = millis_();;
 	//heading = Emu.get_heading();
 	
 //	headingGrad = 0;
@@ -271,6 +271,10 @@ void HmcClass::loop(){
 	//log();
 	log_sens();
 
+	
+
+
+//	Mpu.hmc_timed = Mpu.timed;
 }
 
 #endif

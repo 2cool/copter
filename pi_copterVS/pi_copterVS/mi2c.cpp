@@ -36,9 +36,9 @@ void Megai2c::settings(float overCurrentVal, uint8_t esc_calibr) {
 	char send_buf[6];
 	send_buf[0] = 2;
 
-	if (overCurrentVal > 20)
-		overCurrentVal = 20;
-	uint16_t overloadVal = (uint16_t)1024 - ((overCurrentVal / 20) * 1024);
+	if (overCurrentVal > HALL_EFFECT_SENSOR_MAX_CURRENT)
+		overCurrentVal = HALL_EFFECT_SENSOR_MAX_CURRENT;
+	uint16_t overloadVal = (uint16_t)1024 - ((overCurrentVal / HALL_EFFECT_SENSOR_MAX_CURRENT) * 1024);
 	*((uint16_t*)&send_buf[1]) = overloadVal;
 	send_buf[3] = esc_calibr;
 

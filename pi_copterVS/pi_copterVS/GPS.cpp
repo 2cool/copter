@@ -161,7 +161,6 @@ void GPSClass::loop(){
 		cout << "gps jamming, accHP="<<(int)loc.accuracy_hor_pos_<<"  , uptime=" << _ct << ",msec. last upd=" << loc.last_gps_data__time << "msec. \n";
 		
 	}	
-	//Mpu.gps_time = 1000L * _ct;
 }
 #endif
 
