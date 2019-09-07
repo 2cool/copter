@@ -184,18 +184,18 @@ int8_t readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data
     int fd = open("/dev/i2c-0", O_RDWR);
 
     if (fd < 0) {
-		cout << "Failed to open device: "<< (int)devAddr<<":"<< errno << "\t"<<(millis_()/1000) << endl;
+		cout << "Failed to open device: "<< (int)devAddr<<":"<< errno << "\t"<<millis_() << endl;
         //fprintf(stderr, "Failed to open device: %s\n", strerror(errno));
         return(-1);
     }
     if (ioctl(fd, I2C_SLAVE, devAddr) < 0) {
-		cout << "Failed to select device: " << (int)devAddr << ":" << errno << "\t"<<(millis_()/1000) << endl;
+		cout << "Failed to select device: " << (int)devAddr << ":" << errno << "\t"<<millis_() << endl;
         //fprintf(stderr, "Failed to select device: %s\n", strerror(errno));
         close(fd);
         return(-1);
     }
     if (write(fd, &regAddr, 1) != 1) {
-		cout << "Failed to write reg: " << (int)devAddr << ":" << errno << "\t"<<(millis_()/1000) << endl;
+		cout << "Failed to write reg: " << (int)devAddr << ":" << errno << "\t"<<millis_() << endl;
 		
        // fprintf(stderr, "Failed to write reg: %s\n", strerror(errno));
         close(fd);
@@ -203,13 +203,13 @@ int8_t readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data
     }
     count = read(fd, data, length);
     if (count < 0) {
-		cout << "Failed to read device(" <<(int)count<<")"<<":"<< (int)devAddr << ":" << errno <<":"<<(millis_()/1000)<< endl;
+		cout << "Failed to read device(" <<(int)count<<")"<<":"<< (int)devAddr << ":" << errno <<":"<<millis_()<< endl;
        // fprintf(stderr, "Failed to read device(%d): %s\n", count, strerror(errno));
 		
         close(fd);
         return(-1);
     } else if (count != length) {
-		cout << "Short read from device, expected "<<length<<", got "<< (int)count << ":" << (int)devAddr << "\t"<<(millis_()/1000) << endl;
+		cout << "Short read from device, expected "<<length<<", got "<< (int)count << ":" << (int)devAddr << "\t"<<millis_() << endl;
       //  fprintf(stderr, "Short read  from device, expected %d, got %d\n", length, count);
 		
         close(fd);

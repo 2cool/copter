@@ -398,7 +398,7 @@ int main()
 			set_zoom(zoom - 1);
 		}
 		if (shmPTR->fpv_code) {
-			cout << shmPTR->fpv_code << endl;
+			cout << "fpv code:"<<shmPTR->fpv_code << endl;
 			send_msg(shmPTR->fpv_code);
 			shmPTR->fpv_code = 0;
 		}

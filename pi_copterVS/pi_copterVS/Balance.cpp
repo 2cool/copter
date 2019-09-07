@@ -90,7 +90,7 @@ void BalanceClass::init()
 	old_time = micros_();
 
 	//set_pitch_roll_pids(0.001, 0.001, 0.3);  // 10
-	set_pitch_roll_pids(0.0012, 0.001, 0.3);//9
+	set_pitch_roll_pids(0.001, 0.001, 0.3);//9
 
 
 	yaw_stabKP = 2;
@@ -210,7 +210,7 @@ void BalanceClass::log() {
 		Log.end();
 	}
 }
-void BalanceClass::reset() {
+void BalanceClass::PID_reset() {
 	pids[PID_PITCH_RATE].reset_I();
 	pids[PID_ROLL_RATE].reset_I();
 	pids[PID_YAW_RATE].reset_I();
@@ -220,10 +220,8 @@ void BalanceClass::reset() {
 }
 
 bool BalanceClass::set_min_max_throttle(const float max, const float min) {
-	if (min < MIN_THROTTLE || max > MAX_THROTTLE)
-		return true;
-	max_throttle = max;
-	min_throttle = min;
+	min_throttle = (min < MIN_THROTTLE) ? MIN_THROTTLE : min;
+	max_throttle = (max > MAX_THROTTLE) ? MAX_THROTTLE : max;
 	Stabilization.setMinMaxI_Thr();
 
 
@@ -235,9 +233,61 @@ bool BalanceClass::set_min_max_throttle(const float max, const float min) {
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+
+bool BalanceClass::speed_up_control(float n[]) {
+#define START_THROTTHLE 0.15
+#define SPEEDUP_CNT 200
+	static uint32_t start_cnt[4];
+	static float max_thr[4];
+	int ret = 0;
+	for (int i = 0; i < 4; i++) {
+		ret |= (n[i] <= MIN_THROTTLE)<<i;
+		if (n[i] < START_THROTTHLE) {
+			start_cnt[i] = 0;
+			max_thr[i] = START_THROTTHLE;
+			ret |= 1<<i;
+		}
+		else {
+			if (start_cnt[i] < SPEEDUP_CNT && n[i] > max_thr[i]) {
+				n[i] = max_thr[i];
+				start_cnt[i]++;
+				max_thr[i] = START_THROTTHLE + (float)start_cnt[i] * (0.15 / SPEEDUP_CNT);
+				start_cnt[i]++;
+				ret |= 1<<i;
+			}
+		}
+	}
+	//Debug.dump(n[0], n[1], n[2], n[3]);
+	//n[0] = n[1] = n[2] = n[3] = 0;
+	//if (ret && ret!=0b1111)
+	//	cout << ret << endl;
+	return ret==0b1111;
+}
+
+
+
+
+
+
+
+
+
 #define MAX_D_ANGLE_SPEED 70
 #define MAX_D_YAW_SPEED 70
 //#define MAX_POWER_K_IF_MAX_ANGLE_30 1.12
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -252,9 +302,21 @@ bool BalanceClass::loop()
 	else {
 		if (Autopilot.motors_is_on()) { 
 
+			static float secure_throttle = MAX_THROTTLE;
+			if (mega_i2c.motors_overload) {
+				secure_throttle -= 0.02;
+				if (secure_throttle < HOVER_THROTHLE)
+					secure_throttle = HOVER_THROTHLE;
+			}
+			else {
+				secure_throttle += 0.01;
+				if (secure_throttle > max_throttle)
+					secure_throttle = max_throttle;
+			}
+			
 			const float pK =  powerK();
 			const float c_min_throttle = min_throttle*pK;
-			const float c_max_throttle = (max_throttle*pK > OVER_THROTTLE) ? OVER_THROTTLE : max_throttle * pK;
+			const float c_max_throttle = (secure_throttle *pK > OVER_THROTTLE) ? OVER_THROTTLE : secure_throttle * pK;
 
 			if (Autopilot.z_stabState()) {
 				true_throttle = pK * Stabilization.Z();
@@ -274,7 +336,7 @@ bool BalanceClass::loop()
 			if (thr > OVER_THROTTLE) {
 				t_max_angle = RAD2GRAD * acos(throttle / OVER_THROTTLE);
 				t_max_angle = constrain(t_max_angle, MIN_ANGLE, max_angle);
-				throttle = max_throttle;
+				throttle = secure_throttle;
 			}
 			else {
 				throttle = thr;
@@ -343,25 +405,32 @@ bool BalanceClass::loop()
 			f_[2] = f_constrain((throttle - roll_output + pitch_output + yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
 			f_[0] = f_constrain((throttle - roll_output - pitch_output - yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
 
+
+			
+			
+
 			if (Hmc.do_compass_motors_calibr) {
 				f_[0] = f_[1] = f_[2] = f_[3] = 0;
-				f_[Hmc.motor_index] = 0.5;
+				f_[Hmc.motor_index] = HOVER_THROTHLE;
 			}
 			else {
 				const int32_t speedup_time = 5e3;
 				const int32_t _ct32 = _ct / 1e3;
 				if ((_ct32 - Autopilot.time_at__start) < speedup_time || (Autopilot.time_at__start - Autopilot.old_time_at__start) > 8e3) {
-					float thr = FALLING_THROTTLE *(_ct32 - Autopilot.time_at__start) / speedup_time;
-					true_throttle = constrain(thr, 0.051, 0.35);
+					true_throttle = MIN_THROTTLE;
 					f_[0] = f_[1] = f_[2] = f_[3] = throttle = true_throttle;
-					reset();
 				}
+
+
+				//f_[0] = f_[1] = f_[2] = f_[3] = throttle;//!!!!!!!!!!!!!!!!!
+
+
+				
 			}
+			
 
 		}
-		else {
-			reset();
-		}
+		
 		
 //#define MOTORS_OFF
 #ifdef MOTORS_OFF
@@ -369,14 +438,18 @@ bool BalanceClass::loop()
 #endif
 
 		//f_[1] = f_[2] = 0;
-		//f_[0] = f_[1] = f_[2] = f_[3] = throttle;
+		//f_[0] = f_[1] = f_[2] = f_[3] = 0;
 		//f_[0] = f_[1] = 0.502;
 		//отключить двигатели при слабом токе
 		//if (propeller_lost[0] || propeller_lost[3]) 	f_[0]=f_[3] = 0;
 		//if (propeller_lost[1] || propeller_lost[2]) 	f_[1] = f_[2] = 0;
-	//	if (f_[0]>=0.4 || f_[1]>0.4 || f_[2]>0.4 || f_[3]>0.4)	f_[0] = f_[1] = f_[2] = f_[3] = throttle;
+		///if (f_[0]>=0.4 || f_[1]>0.4 || f_[2]>0.4 || f_[3]>0.4)	f_[0] = f_[1] = f_[2] = f_[3] = 0.3;
 		//f_[3] = f_[0];
 
+
+
+		if (speed_up_control(f_))
+			PID_reset();
 		mega_i2c.throttle(f_);  //670 micros
 		log();
 	}

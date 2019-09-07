@@ -158,8 +158,9 @@ void GPSClass::loop(){
 		mega_i2c.beep_code(B_GPS_TOO_LONG);
 	}
 	if (Autopilot.motors_is_on() && (_ct - loc.last_gps_accuracy_ok) > NO_GPS__DATA && loc.last_gps_accuracy_ok) {
+#ifndef DEBUG
 		cout << "gps jamming, accHP="<<(int)loc.accuracy_hor_pos_<<"  , uptime=" << _ct << ",msec. last upd=" << loc.last_gps_data__time << "msec. \n";
-		
+#endif		
 	}	
 }
 #endif

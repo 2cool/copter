@@ -87,7 +87,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             Log.i("UPS", "DOWNLOADING SETINGS");
             Telemetry.n_settings=-2;
             boolean uploaded=false;
-            for (int i=0; i<3; i++) {
+            for (int i=0; i<5; i++) {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {

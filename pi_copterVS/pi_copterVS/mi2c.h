@@ -115,7 +115,7 @@ protected:
 public:
 	uint8_t  DO_SOUND = 0;
 	void set_led_mode(uint8_t n,uint8_t briht, bool pulse=false);
-
+	uint8_t motors_overload = 0;
 	 bool ring_received;
 	
 	 int init();

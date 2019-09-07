@@ -43,7 +43,7 @@ static float  f_current = 0;
 static float fly_time_lef = 0;
 void TelemetryClass::addMessage(const string msg, bool and2sms){
 
-	cout << msg << "\t"<<(millis_()/1000) << endl;;
+	cout << msg << "\t"<<millis_() << endl;;
 	if (message.length() < msg.length() || message.compare(msg) == -1) {
 		message += msg;
 	}
@@ -143,7 +143,7 @@ void TelemetryClass::loop()
 		testBatteryVoltage();
 		uint16_t time_left = check_time_left_if_go_to_home();
 		if (Autopilot.progState() && time_left < 60 && ++no_time_cnt>3){ 
-			cout << "too far from HOME!" << "\t"<<(millis_()/1000) << endl;
+			cout << "too far from HOME!" << "\t"<<millis_() << endl;
 			addMessage(e_BATERY_OFF_GO_2_HOME);
 			Autopilot.going2HomeStartStop(false);
 		}	
@@ -218,7 +218,7 @@ Max Continuous Power 220 Watts
 
 
 
-	Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);  
+	//Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);  
 	//Debug.dump((float)data[0], (float)data[1], (float)data[2], (float)data[3]);
 #endif
 }

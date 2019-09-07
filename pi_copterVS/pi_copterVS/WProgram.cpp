@@ -32,7 +32,7 @@ std::string exec(const std::string cmd) {
 	FILE* pipe = popen(cmd.c_str(), "r");
 	if (!pipe) {
 		//throw std::runtime_error("popen() failed!");
-		cout << "pipe brock" << "\t"<<(millis_()/1000) << endl;
+		cout << "pipe brock" << "\t"<<millis_() << endl;
 		return "";
 	}
 	while (!feof(pipe)) {
@@ -55,7 +55,7 @@ int init_shmPTR() {
 		ShmKEY = ftok(SHMKEY, 'x');
 	ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
 		if (ShmID < 0) {
-			cout << "*** shmget error (server) ***" << "\t"<<(millis_()/1000) << endl;
+			cout << "*** shmget error (server) ***" << "\t"<<millis_() << endl;
 			return 1;
 		}
 		shmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
@@ -64,10 +64,10 @@ int init_shmPTR() {
 }
 
 void close_shmPTR() {
-	cout << "Server has detected the completion of its child..." << "\t"<<(millis_()/1000) << endl;
+	cout << "Server has detected the completion of its child..." << "\t"<<millis_() << endl;
 	shmdt((void *)shmPTR);
-	cout << "Server has detached its shared memory..." << "\t"<<(millis_()/1000) << endl;
+	cout << "Server has detached its shared memory..." << "\t"<<millis_() << endl;
 	shmctl(ShmID, IPC_RMID, NULL);
-	cout << "Server has removed its shared memory..." << "\t"<<(millis_()/1000) << endl;
-	cout << "Server exits..." << "\t"<<(millis_()/1000) << endl;
+	cout << "Server has removed its shared memory..." << "\t"<<millis_() << endl;
+	cout << "Server exits..." << "\t"<<millis_() << endl;
 }

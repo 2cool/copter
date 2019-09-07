@@ -16,11 +16,11 @@ unsigned int PROM_read(int DA, char PROM_CMD)
 	uint8_t r8b[] = { 0, 0 };
 
 	if (write(DA, &PROM_CMD, 1) != 1){
-		cout << "read set reg Failed to write to the i2c bus." << "\t"<<(millis_()/1000) << endl;
+		cout << "read set reg Failed to write to the i2c bus." << "\t"<<millis_() << endl;
 	}
 
 	if (read(DA, r8b, 2) != 2){
-		cout << "Failed to read from the i2c bus." << "\t"<<(millis_()/1000) << endl;
+		cout << "Failed to read from the i2c bus." << "\t"<<millis_() << endl;
 	}
 
 	ret = r8b[0] * 256 + r8b[1];
@@ -36,7 +36,7 @@ char RESET = 0x1E;
 
 int MS5611Class::writeReg(char bar_zero) {
 	if (write(fd4S, &bar_zero, 1) != 1) {
-		cout << "write reset 8 bit Failed to write to the i2c bus." << "\t"<<(millis_()/1000) << endl;
+		cout << "write reset 8 bit Failed to write to the i2c bus." << "\t"<<millis_() << endl;
 		bar_task = 0;
 		return -1;
 	}
@@ -181,7 +181,7 @@ void MS5611Class::error(const int n) {
 	Telemetry.addMessage(e_BAROMETR_RW_ERROR);
 	mega_i2c.beep_code(B_I2C_ERR);
 	bar_task = 0;
-	cout << "Failed to read-write from the i2c barometr bus #" <<n<<" "<< (millis_()/1000) << endl;
+	cout << "Failed to read-write from the i2c barometr bus #" <<n<<" "<< millis_() << endl;
 	wrong_altitude_cnt++;
 	ct = NORM_CT + NORM_CT;
 }
@@ -290,7 +290,7 @@ void MS5611Class::phase2() {
 		int32_t tP = ((((int64_t)D1*SENS) / 2097152 - OFF) / 32768);
 
 		if (tP < 80000 || tP > 107000) {
-			cout << "PRESSURE ERROR " << tP << "\t"<<(millis_()/1000) << endl;
+			cout << "PRESSURE ERROR " << tP << "\t"<<millis_() << endl;
 			error(33);
 			return;
 		}

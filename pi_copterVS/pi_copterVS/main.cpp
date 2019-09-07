@@ -3,6 +3,9 @@
 #define PROG_VERSION "ver 3.190823\n"
 #define SIM800_F
 
+
+//Additional Options  DDEBUG
+
 //при стартре замерять вибрацию после чего делать корекцию или вообще запрещать полет при сильной вибрации
 
 #include <sys/sem.h>
@@ -155,7 +158,7 @@ void handler(int sig) { // can be called asynchronously
 	flag = 1; // set flag
 }
 void pipe_handler(int sig) {
-	cout << "pipe error" << "\t"<<(millis_()/1000) << endl;
+	cout << "pipe error" << "\t"<<millis_() << endl;
 }
 
 
@@ -201,12 +204,12 @@ void watch_dog() {
 		if (start_wifi)
 			if (wifi_cnt == shmPTR->wifi_cnt || (Autopilot.last_time_data__recived && (_ct - Autopilot.last_time_data__recived) > 60e3 && (_ct - last_wifi__reloaded) > 60e3)) {
 				last_wifi__reloaded = _ct;
-				cout << "--------------wifi killed:\t" << (_ct/1000) << endl;
+				cout << "--------------wifi killed:\t" << _ct << endl;
 				shmPTR->wifi_run = false;
 				system("nice -n -20 pkill wifi_p");
 				delay(1000);
 				shmPTR->wifi_run = true;
-				cout << "--------------wifi started:\t" << (_ct / 1000) << endl;;
+				cout << "--------------wifi started:\t" << _ct << endl;;
 				string t = "nice -n -20 /root/projects/wifi_p ";
 				t += " &";
 				system(t.c_str());
@@ -214,7 +217,7 @@ void watch_dog() {
 
 		if (start_inet)
 			if (internet_cnt == shmPTR->internet_cnt) {
-				cout << "--------------ppp starting" << "\t" << (_ct / 1000) << endl;
+				cout << "--------------ppp starting" << "\t" << _ct << endl;
 				shmPTR->internet_run = false;
 				system("nice -n -20 pkill ppp_p");
 				delay(1000);
@@ -394,7 +397,7 @@ int main(int argc, char *argv[]) {
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 	if (flag!=0)
-		cout<< "\n main Signal caught!" << "\t"<<(millis_()/1000) << endl;
+		cout<< "\n main Signal caught!" << "\t"<<millis_() << endl;
 	//WiFi.stopServer();
 	Settings.write();
 	

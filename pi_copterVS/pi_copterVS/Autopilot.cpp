@@ -393,7 +393,7 @@ bool AutopilotClass::holdAltitude(float alt){
 	tflyAtAltitude = flyAtAltitude = alt;
 	control_bits |= Z_STAB;
 	//setbuf(stdout, NULL);
-	cout << "FlyAt: " << flyAtAltitude << "\t"<<(millis_()/1000) << endl;
+	cout << "FlyAt: " << flyAtAltitude << "\t"<<millis_() << endl;
 
 	return true;
 }
@@ -530,7 +530,7 @@ bool AutopilotClass::going2HomeON(const bool hower){
 		control_bits |= GO2HOME;
 		f_go2homeTimer = 0;
 		//Out.println("Hanging on the site!");
-		cout << "go2home" << "\t"<< (millis_() / 1000) << endl;
+		cout << "go2home" << "\t"<< millis_() << endl;
 		go2homeIndex=JUMP;
 	}
 	return res;
@@ -562,7 +562,7 @@ bool AutopilotClass::holdLocation(const long lat, const long lon){
 
 	
 		//GPS.loc.setNeedLoc(lat,lon);
-		cout << "Hower at: " << GPS.loc.lat_ << " " << GPS.loc.lon_ << "\t"<< (millis_() / 1000) << endl;;
+		cout << "Hower at: " << GPS.loc.lat_ << " " << GPS.loc.lon_ << "\t"<< millis_() << endl;;
 
 		//Stabilization.init_XY(0, 0);
 		Stabilization.setNeedPos(Mpu.get_Est_X(), Mpu.get_Est_Y());
@@ -606,7 +606,7 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 #ifndef FLY_EMULATOR
 		cout << "on ";
 		if (_ct < CALIBRATION__TIMEOUT) {
-			cout << "\n!!!calibrating!!! to end:"<< CALIBRATION__TIMEOUT -(int)(_ct / 1000) <<" sec." << "\t"<< (_ct / 1000) << endl;
+			cout << "\n!!!calibrating!!! to end:"<< CALIBRATION__TIMEOUT -(int)_ct <<" sec." << "\t"<< _ct << endl;
 			mega_i2c.beep_code(B_MS611_ERROR);
 			return false;
 		}
@@ -619,13 +619,13 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 
 			if (Telemetry.low_voltage){
 				Telemetry.addMessage(e_LOW_VOLTAGE);
-				cout << " LOW VOLTAGE" << "\t"<< (_ct / 1000) << endl;
+				cout << " LOW VOLTAGE" << "\t"<< _ct << endl;
 				mega_i2c.beep_code(B_LOW_VOLTAGE);
 				return false;
 			}
 
 			if (Hmc.do_compass_motors_calibr==false && GPS.loc.accuracy_hor_pos_ > MIN_ACUR_HOR_POS_2_START ){
-				cout << " GPS error" << "\t"<< (_ct / 1000) << endl;
+				cout << " GPS error" << "\t"<< _ct << endl;
 				mega_i2c.beep_code(B_GPS_ACCURACY_E);
 				Telemetry.addMessage(e_GPS_ERROR);
 
@@ -637,7 +637,7 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 			
 			control_bits |= MOTORS_ON;
 
-			cout << "OK" << "\t"<< (_ct / 1000) <<endl;
+			cout << "OK" << "\t"<< _ct <<endl;
 
 			GPS.loc.setHomeLoc();
 			Mpu.set_XYZ_to_Zero();  // все берем из мпу. при  старте x y z = 0;
@@ -679,7 +679,7 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 				mega_i2c.beep_code(5);
 
 			}
-			cout << " calibr FALSE" << "\t"<< (_ct / 1000) <<endl;
+			cout << " calibr FALSE" << "\t"<< _ct <<endl;
 		}
 	}//------------------------------OFF----------------
 	else {
@@ -690,7 +690,7 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 		Telemetry.addMessage(i_OFF_MOTORS);
 		off_throttle(true, msg);
 
-		cout << "OK" << "\t"<< (_ct / 1000) <<endl;
+		cout << "OK" << "\t"<< _ct <<endl;
 
 		//if (camera_mode) {//----------------------------------
 		//	thread t(stop_video);
@@ -717,10 +717,11 @@ void AutopilotClass::control_falling(const string msg){
 bool AutopilotClass::off_throttle(const bool force, const string msg){/////////////////////////////////////////////////////////////////////////////////////////////////
 	if ( force)
 	{
-		cout << "force motors_off " << msg << ", alt: " << (int)Mpu.get_Est_Alt() << ", time " << (int)(millis_() / 1000) << endl;
+		cout << "force motors_off " << msg << ", alt: " << (int)Mpu.get_Est_Alt() << ", time " << (int)millis_() << endl;
 		Balance.set_off_th_();
 		Telemetry.addMessage(msg);
-		control_bits = DEFAULT_STATE;
+		static uint32_t prog = control_bits & PROGRAM_LOADED;
+		control_bits = DEFAULT_STATE|prog;
 		return true;
 	}
 	else{
@@ -751,7 +752,7 @@ void AutopilotClass::connectionLost_(){ ///////////////// LOST
 	shmPTR->commander_buf_len = 0;
 	shmPTR->telemetry_buf_len = 0;
 
-	cout << "connection lost" << "\t"<<(_ct/1000)<<endl;
+	cout << "connection lost" << "\t"<<_ct<<endl;
 	Telemetry.addMessage(e_LOST_CONNECTION);
 	Commander.controls2zero();
 
@@ -824,7 +825,7 @@ bool AutopilotClass::start_stop_program(const bool stopHere){
 				res &= holdLocation(GPS.loc.lat_, GPS.loc.lon_);
 				if (res) {
 					control_bits |= PROGRAM;
-					cout << "prog started" << "\t"<< (millis_() / 1000) << endl;;
+					cout << "prog started" << "\t"<< millis_() << endl;;
 					return true;
 				}
 			}
@@ -849,7 +850,7 @@ bool AutopilotClass::set_control_bits(uint32_t bits) {
 		bool on = motors_is_on() == false;
 		on = motors_do_on(on, m_START_STOP);
 		if (on == false) {
-			cout << "motors on denied!"<< "\t"<<(millis_()/1000)<<endl;
+			cout << "motors on denied!"<< "\t"<<millis_()<<endl;
 		}
 	}
 
@@ -910,7 +911,7 @@ bool AutopilotClass::set_control_bits(uint32_t bits) {
 
 int  AutopilotClass::reboot() {
 	if (motors_is_on() == false) {
-		cout << "REBOOT" << "\t"<<(millis_()/1000) << endl;
+		cout << "REBOOT" << "\t"<<millis_() << endl;
 		shmPTR->reboot = 1;
 		shmPTR->run_main = false;
 		return 0;
@@ -919,7 +920,7 @@ int  AutopilotClass::reboot() {
 }
 int  AutopilotClass::shutdown() {
 	if (motors_is_on() == false) {
-		cout << "SHUTD" << "\t"<< (millis_() / 1000) << endl;
+		cout << "SHUTD" << "\t"<< millis_() << endl;
 		shmPTR->reboot = 2;
 		shmPTR->run_main = false;
 		return 0;
@@ -929,7 +930,7 @@ int  AutopilotClass::shutdown() {
 }
 int  AutopilotClass::exit() {
 	if (motors_is_on() == false) {
-		cout << "EXIT" << "\t"<< (millis_() / 1000) << endl;
+		cout << "EXIT" << "\t"<< millis_() << endl;
 		shmPTR->reboot = 3;
 		shmPTR->run_main = false;
 		return 0;

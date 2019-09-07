@@ -184,7 +184,7 @@ void ProgClass::loop(){
 	if (go_next && !do_action){
 		go_next = distFlag = altFlag = do_action = false;
 		if (load_next(true) == false){
-			cout << "PROG END" << "\t"<<(millis_()/1000) << endl;
+			cout << "PROG END" << "\t"<<millis_() << endl;
 			Autopilot.start_stop_program(false);
 		}
 	}
@@ -218,7 +218,7 @@ bool ProgClass::program_is_OK(){
 				
 				fullTime += time;
 				if (fullTime>timeLeft){//MAX_TIME_LONG_FLIGHT){
-					cout << "to long fly for prog!" <<" fly time="<<fullTime<<". Time left="<<timeLeft<<".\t"<<(millis_()/1000) << endl;
+					cout << "to long fly for prog!" <<" fly time="<<fullTime<<". Time left="<<timeLeft<<".\t"<<millis_() << endl;
 					Telemetry.addMessage(e_PROG_TOO_LONG_DISTANCE);
 					return false;
 				}
@@ -234,11 +234,11 @@ bool ProgClass::program_is_OK(){
 		const float y2 = next_y - Mpu.get_Est_Y();
 		const float dist = (float)sqrt(x2*x2 + y2*y2);
 		if (dist >= 20 || alt  >= 20){
-			cout << "end poitn to far from star!!!" << "\t"<<(millis_()/1000) << endl;
+			cout << "end poitn to far from star!!!" << "\t"<<millis_() << endl;
 			Telemetry.addMessage(e_PROG_TOO_LONG_FROM_START);
 			return false;
 		}
-		cout << "time for flyghy: " << (int)fullTime << "\t"<<(millis_()/1000) << endl;
+		cout << "time for flyghy: " << (int)fullTime << "\t"<<millis_() << endl;
 		return true;
 	}
 else
@@ -584,12 +584,12 @@ bool ProgClass::add(byte*buf)
 	if (steps_count == 0){
 		prog_steps_count_must_be = *(uint16_t*)&buf[i];
 		i+=2;
-		//cout << "prog steps=" << prog_steps_count_must_be << "\t"<<(millis_()/1000) << endl;
+		//cout << "prog steps=" << prog_steps_count_must_be << "\t"<<millis_() << endl;
 	}
 	
 	prog_data_size = pi;
 	steps_count++;
-	cout << steps_count << ". dot added! " << prog_data_size << "\t"<<(millis_()/1000) << endl;
+	cout << steps_count << ". dot added! " << prog_data_size << "\t"<<millis_() << endl;
 	//Autopilot.program_is_loaded(prog_steps_count_must_be == steps_count);
 	if (prog_steps_count_must_be == steps_count) {
 		Autopilot.program_is_loaded(true);

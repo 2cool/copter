@@ -8,6 +8,7 @@ public class Telemetry {
     public static int get_counter(){return telemetry_couter;}
     static public int batVolt,current;
     static public long start_time=0,lost_time=0;
+    static public int initial_vltage=0;
    // static public String motors_on_timer="00:00";
     static public boolean hom_pos_is_loaded=false;
     static public double lat=0;
@@ -389,74 +390,6 @@ public class Telemetry {
         _alt*=0.1;
 
 
-
-        final long cur_time = System.currentTimeMillis();
-
-//load home pos
-        
-        if (MainActivity.motorsOnF()){
-            if (hom_pos_is_loaded == false) {
-                Disk.load_location_("/sdcard/RC/start_location.save");
-                start_lat=Disk._lat;
-                start_lon=Disk._lon;
-                start_time=Disk._time;
-                Log.i("LOAD_LOC","tel="+start_time);
-            }
-        }else if (hom_pos_is_loaded==false)
-            dist=0;
-        hom_pos_is_loaded = true;
-        
-//init old and auto lat lon
-        if (MainActivity.motorsOnF()) {
-            if (start_lat==0 && start_lon==0){
-                start_lat =  lat;
-                start_lon =  lon;
-                start_time=System.currentTimeMillis();
-                Disk.save_location_("/sdcard/RC/start_location.save", lat, lon, _alt,start_time);
-            }
-        }else {
-            start_lat = start_lon = 0;
-            start_time=0;
-        }
-//fly time
-
-
-//dist speed
-        if (old_Lat==0 && old_Lon==0) {
-            old_Lat = lat;
-            old_Lon = lon;
-            speed_time=System.currentTimeMillis();
-        }
-        if (cur_time-speed_time>500 && old_Lat!=lat || old_Lon!=lon) {
-            //вічисляем растояние до старта
-            dist=(start_lat==0 || start_lon==0)?0:dist(start_lat,start_lon,lat,lon);
-            final double dDist = dist(old_Lat, old_Lon, lat, lon);
-            if (dDist>3) {
-                old_Lat = lat;
-                old_Lon = lon;
-                final double dt = 0.001 * (cur_time - speed_time);
-                speed_time = cur_time;
-                speed += (dDist / dt - speed) * ((dt<1)?dt:1);
-            }
-        }
-
-
-
-
-
-
-        if (old_alt1==-100000)
-            old_alt1=_alt;
-        double dalt=_alt-old_alt1;
-        old_alt1=_alt;
-        long t=System.currentTimeMillis();
-        double dt=0.001*(double)(t-alt_time);
-        alt_time=t;
-        if (dt>0)
-            v_speed+=(dalt/dt-v_speed)*0.05;
-        if ((MainActivity.control_bits&MainActivity.MOTORS_ON)==MainActivity.MOTORS_ON){
-            relAlt=_alt;
-        }
         pitch=buf[i++];
         roll=buf[i++];
 
@@ -467,6 +400,10 @@ public class Telemetry {
 
         batVolt=load_int16(buf,i);
         i+=2;
+
+        if (initial_vltage==0 || initial_vltage<batVolt)
+            initial_vltage=batVolt;
+
         //int b0= 256+load_uint8(buf,i++);
         //int b1= 256+load_uint8(buf,i++);
         //int b2= 256+load_uint8(buf,i++);
@@ -531,32 +468,75 @@ public class Telemetry {
             ap_throttle += (realThrottle * z - ap_throttle) * 0.03;
         }
 
-/*
-	//	msg+=",";
-		final long cttt=System.currentTimeMillis();
-		if (oldMsgTimer<=cttt) {
-			oldMsgTimer+=DELTA_TIME_4_MSG;
-			if (msg.matches("TELE,,,,,,,,,,,,,,"))
-				Disk.write("n\n");
-			else
-				Disk.write(msg+"\n");
-			while (oldMsgTimer<=cttt){
-				oldMsgTimer+=DELTA_TIME_4_MSG;
-				Disk.write("t\n");
-			}
+        //-------------------------------------------------------------------------------------
 
-			oldMsgTimer=cttt;
-		}
-		readMessages(new String(buf,i,buf_len-i));
 
-		float z = (float) Math.sqrt( (1 - pitch * pitch*GRAD2RAD*GRAD2RAD ) * (1 - roll * roll * GRAD2RAD*GRAD2RAD) );
-		//ap_throttle=realThrottle*z;
-		if ((MainActivity.control_bits&MainActivity.MOTORS_ON)==0){
-			ap_throttle=realThrottle*z;
-		}else {
-			ap_throttle += (realThrottle * z - ap_throttle) * 0.03;
-		}
-		*/
+
+
+        final long cur_time = System.currentTimeMillis();
+
+//load home pos
+
+        if (MainActivity.motorsOnF()){
+            if (hom_pos_is_loaded == false) {
+                Disk.load_location_("/sdcard/RC/start_location.save");
+                start_lat=Disk._lat;
+                start_lon=Disk._lon;
+                start_time=Disk._time;
+                Log.i("LOAD_LOC","tel="+start_time);
+            }
+        }else if (hom_pos_is_loaded==false)
+            dist=0;
+        hom_pos_is_loaded = true;
+
+//init old and auto lat lon
+        if (MainActivity.motorsOnF()) {
+            if (start_lat==0 && start_lon==0){
+                start_lat =  lat;
+                start_lon =  lon;
+                start_time=System.currentTimeMillis();
+                Disk.save_location_("/sdcard/RC/start_location.save", lat, lon, _alt,start_time);
+            }
+        }else {
+            start_lat = start_lon = 0;
+            start_time=0;
+        }
+//fly time
+
+
+//dist speed
+        if (old_Lat==0 && old_Lon==0) {
+            old_Lat = lat;
+            old_Lon = lon;
+            speed_time=System.currentTimeMillis();
+        }
+        if (cur_time-speed_time>500 && old_Lat!=lat || old_Lon!=lon) {
+            //вічисляем растояние до старта
+            dist=(start_lat==0 || start_lon==0)?0:dist(start_lat,start_lon,lat,lon);
+            final double dDist = dist(old_Lat, old_Lon, lat, lon);
+            if (dDist>3) {
+                old_Lat = lat;
+                old_Lon = lon;
+                final double dt = 0.001 * (cur_time - speed_time);
+                speed_time = cur_time;
+                speed += (dDist / dt - speed) * ((dt<1)?dt:1);
+            }
+        }
+
+        if (old_alt1==-100000)
+            old_alt1=_alt;
+        double dalt=_alt-old_alt1;
+        old_alt1=_alt;
+        long t=System.currentTimeMillis();
+        double dt=0.001*(t-alt_time);
+        alt_time=t;
+        if (dt>0)
+            v_speed+=(dalt/dt-v_speed)*0.05;
+        if ((MainActivity.control_bits&MainActivity.MOTORS_ON)==MainActivity.MOTORS_ON){
+            relAlt=_alt;
+        }
+
+
     }
 
 

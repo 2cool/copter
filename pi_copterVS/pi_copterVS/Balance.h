@@ -33,7 +33,7 @@
 class BalanceClass
 {
  protected:
-	 void reset();
+	 void PID_reset();
 	 void log();
 	 int64_t old_time;
 	 void set_pitch_roll_pids(const float kp, const float ki, const float imax);
@@ -46,6 +46,7 @@ class BalanceClass
 
 	float t_max_angle;
 	float max_throttle,min_throttle, max_angle;
+	bool speed_up_control(float n[]);
  public:
 	 float get_max_throttle() { return max_throttle; }
 	 float get_min_throttle() { return min_throttle; }
