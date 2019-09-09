@@ -141,13 +141,8 @@ void MpuClass::init()
 	w_accX = w_accY = 0;
 	sinPitch = sinRoll = 0;
 	yaw_offset = yaw = pitch = roll = gyroPitch = gyroRoll = gyroYaw = accX = accY = accZ = 0;
-
-	max_g_cnt = 0;
 	cosYaw = 1;
 	sinYaw = 0;
-	temp_deb = 6;
-	
-	
 	tiltPower = cosPitch = cosRoll = 1;
 
 	//COMP_FILTR = 0;// 0.003;

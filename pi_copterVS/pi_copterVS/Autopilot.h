@@ -42,7 +42,7 @@ class AutopilotClass
 	 float f_go2homeTimer;
  
 	 
-	 float flyAtAltitude;
+	 float flyAtAltitude_V,flyAtAltitude_R;
 
 	// bool motors_on, smart_ctrl;
 
@@ -52,7 +52,7 @@ class AutopilotClass
 	 float throttle;
 	 
 	 uint32_t control_bits;
-	 float tflyAtAltitude;
+
 
 	 void log();
 
@@ -66,8 +66,7 @@ class AutopilotClass
 
 	 
  public:
-
-	 bool not_start_motors_if_gps_error;
+	 bool is_all_OK(bool print=false);
 	 int reboot();
 	 int shutdown();
 	 int exit();
@@ -95,7 +94,7 @@ class AutopilotClass
 	 void program_is_loaded(bool set);
 	 bool set_control_bits(uint32_t bits);
 
-	 float fly_at_altitude() { return flyAtAltitude; }
+	 float fly_at_altitude() { return flyAtAltitude_V; }
 	 uint32_t get_control_bits(){ return control_bits; }
 	 //uint8_t mod;  //режим работы 
 	// bool falling(){ return ctrl_flag == CNTR_FALLING; }
@@ -113,7 +112,7 @@ class AutopilotClass
 	 void set(const float buf[]);
 
 	
-	 void clearSpeedCoreection(){ flyAtAltitude = tflyAtAltitude; }
+	 void clearSpeedCoreection(){ flyAtAltitude_V = flyAtAltitude_R; }
 
 	// bool get_smart_cntr_flag(){ return smart_ctrl; }
 

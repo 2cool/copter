@@ -149,15 +149,15 @@ void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 				speed = MAX_VER_SPEED_MINUS;
 
 
-		if (speed<-0.2 && (tflyAtAltitude < lowest_height || flyAtAltitude < lowest_height))
+		if (speed<-0.2 && (flyAtAltitude_R < lowest_height || flyAtAltitude_V < lowest_height))
 			speed = fmax(-0.2, speed);
 
-		tflyAtAltitude += speed * dt;
+		flyAtAltitude_R += speed * dt;
 
 		//if (tflyAtAltitude < lowest_height)
 		//	tflyAtAltitude = lowest_height;
 
-		flyAtAltitude = tflyAtAltitude + Stabilization.getDist_Z(speed);
+		flyAtAltitude_V = flyAtAltitude_R + Stabilization.getDist_Z(speed);
 		//if (flyAtAltitude < lowest_height)
 		//	flyAtAltitude = lowest_height;
 
@@ -166,7 +166,7 @@ void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 	else {
 		if (set_alt) {
 			set_alt = false;
-			flyAtAltitude = tflyAtAltitude= Mpu.get_Est_Alt();
+			flyAtAltitude_V = flyAtAltitude_R= Mpu.get_Est_Alt();
 
 		}
 	}
@@ -298,7 +298,10 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 	else {
 
 		if (motors_is_on() == false) {
-			mega_i2c.set_led_mode(0, 10, false);
+			if (is_all_OK(false))
+				mega_i2c.set_led_mode(0, 10, false);
+			else
+				mega_i2c.set_led_mode(0, 10, true);
 		}
 		else {
 			if (control_bits&CONTROL_FALLING)
@@ -385,15 +388,15 @@ void AutopilotClass::set(const float ar[]){
 
 
 void AutopilotClass::set_new_altitude(float alt){
-	tflyAtAltitude = flyAtAltitude = alt;
+	flyAtAltitude_R = flyAtAltitude_V = alt;
 }
 
 bool AutopilotClass::holdAltitude(float alt){
 
-	tflyAtAltitude = flyAtAltitude = alt;
+	flyAtAltitude_R = flyAtAltitude_V = alt;
 	control_bits |= Z_STAB;
 	//setbuf(stdout, NULL);
-	cout << "FlyAt: " << flyAtAltitude << "\t"<<millis_() << endl;
+	cout << "FlyAt: " << flyAtAltitude_V << "\t"<<millis_() << endl;
 
 	return true;
 }
@@ -445,12 +448,12 @@ bool AutopilotClass::go2HomeProc(const float dt){
 				break;
 			}	
 			//поднятся  на высоту  X м от стартовой высоты или опуститься
-			tflyAtAltitude=flyAtAltitude = height_to_lift_to_fly_to_home;
+			flyAtAltitude_R=flyAtAltitude_V = height_to_lift_to_fly_to_home;
 			go2homeIndex = TEST_ALT1;
 			break;
 		}
 		case TEST_ALT1:{
-			if (fabs(Mpu.get_Est_Alt() - flyAtAltitude) <= (ACCURACY_Z)){
+			if (fabs(Mpu.get_Est_Alt() - flyAtAltitude_V) <= (ACCURACY_Z)){
 				go2homeIndex = GO2HOME_LOC;
 			}
 			break;
@@ -477,13 +480,13 @@ bool AutopilotClass::go2HomeProc(const float dt){
 			f_go2homeTimer += dt;
 			if (f_go2homeTimer > 5){
 				go2homeIndex = TEST_ALT2;
-				tflyAtAltitude = flyAtAltitude = (FAST_DESENDING_TO_HIGH);
+				flyAtAltitude_R = flyAtAltitude_V = (FAST_DESENDING_TO_HIGH);
 			}
 			break;
 
 
 		case TEST_ALT2:{//спуск до FAST_DESENDING_TO_HIGH метров
-			if (fabs(Mpu.get_Est_Alt() - flyAtAltitude) < (ACCURACY_Z)){
+			if (fabs(Mpu.get_Est_Alt() - flyAtAltitude_V) < (ACCURACY_Z)){
 				go2homeIndex = SLOW_DESENDING;
 			}
 			   
@@ -500,11 +503,11 @@ bool AutopilotClass::go2HomeProc(const float dt){
 				float k = Mpu.get_Est_Alt()*0.05f;
 				if (k < 0.1f)
 					k = 0.1f;
-				flyAtAltitude -= (dt*k);
-				tflyAtAltitude = flyAtAltitude;
+				flyAtAltitude_V -= (dt*k);
+				flyAtAltitude_R = flyAtAltitude_V;
 			}
 			else{
-				tflyAtAltitude = flyAtAltitude = lowest_height;
+				flyAtAltitude_R = flyAtAltitude_V = lowest_height;
 			}
 						   
 			break;
@@ -542,7 +545,7 @@ bool AutopilotClass::going2HomeStartStop(const bool hower){
 		return false;
 	bool f = (control_bits & GO2HOME);
 	if (f){
-		tflyAtAltitude = flyAtAltitude;
+		flyAtAltitude_R = flyAtAltitude_V;
 		control_bits ^=GO2HOME;
 		holdLocation(GPS.loc.lat_, GPS.loc.lon_);
 		return true;
@@ -590,6 +593,76 @@ bool AutopilotClass::holdLocationStartStop(){///////////////////////////////////
 	}
 	return false;
 }
+//-------------------------------------------------------------------------------------------------------------------------
+bool AutopilotClass::is_all_OK(bool print){
+	const int32_t _ct = millis_();
+	//printf( "\MS5611 err: %f\n",MS5611.getErrorsK());
+#ifndef FLY_EMULATOR
+
+	if (_ct < CALIBRATION__TIMEOUT) {
+		if (print) {
+			cout << "\n!!!calibrating!!! to end:" << CALIBRATION__TIMEOUT - (int)_ct << " sec." << "\t" << _ct << endl;
+			mega_i2c.beep_code(B_MS611_ERROR);
+		}
+		return false;
+	}
+#endif
+
+	if (shmPTR->inet_ok == false) {
+		if (print) {
+			Telemetry.addMessage(e_NO_INTERNET);
+			cout << "inet dont work" << "\t" << _ct << endl;
+		}
+#ifndef DEBUG
+		return false;
+#endif
+	}
+
+	if (Hmc.do_compass_motors_calibr || (Mpu.gyro_calibratioan && Hmc.calibrated)) {
+		if (Telemetry.low_voltage) {
+			if (print) {
+				Telemetry.addMessage(e_LOW_VOLTAGE);
+				cout << " LOW VOLTAGE" << "\t" << _ct << endl;
+				mega_i2c.beep_code(B_LOW_VOLTAGE);
+			}
+			return false;
+		}
+
+		if (Hmc.do_compass_motors_calibr == false && GPS.loc.accuracy_hor_pos_ > MIN_ACUR_HOR_POS_2_START) {
+			if (print) {
+				cout << " GPS error" << "\t" << _ct << endl;
+				mega_i2c.beep_code(B_GPS_ACCURACY_E);
+				Telemetry.addMessage(e_GPS_ERROR);
+			}
+#ifndef DEBUG
+			return false;
+#endif
+		}
+		if (print)
+			cout << "OK" << "\t" << _ct << endl;
+		return true;
+
+
+	}
+	else {
+		if (Hmc.calibrated == false) {
+			if (print) {
+				cout << "compas, ";
+				mega_i2c.beep_code(4);
+			}
+		}
+		if (Mpu.gyro_calibratioan == false) {
+			if (print) {
+				cout << "gyro";
+				mega_i2c.beep_code(5);
+			}
+
+		}
+		if (print)
+			cout << " calibr FALSE" << "\t" << _ct << endl;
+	}
+	return false;
+}
 /*
 beep codes
 {0, B00001000, B00001001, B00001010, B00001011, B00001100, B00001101, B00001110, B00001111, B00000001, B00000010, B00000011, B00000100, B00000101, B00000110, B00000111 };//4 beeps. 0 short 1 long beep
@@ -602,85 +675,29 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 	cout << msg << "-";
 	
 	if (start){
-		//printf( "\MS5611 err: %f\n",MS5611.getErrorsK());
-#ifndef FLY_EMULATOR
-		cout << "on ";
-		if (_ct < CALIBRATION__TIMEOUT) {
-			cout << "\n!!!calibrating!!! to end:"<< CALIBRATION__TIMEOUT -(int)_ct <<" sec." << "\t"<< _ct << endl;
-			mega_i2c.beep_code(B_MS611_ERROR);
+
+
+		cout << "ON\n";
+
+		if (is_all_OK(true) == false)
 			return false;
-		}
-#endif
+
+		time_at__start = _ct;
+		Telemetry.update_voltage();
+		control_bits |= MOTORS_ON;
+		GPS.loc.setHomeLoc();
+		Mpu.set_XYZ_to_Zero();  // все берем из мпу. при  старте x y z = 0;
+		//tflyAtAltitude = flyAtAltitude = 0;// Mpu.get_Est_Alt();
+
+		if (control_bits&Z_STAB) 
+			holdAltitude(shmPTR->fly_at_start);
+		if (control_bits&XYSTAB)
+			holdLocation(GPS.loc.lat_, GPS.loc.lon_);
+		Stabilization.resset_z();
+		Stabilization.resset_xy_integrator();
+		aYaw_ = -Mpu.get_yaw();
+		Log.run_counter++;
 		
-
-#define MAX_MACC 0.1f
-
-		if (Hmc.do_compass_motors_calibr || (Mpu.gyro_calibratioan && Hmc.calibrated)){
-
-			if (Telemetry.low_voltage){
-				Telemetry.addMessage(e_LOW_VOLTAGE);
-				cout << " LOW VOLTAGE" << "\t"<< _ct << endl;
-				mega_i2c.beep_code(B_LOW_VOLTAGE);
-				return false;
-			}
-
-			if (Hmc.do_compass_motors_calibr==false && GPS.loc.accuracy_hor_pos_ > MIN_ACUR_HOR_POS_2_START ){
-				cout << " GPS error" << "\t"<< _ct << endl;
-				mega_i2c.beep_code(B_GPS_ACCURACY_E);
-				Telemetry.addMessage(e_GPS_ERROR);
-
-				if (not_start_motors_if_gps_error)
-					return false;
-			}
-			time_at__start = _ct;
-			Telemetry.update_voltage();
-			
-			control_bits |= MOTORS_ON;
-
-			cout << "OK" << "\t"<< _ct <<endl;
-
-			GPS.loc.setHomeLoc();
-			Mpu.set_XYZ_to_Zero();  // все берем из мпу. при  старте x y z = 0;
-			//tflyAtAltitude = flyAtAltitude = 0;// Mpu.get_Est_Alt();
-			
-			Mpu.max_g_cnt = 0;
-
-			if (control_bits&Z_STAB) 
-				holdAltitude(shmPTR->fly_at_start);
-			
-			if (control_bits&XYSTAB)
-				holdLocation(GPS.loc.lat_, GPS.loc.lon_);
-
-			Stabilization.resset_z();
-			Stabilization.resset_xy_integrator();
-			aYaw_ = -Mpu.get_yaw();
-
-#ifdef DEBUG_MODE
-			printf( "\nhome loc: %i %i \nhome alt set %i\n", GPS.loc.lat_, GPS.loc.lon_, (int)flyAtAltitude);
-#endif
-
-			Log.run_counter++;
-			//if (camera_mode) {//---------------------------------------------------
-			//	thread t(start_video);
-			//	t.detach();
-
-			//}
-
-
-		}
-		else{
-			if (Hmc.calibrated == false){
-				cout << "compas, ";
-				mega_i2c.beep_code(4);
-
-			}
-			if (Mpu.gyro_calibratioan == false){
-				cout << "gyro";
-				mega_i2c.beep_code(5);
-
-			}
-			cout << " calibr FALSE" << "\t"<< _ct <<endl;
-		}
 	}//------------------------------OFF----------------
 	else {
 		old_time_at__start = _ct;

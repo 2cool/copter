@@ -93,12 +93,7 @@ private:
 
 	 float cor_c_pitch, cor_c_roll;
 	 int64_t oldmpuTime;
-
-
 	 float cosYaw,sinYaw;
-	 int8_t max_g_cnt;
-
-	 float temp_deb;
 	 void initYaw(const float angle);
 	
 	 void new_calibration(const bool onlyGyro);

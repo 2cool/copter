@@ -288,7 +288,7 @@ bool BalanceClass::speed_up_control(float n[]) {
 
 
 
-
+static bool speed_up = true;
 
 
 bool BalanceClass::loop()
@@ -412,6 +412,7 @@ bool BalanceClass::loop()
 			if (Hmc.do_compass_motors_calibr) {
 				f_[0] = f_[1] = f_[2] = f_[3] = 0;
 				f_[Hmc.motor_index] = HOVER_THROTHLE;
+				throttle = HOVER_THROTHLE;
 			}
 			else {
 				const int32_t speedup_time = 5e3;
@@ -427,16 +428,19 @@ bool BalanceClass::loop()
 
 				
 			}
-			
+			if (speed_up && throttle > FALLING_THROTTLE)
+				speed_up = false;
 
-		}
+		}else
+			speed_up = true;
 		
 		
 //#define MOTORS_OFF
+#ifdef DEBUG
 #ifdef MOTORS_OFF
 		f_[0] = f_[1] = f_[2] = f_[3] = 0;
 #endif
-
+#endif
 		//f_[1] = f_[2] = 0;
 		//f_[0] = f_[1] = f_[2] = f_[3] = 0;
 		//f_[0] = f_[1] = 0.502;
@@ -448,7 +452,8 @@ bool BalanceClass::loop()
 
 
 
-		if (speed_up_control(f_))
+		speed_up_control(f_);
+		if (speed_up)
 			PID_reset();
 		mega_i2c.throttle(f_);  //670 micros
 		log();

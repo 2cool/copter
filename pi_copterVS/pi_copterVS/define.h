@@ -75,7 +75,7 @@
 #define TIMEOUT__LAG 500
 
 #define MIDDLE_POSITION 0.5f
-#define HOVER_THROTHLE 0.45
+#define HOVER_THROTHLE 0.5
 #define MIN_THROTTLE 0.35
 #define FALLING_THROTTLE 0.4
 
@@ -106,6 +106,7 @@
 #define e_OUT_OF_PER_H   "TFR"
 #define e_OUT_OF_PER_V   "THG"
 #define e_NO_WIFI_2_LONG "NWF"
+#define e_NO_INTERNET	"WWW"
 #define e_LOW_VOLTAGE    "LWV"
 #define e_GPS_ERROR      "GPE"
 #define e_NO_GPS_2_LONG  "NGP"
