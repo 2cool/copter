@@ -234,26 +234,21 @@ bool BalanceClass::set_min_max_throttle(const float max, const float min) {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-bool BalanceClass::speed_up_control(float n[]) {
+void BalanceClass::speed_up_control(float n[]) {
 #define START_THROTTHLE 0.15
 #define SPEEDUP_CNT 200
 	static uint32_t start_cnt[4];
 	static float max_thr[4];
-	int ret = 0;
 	for (int i = 0; i < 4; i++) {
-		ret |= (n[i] <= MIN_THROTTLE)<<i;
 		if (n[i] < START_THROTTHLE) {
 			start_cnt[i] = 0;
 			max_thr[i] = START_THROTTHLE;
-			ret |= 1<<i;
 		}
 		else {
 			if (start_cnt[i] < SPEEDUP_CNT && n[i] > max_thr[i]) {
 				n[i] = max_thr[i];
-				start_cnt[i]++;
 				max_thr[i] = START_THROTTHLE + (float)start_cnt[i] * (0.15 / SPEEDUP_CNT);
 				start_cnt[i]++;
-				ret |= 1<<i;
 			}
 		}
 	}
@@ -261,7 +256,7 @@ bool BalanceClass::speed_up_control(float n[]) {
 	//n[0] = n[1] = n[2] = n[3] = 0;
 	//if (ret && ret!=0b1111)
 	//	cout << ret << endl;
-	return ret==0b1111;
+
 }
 
 
@@ -428,7 +423,7 @@ bool BalanceClass::loop()
 
 				
 			}
-			if (speed_up && throttle > FALLING_THROTTLE)
+			if (speed_up && throttle >= HOVER_THROTHLE)
 				speed_up = false;
 
 		}else
