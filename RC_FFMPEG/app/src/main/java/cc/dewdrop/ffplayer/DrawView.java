@@ -17,13 +17,12 @@ import cc.dewdrop.ffplayer.myTools.Img_button;
 import cc.dewdrop.ffplayer.myTools.Joystick;
 import cc.dewdrop.ffplayer.myTools.Monitor;
 import cc.dewdrop.ffplayer.myTools.Square_Cells;
-import cc.dewdrop.ffplayer.utils.FFUtils;
 
 public class DrawView extends View {
 
 
 
-
+    final static float THROTTLE_K =0.55f;
     static public double wrap_180(double x) {return (x < -180 ? x+360 : (x > 180 ? x - 360: x));}
     public static ScaleGestureDetector mScaleGestureDetector;
     final float max_manual_thr_index = 5;
@@ -94,10 +93,10 @@ public class DrawView extends View {
         ftx.p[ftx.CAM_ANG]=Integer.toString(Telemetry.gimbalPitch);
         ftx.p[ftx.CAM_ZOOM]=Integer.toString(Commander.fpv_zoom-1);
         ftx.p[ftx.CUR]=Integer.toString((int)(Telemetry.current*Telemetry.batVolt*0.00001f))+"W "+Integer.toString((int)(Telemetry.battery_consumption ));
-        if (Telemetry.start_time==0)
+        if (Telemetry.on_power_time==0)
             ftx.p[ftx.M_ON_T]="00:00:00";
         else {
-            double sec= 0.001 * (System.currentTimeMillis() - Telemetry.start_time);
+            double sec= 0.001 * Telemetry.on_power_time;
             int h=(int)Math.floor(sec/3600);
             String sh=((h<10)?"0":"")+h;
             sec-=h*3600;
@@ -134,8 +133,8 @@ public class DrawView extends View {
             smart_ctrl.set(MainActivity.smartCntrF());
             hold_alt.set(MainActivity.altHoldF());
 
-            if ((MainActivity.command_bits_& MainActivity.Z_STAB) == 0)
-                j_left.set_return_back_Y(MainActivity.altHoldF());
+          //  if ((MainActivity.command_bits_& MainActivity.Z_STAB) == 0)
+          //      j_left.set_return_back_Y(MainActivity.altHoldF());
             do_prog.set(MainActivity.progF());
         }
     }
@@ -534,7 +533,7 @@ public class DrawView extends View {
                 desc_off.set(false);
                 j_left.set_block_Y(false);
                 if (hold_alt.is_pressed() == false)
-                    j_left.setJosticY((float) (max_manual_thr_index * (0.6 - Telemetry.corectThrottle())));
+                    j_left.setJosticY( (max_manual_thr_index * (THROTTLE_K - Telemetry.corectThrottle())));
                 else
                     j_left.setJosticY(0);
             }
@@ -693,8 +692,10 @@ public class DrawView extends View {
 
         if (hold_alt.is_pressed()){
             Commander.throttle=0.5f+j_left.get_neg_Y()/2;
-        }else
-            Commander.throttle=0.55f+j_left.get_neg_Y()/max_manual_thr_index;
+        }else {
+            Commander.throttle = THROTTLE_K + j_left.get_neg_Y() / max_manual_thr_index;
+
+        }
 
       //  Log.d("JLEFT",Double.toString(j_left.getY()));
 

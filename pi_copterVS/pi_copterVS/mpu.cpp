@@ -127,7 +127,7 @@ void MpuClass::log_emu() {
 #ifdef FLY_EMULATOR
 double newQ4z = 0.1, newR4z = 0.2, newQ4xy = 0.1, newR4xy = 5;
 #else
-double newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.01, newR4xy = 5;
+double newQ4z = 0.005, newR4z = 0.2, newQ4xy = 0.01, newR4xy = 5;
 #endif
 //-----------------------------------------------------
 void MpuClass::init()

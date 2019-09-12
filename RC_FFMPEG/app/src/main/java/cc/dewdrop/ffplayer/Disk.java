@@ -116,16 +116,15 @@ public class Disk {
 
 
 
-    public static void save_location_(String fname, double lat, double lon, double alt, long _time){
+    public static void save_location_(String fname, double lat, double lon, double alt){
         if (Telemetry.lat==0 && Telemetry.lon==0)
             return;
         // final File file = new File("/sdcard/RC/start_location.save");
         try {
             OutputStream os = new FileOutputStream(fname);//"/sdcard/RC/start_location.save");
 
-            String t=lat+","+lon+","+alt+","+_time;
+            String t=lat+","+lon+","+alt;
             os.write(t.getBytes());
-            Log.i("LOAD_LOC","Save "+fname+" "+lat+" "+lon+" "+alt+" "+_time);
             os.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,7 +132,6 @@ public class Disk {
     }
 
     public static double _lat, _lon, _alt;
-    public static long _time;
 
     public static boolean load_location_(String fname){
         final File file = new File(fname);//"/sdcard/RC/start_location.save");
@@ -154,12 +152,9 @@ public class Disk {
                 return false;
 
             String s[]=line.split(",");
-
             _lat =Double.parseDouble(s[0]);
             _lon =Double.parseDouble(s[1]);
             _alt =Double.parseDouble(s[2]);
-            _time =Long.parseLong(s[3]);
-            Log.i("LOAD_LOC","LOAD "+fname+" "+_lat+" "+_lon+" "+_alt+" "+_time);
             is.close();
 
         } catch (Exception e) {
@@ -269,7 +264,11 @@ public class Disk {
 
     public static int close_(){
         try {
-            Disk.save_location_("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt,Telemetry.lost_time>0?Telemetry.lost_time:System.currentTimeMillis());
+            Disk.save_location_(
+                    "/sdcard/RC/lostCon_location.save",
+                    Telemetry.lat,
+                    Telemetry.lon,
+                    Telemetry._alt);
             Log.i("MSGG", "disk close");
 
 

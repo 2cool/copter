@@ -253,10 +253,71 @@ bool is_clone() {
 	return false;
 }
 
+#define LOG_COUNTER_NAME "/home/igor/logs/logCounter"
+
+
+
+
+int find_bigest() {
+	FILE* in;
+	char buff[512];
+
+	if (!(in = popen("ls /home/igor/logs", "r"))) {
+		return 1;
+	}
+	int counter = 0;
+	while (fgets(buff, sizeof(buff), in) != NULL) {
+		string s = string(buff);
+		int b = s.find_first_of("0123456789");
+		int e = s.find_first_of(".");
+		if (b > 0 && e + 4 > b) {
+			int cnt = stoi(s.substr(b, e));
+			if (cnt > counter)
+				counter = cnt;
+		}
+	}
+	fclose(in);
+	if (counter == 0) {
+		counter = 1;
+		const int dir_err = system("mkdir /home/igor/logs");
+		if (-1 == dir_err)
+		{
+			counter = 0;
+		}
+
+	}
+	return counter;
+}
+
+int test_4_counterFile() {
+	int counter = 1;
+	FILE* set = fopen(LOG_COUNTER_NAME, "r");
+	if (set) {
+		fscanf(set, "%i", &counter);
+		fclose(set);
+		usleep(500);
+		remove(LOG_COUNTER_NAME);
+		if (counter <=0)
+		{
+			counter = find_bigest();
+		}
+	}
+	else {
+		return counter = find_bigest();
+	}
+	return counter;
+}
+
+
+
 std::ofstream out;
 std::streambuf *coutbuf;// старый буфер
 
 int main(int argc, char *argv[]) {
+
+int counter = test_4_counterFile();
+	if (counter == 0)
+		return 0;
 	if (init_shmPTR())
 		return 0;
 	if (is_clone())
@@ -264,7 +325,6 @@ int main(int argc, char *argv[]) {
 
 	const double d_uptime = std::stod(exec("awk '{print $1}' /proc/uptime"));
 	
-
 	shmPTR->in_fly = (shmPTR->control_bits&MOTORS_ON);
 	shmPTR->wifi_cnt = 0;
 	shmPTR->run_main = true;
@@ -283,8 +343,6 @@ int main(int argc, char *argv[]) {
 	
 	Debug.n_debug = 0;
 
-	int counter = 0;
-
 	if (argc >= 2) {
 		int tt = string(argv[1]).compare("-help");
 		if (tt == 0) {
@@ -299,42 +357,8 @@ int main(int argc, char *argv[]) {
 			shmPTR->lowest_altitude_to_fly = 0.01f*(float)t;
 			if (shmPTR->lowest_altitude_to_fly > shmPTR->fly_at_start)
 				shmPTR->lowest_altitude_to_fly = shmPTR->fly_at_start;
-#define LOG_COUNTER_NAME "/home/igor/logs/logCounter"
 
-			FILE *set = fopen(LOG_COUNTER_NAME, "r");
-			if (set) {
-				fscanf(set, "%i", &counter);
-
-				fclose(set);
-				usleep(500);
-				if (counter < 9999)
-				{
-					FILE *in;
-					char buff[512];
-
-					if (!(in = popen("ls /home/igor/logs", "r"))) {
-						return 1;
-					}
-					counter = 10000;
-					while (fgets(buff, sizeof(buff), in) != NULL) {
-						string s = string(buff);
-						int b = s.find_first_of("0123456789");
-						int e = s.find_first_of(".");
-						if (b > 0 && e + 4 > b) {
-							int cnt = stoi(s.substr(b, e));
-							if (cnt > counter)
-								counter = cnt;
-						}
-					}
-					fclose(in);
-				}
-				remove(LOG_COUNTER_NAME);
-			}
-			else {
-				cout << "no counter file";
-				return 0;
-			}
-			set = fopen(LOG_COUNTER_NAME, "w+");
+			FILE* set = fopen(LOG_COUNTER_NAME, "w+");
 			fprintf(set, "%i\n", counter + 1);
 			fclose(set);
 			if (argv[3][0] == 'f' || argv[3][0] == 'F') {

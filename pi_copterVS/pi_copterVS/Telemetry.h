@@ -29,7 +29,7 @@ class TelemetryClass
 	 float SN;
 	 
 	// uint8_t inner_clock_old_sec;
-	
+	 int get_saved_voltage();
 	 int32_t next_battery_test_time;
 	  uint32_t pressure;
 	 float voltage,voltage_at_start;
@@ -39,6 +39,8 @@ class TelemetryClass
 	 void update_buf();
 	 float full_power;
  public:
+	 int on_power_time = 0;
+	 void save_voltage();
 	 float get_bat_capacity();
 	 float get_full_power() { return full_power; }
 	 void set_bat_capacity(float a_ch);

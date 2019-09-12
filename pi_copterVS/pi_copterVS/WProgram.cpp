@@ -55,7 +55,7 @@ int init_shmPTR() {
 		ShmKEY = ftok(SHMKEY, 'x');
 	ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
 		if (ShmID < 0) {
-			cout << "*** shmget error (server) ***" << "\t"<<millis_() << endl;
+			cout << "***main shmget error (server) ***" << "\t"<<millis_() << endl;
 			return 1;
 		}
 		shmPTR = (struct Memory *) shmat(ShmID, NULL, 0);

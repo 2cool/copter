@@ -37,10 +37,15 @@
 #define MAX_VOLTAGE_AT_START 406
 
 
-
+static int volatage = 0;
 static float BAT_Ampere_hour = 3.5;
 static float  f_current = 0;
 static float fly_time_lef = 0;
+
+static int old_voltage;
+static bool old_volt_init = false;
+
+
 void TelemetryClass::addMessage(const string msg, bool and2sms){
 
 	cout << msg << "\t"<<millis_() << endl;;
@@ -108,8 +113,43 @@ void TelemetryClass::set_bat_capacity(float a_ch) {
 	battery_charge -= lost;
 }
 
+#define voltage_fn "/home/igor/copter_work_info"
+
+
+
+
+
+
+void TelemetryClass::save_voltage() {
+	FILE* f = fopen(voltage_fn, "w");
+	if (f!=NULL) {
+		fprintf(f, "%i,%i", (int)voltage, on_power_time);
+		fclose(f);
+	}
+}
+
+int TelemetryClass::get_saved_voltage() {
+	char data[80];
+
+
+	FILE* set = fopen(voltage_fn, "r");
+	if (set) {
+		fscanf(set, "%i,%i", &old_voltage, &on_power_time);
+		fclose(set);
+			
+		return 0;
+			
+		
+	}
+	return -1;
+}
+
+
 void TelemetryClass::init_()
 {
+
+	get_saved_voltage();
+
 	BAT_Ampere_hour = 3.5;
 	init_shmPTR();
 
@@ -221,6 +261,12 @@ Max Continuous Power 220 Watts
 	//Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);  
 	//Debug.dump((float)data[0], (float)data[1], (float)data[2], (float)data[3]);
 #endif
+
+	if (old_volt_init == false) {
+		old_volt_init = true;
+		if (voltage - old_voltage > 10)
+			on_power_time = 0;
+	}
 }
 
 
@@ -231,6 +277,7 @@ void TelemetryClass::testBatteryVoltage() {
 	const int32_t _ct = millis_();
 
 	double dt = 0.001 * (_ct - old_time);
+
 	old_time = _ct;
 	if (dt > 0.5)
 		dt = 0.5;
@@ -346,7 +393,7 @@ void TelemetryClass::update_buf() {
 	loadBUF8(i, Mpu.get_roll());
 	loadBUF8(i, Balance.c_pitch);
 	loadBUF8(i, Balance.c_roll);
-	loadBUF16(i, voltage/SN*4);
+	loadBUF16(i, (int)(voltage*10*4/SN));
 
 
 
@@ -362,6 +409,7 @@ void TelemetryClass::update_buf() {
 
 	float yaw=Mpu.get_yaw();
 	loadBUF16(i, (int16_t)(yaw * 182.0));
+	loadBUF32(i, on_power_time+Autopilot.powerOnTime());
 	loadBUF32(i, shmPTR->status);
 
 	if (message.length() && i + message.length() + 2 < TELEMETRY_BUF_SIZE) {

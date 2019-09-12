@@ -3,7 +3,7 @@
 // 
 
 #include "Settings.h"
-
+#include "Telemetry.h"
 #include "Hmc.h"
 #include "Balance.h"
 #include "Stabilization.h"
@@ -281,6 +281,8 @@ string r0(string str) {
 }
 int SettingsClass::write_all() {
 #ifndef FLY_EMULATOR
+
+	Telemetry.save_voltage();
 
 	FILE *f = fopen("/home/igor/copter_set.txt", "w");
 	if (f == NULL)

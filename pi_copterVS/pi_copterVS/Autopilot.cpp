@@ -122,7 +122,9 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	mega_i2c.gimagl(gimBalPitchZero, gimBalRollZero);
 
 }
-
+int32_t AutopilotClass::powerOnTime() {
+	return (time_at__start)?(millis_() - time_at__start):0;
+}
 float AutopilotClass::corectedAltitude4tel() {
 	return Mpu.get_Est_Alt();
 	//return ((control_bits & Z_STAB) == 0) ? Mpu.get_Est_Alt() : Stabilization.getAltitude();
@@ -700,6 +702,8 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 		
 	}//------------------------------OFF----------------
 	else {
+		if (time_at__start)
+			Telemetry.on_power_time += _ct - time_at__start;
 		old_time_at__start = _ct;
 		time_at__start = 0;
 

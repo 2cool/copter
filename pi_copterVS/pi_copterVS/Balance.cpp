@@ -423,7 +423,7 @@ bool BalanceClass::loop()
 
 				
 			}
-			if (speed_up && throttle >= HOVER_THROTHLE)
+			if (speed_up && throttle > HOVER_THROTHLE)
 				speed_up = false;
 
 		}else
@@ -436,17 +436,11 @@ bool BalanceClass::loop()
 		f_[0] = f_[1] = f_[2] = f_[3] = 0;
 #endif
 #endif
-		//f_[1] = f_[2] = 0;
-		//f_[0] = f_[1] = f_[2] = f_[3] = 0;
-		//f_[0] = f_[1] = 0.502;
-		//отключить двигатели при слабом токе
-		//if (propeller_lost[0] || propeller_lost[3]) 	f_[0]=f_[3] = 0;
-		//if (propeller_lost[1] || propeller_lost[2]) 	f_[1] = f_[2] = 0;
-		///if (f_[0]>=0.4 || f_[1]>0.4 || f_[2]>0.4 || f_[3]>0.4)	f_[0] = f_[1] = f_[2] = f_[3] = 0.3;
-		//f_[3] = f_[0];
-
-
-
+	/*	f_[0] = 0;
+		f_[1] = 0;
+		f_[2] = 0;
+		f_[3] = 0;
+		*/
 		speed_up_control(f_);
 		if (speed_up)
 			PID_reset();
@@ -456,8 +450,6 @@ bool BalanceClass::loop()
 
 	return true;
 }
-
-
 
 void BalanceClass::set_off_th_() { 
 	f_[0] = f_[1] = f_[2] = f_[3] = 0; 

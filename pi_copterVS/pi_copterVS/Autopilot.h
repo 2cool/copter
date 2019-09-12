@@ -66,6 +66,7 @@ class AutopilotClass
 
 	 
  public:
+	 int32_t powerOnTime();
 	 bool is_all_OK(bool print=false);
 	 int reboot();
 	 int shutdown();

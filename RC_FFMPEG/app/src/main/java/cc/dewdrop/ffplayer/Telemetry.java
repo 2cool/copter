@@ -4,10 +4,15 @@ import android.util.Log;
 
 public class Telemetry {
 
+
+    static public double MIDDLE_POSITION =0.5;
+    static public double HOVER_THROTHLE = 0.45;
+    static public double MIN_THROTTLE = 0.35;
+    static public double FALLING_THROTTLE = 0.4;
+
     private static int  telemetry_couter=0;
     public static int get_counter(){return telemetry_couter;}
     static public int batVolt,current;
-    static public long start_time=0,lost_time=0;
     static public int initial_vltage=0;
    // static public String motors_on_timer="00:00";
     static public boolean hom_pos_is_loaded=false;
@@ -15,11 +20,13 @@ public class Telemetry {
     static public double lon=0;
     static public int r_accuracy_hor_pos=99,r_acuracy_ver_pos=99;//когда включаем смартконтрол мощность меняестя. (исправить)
     static public double roll=0,pitch=0,yaw=0;
-    static private double start_lat=0,start_lon=0;
+    static private double _start_lat=0,_start_lon=0;
+    static private boolean start_data_is_loaded=false;
     static public double dist=0,speed=0,v_speed=0,alt_time=0 ,speed_time=0,alt_speed;
     static public String messages=null;
     static public float heading=0,	battery_consumption=0,vibration=0;
     static public int status=0;
+    static public int on_power_time=0;
     static double ap_pitch,ap_roll,realThrottle;  //autopilot
     static private  double ap_throttle=0;
     static int gimbalPitch;
@@ -56,10 +63,10 @@ public class Telemetry {
 
     static public float corectThrottle(){
 
-        if (ap_throttle < 0.5)
-            ap_throttle = 0.5;
-        if (ap_throttle > 0.7)
-            ap_throttle = 0.7;
+        if (ap_throttle < HOVER_THROTHLE)
+            ap_throttle = HOVER_THROTHLE;
+        if (ap_throttle > 0.6)
+            ap_throttle = 0.6;
         return (float)ap_throttle;//*z;
 
 
@@ -357,6 +364,7 @@ public class Telemetry {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
+
     static public void bufferReader_(byte buf[],int buf_len){
         //   Log.d("BUFREAD","bufRead");
         int i=0;
@@ -399,6 +407,10 @@ public class Telemetry {
         //i+=4;
 
         batVolt=load_int16(buf,i);
+        double d_bat_volt=batVolt;
+        d_bat_volt*=0.1;
+        batVolt=(int)d_bat_volt;
+
         i+=2;
 
         if (initial_vltage==0 || initial_vltage<batVolt)
@@ -427,7 +439,8 @@ public class Telemetry {
 
 
 
-
+        on_power_time=load_int32(buf,i);
+        i+=4;
         status=load_int32(buf,i);
         i+=4;
        // Log.i("STRR","str= "+Integer.toString(status));
@@ -460,12 +473,21 @@ public class Telemetry {
         //if (block_cnt>1)
         //Log.i("DISK","W... "+Integer.toString(log_s)+"  blocks  "+Integer.toString(block_cnt));
 
-        float z = (float) Math.sqrt( (1 - pitch * pitch*GRAD2RAD*GRAD2RAD ) * (1 - roll * roll * GRAD2RAD*GRAD2RAD) );
-        //ap_throttle=realThrottle*z;
+        double correction =  Math.sqrt( (1 - pitch * pitch*GRAD2RAD*GRAD2RAD ) * (1 - roll * roll * GRAD2RAD*GRAD2RAD) );
+     /*    final double MAX_VOLTAGE_AT_START =406 * 4;
+
+       double t_powerK = (MAX_VOLTAGE_AT_START) / d_bat_volt;
+        if (t_powerK<1)
+            t_powerK=1;
+        if (t_powerK>1.35)
+            t_powerK=1.35;
+        correction/=t_powerK;*/
+
         if ((MainActivity.control_bits&MainActivity.MOTORS_ON)==0){
-            ap_throttle=realThrottle*z;
+            ap_throttle=realThrottle*correction;
         }else {
-            ap_throttle += (realThrottle * z - ap_throttle) * 0.03;
+            ap_throttle += (realThrottle * correction - ap_throttle) * 0.03;
+           // Log.d("CORR"," "+ap_throttle);
         }
 
         //-------------------------------------------------------------------------------------
@@ -480,10 +502,8 @@ public class Telemetry {
         if (MainActivity.motorsOnF()){
             if (hom_pos_is_loaded == false) {
                 Disk.load_location_("/sdcard/RC/start_location.save");
-                start_lat=Disk._lat;
-                start_lon=Disk._lon;
-                start_time=Disk._time;
-                Log.i("LOAD_LOC","tel="+start_time);
+                _start_lat=Disk._lat;
+                _start_lon=Disk._lon;
             }
         }else if (hom_pos_is_loaded==false)
             dist=0;
@@ -491,15 +511,21 @@ public class Telemetry {
 
 //init old and auto lat lon
         if (MainActivity.motorsOnF()) {
-            if (start_lat==0 && start_lon==0){
-                start_lat =  lat;
-                start_lon =  lon;
-                start_time=System.currentTimeMillis();
-                Disk.save_location_("/sdcard/RC/start_location.save", lat, lon, _alt,start_time);
+            if (start_data_is_loaded==false){//start_lat==0 && start_lon==0){
+                start_data_is_loaded=true;
+                _start_lat =  lat;
+                _start_lon =  lon;
+
+                Disk.save_location_(
+                        "/sdcard/RC/start_location.save",
+                        lat,
+                        lon,
+                        _alt);
             }
         }else {
-            start_lat = start_lon = 0;
-            start_time=0;
+            start_data_is_loaded=false;
+            _start_lat = _start_lon = 0;
+
         }
 //fly time
 
@@ -512,7 +538,7 @@ public class Telemetry {
         }
         if (cur_time-speed_time>500 && old_Lat!=lat || old_Lon!=lon) {
             //вічисляем растояние до старта
-            dist=(start_lat==0 || start_lon==0)?0:dist(start_lat,start_lon,lat,lon);
+            dist=(_start_lat==0 || _start_lon==0)?0:dist(_start_lat,_start_lon,lat,lon);
             final double dDist = dist(old_Lat, old_Lon, lat, lon);
             if (dDist>3) {
                 old_Lat = lat;

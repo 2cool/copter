@@ -80,6 +80,7 @@ public class Img_button {
         //  index=event.findPointerIndex(pointerIndex);
         final float gx = event.getX(pointerIndex);
         final float gy = event.getY(pointerIndex);
+
         switch (actionMask) {
             case MotionEvent.ACTION_DOWN: // первое касание
             case MotionEvent.ACTION_POINTER_DOWN: // последующие касания

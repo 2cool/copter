@@ -195,7 +195,11 @@ public class Net {
                             run=false;
                             if (Commander.link)
                                 Telemetry.hom_pos_is_loaded=false;
-                                Disk.save_location_("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt,(Telemetry.lost_time=System.currentTimeMillis()));
+                                Disk.save_location_(
+                                        "/sdcard/RC/lostCon_location.save",
+                                        Telemetry.lat,
+                                        Telemetry.lon,
+                                        Telemetry._alt);
                             Commander.link = false;
                             Log.d("UDP", "Error1:");
                         }

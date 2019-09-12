@@ -97,7 +97,11 @@ public class MainActivity extends Activity  implements SensorEventListener {
             Thread.currentThread().interrupt();
         }
 
-        Disk.save_location_("/sdcard/RC/lostCon_location.save", Telemetry.lat, Telemetry.lon, Telemetry._alt,((Telemetry.lost_time>0)?Telemetry.lost_time:System.currentTimeMillis()));
+        Disk.save_location_(
+                "/sdcard/RC/lostCon_location.save",
+                Telemetry.lat,
+                Telemetry.lon,
+                Telemetry._alt);
          Disk.close_();
 
 
@@ -341,7 +345,6 @@ public static void verifyPermissions(Activity activity){
                 Telemetry.lat = Disk._lat;
                 Telemetry.lon = Disk._lon;
                 Telemetry._alt = (float) Disk._alt;
-                Telemetry.start_time=Telemetry.lost_time=Disk._time;
             }
         }
 
