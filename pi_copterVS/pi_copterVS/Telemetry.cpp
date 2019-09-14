@@ -38,7 +38,7 @@
 
 
 static int volatage = 0;
-static float BAT_Ampere_hour = 3.5;
+static float BAT_Ampere_hour = 5.5;
 static float  f_current = 0;
 static float fly_time_lef = 0;
 

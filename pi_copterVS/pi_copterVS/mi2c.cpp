@@ -246,8 +246,9 @@ bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с к
 		return false;
 }
 
+enum {RING=1, GPS_READY=2, OVERLOAD= 0b00111100};
 
-int Megai2c::get_gps(SEND_I2C *gps_d) {
+int Megai2c::get_gps(SEND_I2C *gps_d) { 
 
 	char reg = 1;
 	char bit_field;
@@ -258,50 +259,34 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 		return -1;
 	}
 	int res = read(fd, &bit_field, 1);
-	if (res == -1) {
+	if (res != 1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 		cout << "arduino read get_gps error" << millis_() << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 		return -1;
 	}
-	if (res <  1) {
-		cout << "GPS_ERROR___\n";
-		return -1;
-	}
-
+	//--------------------------------------------------------------------------
 	static int32_t last_ring_time = 0;
-
 	if (last_ring_time > 0 && last_ring_time + 10e3 < millis_()) {
 		last_ring_time = 0;
 		shmPTR->stop_ppp_read_sms_start_ppp = true;
 		cout << "RING_BIT sended..." << "\t"<< millis_() << endl;
-		
 	}
-
-	if (bit_field & 1 && shmPTR->sim800_reset_time == 0) {
+	if (bit_field & RING && shmPTR->sim800_reset_time == 0) {
 		if (last_ring_time==0)
 			cout << "RING_BIT" << "\t"<< millis_() << endl;//при заходе смс при ppp
 		last_ring_time = millis_();
-		
 		///stop servises, stop ppp? read sms and do. start ppp and services again
+	}
+	//--------------------------------------------------------------------------
+	motors_overload = (bit_field & OVERLOAD);
+	if (motors_overload) {
 		
+		cout <<"OVERLOAD "<< std::bitset<4>(motors_overload>>2) <<"\t" << millis_()<<endl;
 	}
+	//--------------------------------------------------------------------------
+	return (bit_field & GPS_READY) ? read(fd, (char*)gps_d, sizeof(SEND_I2C)) : 0;
 
-	if (bit_field & 2) {
-		res = read(fd, (char*)gps_d, sizeof(SEND_I2C));
-		if (res == -1) {
-			Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-			cout << "arduino write bit_field & 2 error" << millis_() << endl;
-			mega_i2c.beep_code(B_I2C_ERR);
-		}
-	}
-
-	motors_overload = bit_field;
-	if (bit_field & 0b00111100) {
-		cout <<"OVERLOAD "<< std::bitset<4>((bit_field & 0b00111100) >> 2) <<"\t" << millis_()<<endl;
-	}
-	
-	return res;
 }
 
 int Megai2c::getiiiiv(char *iiiiv) {

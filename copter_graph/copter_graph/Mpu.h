@@ -6,7 +6,7 @@ enum { mPITCH, mROLL, mrPITCH, mrROLL, mYAW, mGYRO_PITCH, mGYRO_ROLL, mGYRO_YAW,
 class Mpu
 {
 public:
-	double newR=0.2;
+	double newR=0.1;
 	double newQ = 0.001;
 
 

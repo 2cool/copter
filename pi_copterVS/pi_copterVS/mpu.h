@@ -60,7 +60,6 @@ class MpuClass
 
 	float yaw,yaw_offset;
 	void test_vibration( float x,  float y,  float z);
-	float _0007;
 private:
 	float altitude_at_zero,XatZero,YatZero;
 	void gyro_calibr();

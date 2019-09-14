@@ -127,7 +127,7 @@ void MpuClass::log_emu() {
 #ifdef FLY_EMULATOR
 double newQ4z = 0.1, newR4z = 0.2, newQ4xy = 0.1, newR4xy = 5;
 #else
-double newQ4z = 0.005, newR4z = 0.2, newQ4xy = 0.01, newR4xy = 5;
+double newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.05, newR4xy = 1;
 #endif
 //-----------------------------------------------------
 void MpuClass::init()
@@ -136,7 +136,6 @@ void MpuClass::init()
 
 	tiltPower_CF = 0.05;
 	altitude_at_zero = XatZero = YatZero = 0;
-	_0007=0.007;
 	acc_callibr_time = 0;
 	w_accX = w_accY = 0;
 	sinPitch = sinRoll = 0;
@@ -190,10 +189,10 @@ void MpuClass::init()
 
 
 
-	accelgyro.initialize(MPU6050_GYRO_FS_1000, MPU6050_ACCEL_FS_2, MPU6050_DLPF_BW_20);
+	accelgyro.initialize(MPU6050_GYRO_FS_1000, MPU6050_ACCEL_FS_2, MPU6050_DLPF_BW_10);
 	//ms_open();
 	sleep(1);
-	accelgyro.initialize(MPU6050_GYRO_FS_1000, MPU6050_ACCEL_FS_2, MPU6050_DLPF_BW_20);
+	accelgyro.initialize(MPU6050_GYRO_FS_1000, MPU6050_ACCEL_FS_2, MPU6050_DLPF_BW_10);
 	writeWord(104, MPU6050_RA_XA_OFFS_H, -535);//-5525);
 	writeWord(104, MPU6050_RA_YA_OFFS_H, 219);// -1349);
 	writeWord(104, MPU6050_RA_ZA_OFFS_H, 1214);// 1291);

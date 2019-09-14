@@ -11,55 +11,6 @@
 #include "Settings.h"
 
 
-
-
-
-
-class Pendulum {
-private:
-	float possition, speed;
-	float mass, stiff;
-	float k;
-public:
-	
-	Pendulum(float m, float s, float _k) {
-		k = 0.1;
-		possition = 1;
-		mass = 1;
-		speed = 10;
-		stiff = 1;
-	}
-	void loop(float pos) {
-		const float dt = 0.01;
-		float force = possition * stiff + (pos-possition)*k;
-		float a = force / mass;
-		speed -= a * dt;
-		
-
-	}
-
-
-};
-void correct(float & f){
-	if (f < 0)
-		f = 0;
-	else if (f>1)
-		f = 1;
-}
-
-
-
-float MAX_ANGLE__ = 35;
-
-float old[2];
-float force[2];
-float balanceForce[2];
-
-float dTime[2];
-float nTime[2];
-#define MIN_SPEED 0.2f
-float const predTime = 0.009f;
-
 static const float f_constrain(const float v, const float min, const float max){
 	return constrain(v, min, max);
 }
@@ -439,8 +390,8 @@ bool BalanceClass::loop()
 	/*	f_[0] = 0;
 		f_[1] = 0;
 		f_[2] = 0;
-		f_[3] = 0;
-		*/
+		f_[3] = 0;*/
+		
 		speed_up_control(f_);
 		if (speed_up)
 			PID_reset();
