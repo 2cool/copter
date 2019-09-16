@@ -123,7 +123,8 @@ void TelemetryClass::set_bat_capacity(float a_ch) {
 void TelemetryClass::save_voltage() {
 	FILE* f = fopen(voltage_fn, "w");
 	if (f!=NULL) {
-		fprintf(f, "%i,%i", (int)voltage, on_power_time);
+		
+		fprintf(f, "%i,%i,%i", (int)voltage, on_power_time, total_time);
 		fclose(f);
 	}
 }
@@ -134,7 +135,7 @@ int TelemetryClass::get_saved_voltage() {
 
 	FILE* set = fopen(voltage_fn, "r");
 	if (set) {
-		fscanf(set, "%i,%i", &old_voltage, &on_power_time);
+		fscanf(set, "%i,%i,%i", &old_voltage, &on_power_time, &total_time);
 		fclose(set);
 			
 		return 0;
@@ -264,8 +265,10 @@ Max Continuous Power 220 Watts
 
 	if (old_volt_init == false) {
 		old_volt_init = true;
-		if (voltage - old_voltage > 10)
+		if (voltage - old_voltage > 10) {
+			total_time += on_power_time / 1000;
 			on_power_time = 0;
+		}
 	}
 }
 

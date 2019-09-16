@@ -39,7 +39,7 @@ class TelemetryClass
 	 void update_buf();
 	 float full_power;
  public:
-	 int on_power_time = 0;
+	 int on_power_time = 0, total_time=0;
 	 void save_voltage();
 	 float get_bat_capacity();
 	 float get_full_power() { return full_power; }

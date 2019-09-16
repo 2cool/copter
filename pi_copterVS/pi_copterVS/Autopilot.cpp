@@ -879,21 +879,31 @@ bool AutopilotClass::set_control_bits(uint32_t bits) {
 		gimBalPitchADD(1);
 	if (bits & GIMBAL_MINUS)
 		gimBalPitchADD(-1);
-	if (control_bits&CONTROL_FALLING)
+	if (control_bits & CONTROL_FALLING) {
+		cout << "<< CONTROL_FALLING " << millis_() << endl;
 		return false;
+	}
 
 	if (control_bits&MOTORS_ON) {
-		if (bits & GO2HOME)
-		going2HomeStartStop(false);
+		if (bits & GO2HOME) {
+			going2HomeStartStop(false);
+			cout << "<< GO2HOME "<<(!Autopilot.go2homeState()?"OFF ":"ON ") << millis_() << endl;
+		}
 
-		if (bits & PROGRAM)
+		if (bits & PROGRAM) {
 			start_stop_program(true);
+			cout << "<< PROGRAM " << (!Autopilot.progState() ? "OFF " : "ON ") << millis_() << endl;
+		}
 
-		if (bits & Z_STAB)
+		if (bits & Z_STAB) {
 			holdAltitudeStartStop();
+			cout << "<< Hold Alt " << (!Autopilot.z_stabState() ? "OFF " : "ON ") << millis_() << endl;
+		}
 
-		if (bits & XY_STAB)
+		if (bits & XY_STAB) {
 			holdLocationStartStop();
+			cout << "<< XY stab " << (!Autopilot.xy_stabState() ? "OFF " : "ON ") << millis_() << endl;
+		}
 	}
 	else 
 		control_bits ^= bits & ( XY_STAB | Z_STAB);

@@ -189,10 +189,10 @@ void MpuClass::init()
 
 
 
-	accelgyro.initialize(MPU6050_GYRO_FS_1000, MPU6050_ACCEL_FS_2, MPU6050_DLPF_BW_10);
+	accelgyro.initialize(MPU6050_GYRO_FS_1000, MPU6050_ACCEL_FS_2, MPU6050_DLPF_BW_20);
 	//ms_open();
 	sleep(1);
-	accelgyro.initialize(MPU6050_GYRO_FS_1000, MPU6050_ACCEL_FS_2, MPU6050_DLPF_BW_10);
+	accelgyro.initialize(MPU6050_GYRO_FS_1000, MPU6050_ACCEL_FS_2, MPU6050_DLPF_BW_20);
 	writeWord(104, MPU6050_RA_XA_OFFS_H, -535);//-5525);
 	writeWord(104, MPU6050_RA_YA_OFFS_H, 219);// -1349);
 	writeWord(104, MPU6050_RA_ZA_OFFS_H, 1214);// 1291);

@@ -41,7 +41,7 @@ void BalanceClass::init()
 	old_time = micros_();
 
 	//set_pitch_roll_pids(0.001, 0.001, 0.3);  // 10
-	set_pitch_roll_pids(0.001, 0.001, 0.3);//9
+	set_pitch_roll_pids(0.0008, 0.001, 0.3);//9
 
 
 	yaw_stabKP = 2;
@@ -247,8 +247,8 @@ bool BalanceClass::loop()
 	}
 	else {
 		if (Autopilot.motors_is_on()) { 
-
-			static float secure_throttle = MAX_THROTTLE;
+/*
+			static float secure_throttle = max_throttle;
 			if (mega_i2c.motors_overload) {
 				secure_throttle -= 0.02;
 				if (secure_throttle < HOVER_THROTHLE)
@@ -259,10 +259,10 @@ bool BalanceClass::loop()
 				if (secure_throttle > max_throttle)
 					secure_throttle = max_throttle;
 			}
-			
-			const float pK =  powerK();
-			const float c_min_throttle = min_throttle*pK;
-			const float c_max_throttle = (secure_throttle *pK > OVER_THROTTLE) ? OVER_THROTTLE : secure_throttle * pK;
+	*/		
+			const float pK = powerK();
+			const float c_min_throttle = min_throttle * pK;
+			const float c_max_throttle = (max_throttle * pK > OVER_THROTTLE) ? OVER_THROTTLE : max_throttle * pK;
 
 			if (Autopilot.z_stabState()) {
 				true_throttle = pK * Stabilization.Z();
@@ -282,7 +282,7 @@ bool BalanceClass::loop()
 			if (thr > OVER_THROTTLE) {
 				t_max_angle = RAD2GRAD * acos(throttle / OVER_THROTTLE);
 				t_max_angle = constrain(t_max_angle, MIN_ANGLE, max_angle);
-				throttle = secure_throttle;
+				throttle = max_throttle;
 			}
 			else {
 				throttle = thr;
