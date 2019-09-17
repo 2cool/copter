@@ -96,7 +96,8 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	time_at__start = old_time_at__start = 0;
 	lowest_height = shmPTR->lowest_altitude_to_fly;
 	last_time_data__recived = 0;
-	
+	min_hor_accuracy_2_start = MIN_ACUR_HOR_POS_2_START_;
+	ignore_the_lack_of_internet_at_startup = false;
 	Balance.init();
 	MS5611.init();
 
@@ -348,9 +349,9 @@ string AutopilotClass::get_set(){
 		sens_z << "," << \
 		lowest_height << "," << \
 		shmPTR->fly_at_start << "," << \
-		Telemetry.get_bat_capacity();// << "," << 
-	//	-gimBalPitchZero << "," << 
-	//	-gimBalRollZero;
+		Telemetry.get_bat_capacity() << "," << 
+		min_hor_accuracy_2_start << "," <<
+		ignore_the_lack_of_internet_at_startup?1:0;
 	string ret = convert.str();
 	return string(ret);
 }
@@ -370,10 +371,10 @@ void AutopilotClass::set(const float ar[]){
 			shmPTR->fly_at_start = lowest_height + 1;
 		if (motors_is_on()==false)
 			Telemetry.set_bat_capacity(ar[i++]);
+		min_hor_accuracy_2_start = ((ar[i] > 10) ? 10 : ar[i]);
+		i++;
+		ignore_the_lack_of_internet_at_startup = (ar[i++] > 0);
 
-		//gimBalPitchZero= -constrain(ar[i],-15,15);i++;
-		//gimBalRollZero = -constrain(ar[i],-15,15);i++;
-		mega_i2c.gimagl(gimBalPitchZero, gimBalRollZero);
 		int ii;
 		for (ii = 0; ii < i; ii++){
 			cout << ar[ii] << ",";
@@ -616,7 +617,8 @@ bool AutopilotClass::is_all_OK(bool print){
 			cout << "inet dont work" << "\t" << _ct << endl;
 		}
 #ifndef DEBUG
-		return false;
+		if (!ignore_the_lack_of_internet_at_startup)
+			return false;
 #endif
 	}
 
@@ -630,7 +632,7 @@ bool AutopilotClass::is_all_OK(bool print){
 			return false;
 		}
 
-		if (Hmc.do_compass_motors_calibr == false && GPS.loc.accuracy_hor_pos_ > MIN_ACUR_HOR_POS_2_START) {
+		if (Hmc.do_compass_motors_calibr == false && GPS.loc.accuracy_hor_pos_ >= min_hor_accuracy_2_start) {
 			if (print) {
 				cout << " GPS error" << "\t" << _ct << endl;
 				mega_i2c.beep_code(B_GPS_ACCURACY_E);

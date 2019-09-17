@@ -159,7 +159,7 @@ void LocationClass::proceed(SEND_I2C *d) {
 
 
 
-	if (lat_zero == 0 && lon_zero == 0 && accuracy_hor_pos_ < MIN_ACUR_HOR_POS_2_START) {
+	if (lat_zero == 0 && lon_zero == 0 && accuracy_hor_pos_ <= Autopilot.min_hor_accuracy_2_start) {
 		lat_zero = lat_;
 		lon_zero = lon_;
 		alt_zero = altitude;
@@ -208,6 +208,7 @@ int LocationClass::init(){
 
 	
 #endif
+	
 	mspeedx =  mspeedy = 0;
 	old_time = last_gps_data__time = last_gps_accuracy_ok = 0;
 	oldDist_2 = MAX_DIST2UPDATE + MAX_DIST2UPDATE;

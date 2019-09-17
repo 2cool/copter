@@ -27,7 +27,7 @@ class AutopilotClass
 
 
  protected:
-
+	 bool ignore_the_lack_of_internet_at_startup;
 	 float dist2home_at_begin;
 #ifdef FALL_IF_GPS_ALT_NOT_MATCH_BAROM_ALT_
 	 float gps_alt_at_begin, bar_alt_at_begin;
@@ -66,6 +66,8 @@ class AutopilotClass
 
 	 
  public:
+	 
+	 float min_hor_accuracy_2_start;
 	 int32_t powerOnTime();
 	 bool is_all_OK(bool print=false);
 	 int reboot();

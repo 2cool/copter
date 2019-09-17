@@ -18,7 +18,7 @@ class LocationClass
 
 
 public:
-
+	
 	//double cosDirection, sinDirection;
 //	float dir_angle_GRAD;
 	double dt, rdt;
