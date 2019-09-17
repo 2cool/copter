@@ -675,47 +675,53 @@ float est_XError = 0, est_XErrorI = 0;
 float est_YError = 0, est_YErrorI = 0;
 #define ACC_Cr 10000.0f
 void MpuClass::test_Est_XY() {
+	static bool gps_bad = true;
+	if (gps_bad && GPS.loc.accuracy_hor_pos_ <= Autopilot.min_hor_accuracy_2_start)
+		gps_bad = false;
 
-	if (GPS.loc.accuracy_hor_pos_ <= Autopilot.min_hor_accuracy_2_start) {
-		w_accX = (-cosYaw * accX + sinYaw * accY); //relative to world
-		w_accY = (-cosYaw * accY - sinYaw * accX);
-		float static old_X = 0, old_accX = 0, old_Y, old_accY;
-		//XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		kf[X]->A(3) = kf[X]->A(7) = mpu_dt;
-		kf[X]->B[2] = w_accX - old_accX;
-		old_accX = w_accX;
+	if (gps_bad)
+		return;
 
-		if (GPS.loc.dX != old_X) {
-			old_X = GPS.loc.dX;
-			Eigen::VectorXd x(m);
-			x << old_X;
-			kf[X]->update(x);
-		}
-		else
-			kf[X]->update();
+	
+	w_accX = (-cosYaw * accX + sinYaw * accY); //relative to world
+	w_accY = (-cosYaw * accY - sinYaw * accX);
+	float static old_X = 0, old_accX = 0, old_Y, old_accY;
+	//XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+	kf[X]->A(3) = kf[X]->A(7) = mpu_dt;
+	kf[X]->B[2] = w_accX - old_accX;
+	old_accX = w_accX;
 
-		est_speedX = kf[X]->state()(1);
-		estX = kf[X]->state()(0);
-		//YYYYYYYYYYYYYYYYYYYYYYYYYY
-		kf[Y]->A(3) = kf[Y]->A(7) = mpu_dt;
-		kf[Y]->B[2] = w_accY - old_accY;
-		old_accY = w_accY;
-
-		if (GPS.loc.dY != old_Y) {
-			old_Y = GPS.loc.dY;
-			Eigen::VectorXd y(m);
-			y << old_Y;
-			kf[Y]->update(y);
-		}
-		else
-			kf[Y]->update();
-
-		est_speedY = kf[Y]->state()(1);
-		estY = kf[Y]->state()(0);
-		//double t[] = { estX, est_speedX, estY, est_speedY };
-		//Debug.load(0, Mpu.w_accX, Mpu.w_accY);
-		//Debug.dump();
+	if (GPS.loc.dX != old_X) {
+		old_X = GPS.loc.dX;
+		Eigen::VectorXd x(m);
+		x << old_X;
+		kf[X]->update(x);
 	}
+	else
+		kf[X]->update();
+
+	est_speedX = kf[X]->state()(1);
+	estX = kf[X]->state()(0);
+	//YYYYYYYYYYYYYYYYYYYYYYYYYY
+	kf[Y]->A(3) = kf[Y]->A(7) = mpu_dt;
+	kf[Y]->B[2] = w_accY - old_accY;
+	old_accY = w_accY;
+
+	if (GPS.loc.dY != old_Y) {
+		old_Y = GPS.loc.dY;
+		Eigen::VectorXd y(m);
+		y << old_Y;
+		kf[Y]->update(y);
+	}
+	else
+		kf[Y]->update();
+
+	est_speedY = kf[Y]->state()(1);
+	estY = kf[Y]->state()(0);
+	//double t[] = { estX, est_speedX, estY, est_speedY };
+	//Debug.load(0, Mpu.w_accX, Mpu.w_accY);
+	//Debug.dump();
+	
 }
 
 /*

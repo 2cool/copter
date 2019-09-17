@@ -632,7 +632,7 @@ bool AutopilotClass::is_all_OK(bool print){
 			return false;
 		}
 
-		if (Hmc.do_compass_motors_calibr == false && GPS.loc.accuracy_hor_pos_ >= min_hor_accuracy_2_start) {
+		if (Hmc.do_compass_motors_calibr == false && GPS.loc.accuracy_hor_pos_ > min_hor_accuracy_2_start) {
 			if (print) {
 				cout << " GPS error" << "\t" << _ct << endl;
 				mega_i2c.beep_code(B_GPS_ACCURACY_E);
