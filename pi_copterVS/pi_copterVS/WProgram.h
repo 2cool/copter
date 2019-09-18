@@ -101,9 +101,9 @@ class Serial_class{
 
 
 
-inline void sin_cos(const float a, float &s, float &c) {
-	s = (float)sin(a);
-	c = (float)cos(a);
+inline void sin_cos(const double a, double&s, double&c) {
+	s = sin(a);
+	c = cos(a);
 	/*
 	const double ss = s*s;
 	c = (float)sqrt(1 - fmin(1.0f, ss));

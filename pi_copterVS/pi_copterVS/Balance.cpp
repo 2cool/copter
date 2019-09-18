@@ -52,9 +52,7 @@ void BalanceClass::init()
 
 	delay(1500);
 
-	Mpu.init();
-	Hmc.init();
-	Hmc.loop();
+	
 //	Mpu.initYaw(Hmc.heading*RAD2GRAD);
 
 	

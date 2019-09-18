@@ -75,7 +75,7 @@ void TelemetryClass::getSettings(int n){
 		message += Stabilization.get_xy_set();
 		break;
 	case 3:
-		message += Autopilot.get_set();
+		message += Autopilot.get_set(false);
 		break;
 	case 4:
 		message += Mpu.get_set();
@@ -172,6 +172,7 @@ void TelemetryClass::init_()
 	if (bat_chargedK > 1)
 		bat_chargedK = 1;
 	full_battery_charge=battery_charge = BAT_Ampere_hour * bat_chargedK;
+	cout << "telemetry init OK \n";
 }
 
 uint16_t data[5];
@@ -213,10 +214,9 @@ int TelemetryClass::check_time_left_if_go_to_home(){
 	float time_left=0;
 
 	if (Autopilot.motors_is_on()) {
-		const float dist2home = Mpu.dist2home();
-		const float time2home = dist2home * (1.0f / MAX_HOR_SPEED);
-		const float time2down = fabs((Mpu.get_Est_Alt()) * (1.0f / MAX_VER_SPEED_MINUS));
-		time_left += (time2home + time2down);
+		const double time2home = GPS.loc.dist2home * (1.0 / MAX_HOR_SPEED);
+		const double time2down = fabs((Mpu.get_Est_Alt()) * (1.0 / MAX_VER_SPEED_MINUS));
+		time_left = (time2home + time2down);
 	}
 	return fly_time_lef-time_left;
 }

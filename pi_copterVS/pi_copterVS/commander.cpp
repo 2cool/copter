@@ -29,20 +29,10 @@ void CommanderClass::controls2zero() {
 }
 void CommanderClass::init()
 {
-	init_shmPTR();
 
-
-
-
-
-	//Out.println("COMMANDER INIT");
-	//vedeo_stream_client_addr = 0;
 	ppp_inet = true;
 	telegram_bot = false;
-
 	controls2zero();
-
-
 }
 
 //static private final int s_COUNTER = 0;

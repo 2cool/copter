@@ -86,9 +86,6 @@ using namespace std;
 
 void AutopilotClass::init(){/////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if (init_shmPTR())
-		return;
-
 #ifdef FLY_EMULATOR
 	Emu.init(WIND_X, WIND_Y, WIND_Z);
 #endif
@@ -98,9 +95,6 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	last_time_data__recived = 0;
 	min_hor_accuracy_2_start = MIN_ACUR_HOR_POS_2_START_;
 	ignore_the_lack_of_internet_at_startup = false;
-	Balance.init();
-	MS5611.init();
-
 	fall_thr = FALLING_THROTTLE;
 	sens_z = 6;
 	sens_xy = 0.2f;
@@ -221,7 +215,7 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 
 #ifdef LOST_BEEP
 	
-	if (last_time_data__recived &&  GPS.loc.lat_zero!=0 && GPS.loc.lon_zero!=0  && (_ct - last_time_data__recived)>3e3 && (_ct - last_beep__time) > 3e3) {
+	if (last_time_data__recived &&  GPS.loc._lat_zero!=0 && GPS.loc._lon_zero!=0  && (_ct - last_time_data__recived)>3e3 && (_ct - last_beep__time) > 3e3) {
 		last_beep__time = _ct;
 		if ((_ct - last_time_data__recived) < 5e3)
 			Telemetry.addMessage(e_LOST_CONNECTION);
@@ -338,7 +332,7 @@ void AutopilotClass::log() {
 		Log.block_end();
 	}
 }
-string AutopilotClass::get_set(){
+string AutopilotClass::get_set(bool for_save){
 	
 	ostringstream convert;
 	convert << \
@@ -349,9 +343,12 @@ string AutopilotClass::get_set(){
 		sens_z << "," << \
 		lowest_height << "," << \
 		shmPTR->fly_at_start << "," << \
-		Telemetry.get_bat_capacity() << "," << 
-		min_hor_accuracy_2_start << "," <<
-		ignore_the_lack_of_internet_at_startup?1:0;
+		Telemetry.get_bat_capacity() << ",";
+	if (for_save)
+		convert << MIN_ACUR_HOR_POS_2_START_ << "," << 0;
+	else
+		convert << min_hor_accuracy_2_start << "," << ignore_the_lack_of_internet_at_startup;
+
 	string ret = convert.str();
 	return string(ret);
 }
@@ -429,7 +426,7 @@ enum{ JUMP = 0, HOWER = 1, GO_UP_OR_NOT = 2, TEST_ALT1 = 3, GO2HOME_LOC = 4, TES
 bool AutopilotClass::go2HomeProc(const float dt){
 	 switch (go2homeIndex){
 		case JUMP:{	
-			dist2home_at_begin = Mpu.dist2home();
+			dist2home_at_begin = GPS.loc.dist2home;
 			if (Mpu.get_Est_Alt() < 3)
 				holdAltitude(3);
 			go2homeIndex=HOWER;
@@ -516,9 +513,9 @@ bool AutopilotClass::go2HomeProc(const float dt){
 			break;
 		}
 	 }
-	const float dist2H = Mpu.dist2home();
-	if (dist2H - dist2home_at_begin > MAX_DIST_ERROR_TO_FALL){
-		cout << dist2H-dist2home_at_begin<<" STRONG_WIND\n";
+
+	if (GPS.loc.dist2home - dist2home_at_begin > MAX_DIST_ERROR_TO_FALL){
+		cout << GPS.loc.dist2home - dist2home_at_begin<<" STRONG_WIND\n";
 		// Autopilot.off_throttle(false, e_TOO_STRONG_WIND);
 	}
 
@@ -616,10 +613,10 @@ bool AutopilotClass::is_all_OK(bool print){
 			Telemetry.addMessage(e_NO_INTERNET);
 			cout << "inet dont work" << "\t" << _ct << endl;
 		}
-#ifndef DEBUG
+//#ifndef DEBUG
 		if (!ignore_the_lack_of_internet_at_startup)
 			return false;
-#endif
+//#endif
 	}
 
 	if (Hmc.do_compass_motors_calibr || (Mpu.gyro_calibratioan && Hmc.calibrated)) {
@@ -638,9 +635,9 @@ bool AutopilotClass::is_all_OK(bool print){
 				mega_i2c.beep_code(B_GPS_ACCURACY_E);
 				Telemetry.addMessage(e_GPS_ERROR);
 			}
-#ifndef DEBUG
+//#ifndef DEBUG
 			return false;
-#endif
+//#endif 
 		}
 		if (print)
 			cout << "OK" << "\t" << _ct << endl;

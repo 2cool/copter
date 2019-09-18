@@ -28,7 +28,7 @@ class AutopilotClass
 
  protected:
 	 bool ignore_the_lack_of_internet_at_startup;
-	 float dist2home_at_begin;
+	 double dist2home_at_begin;
 #ifdef FALL_IF_GPS_ALT_NOT_MATCH_BAROM_ALT_
 	 float gps_alt_at_begin, bar_alt_at_begin;
 #endif
@@ -111,7 +111,7 @@ class AutopilotClass
 	 void add_2_need_yaw(float speed, const float dt);
 	// bool manualZ;
 	
-	string get_set();
+	string get_set(bool for_save=false);
 	 void set(const float buf[]);
 
 	

@@ -87,7 +87,7 @@ void ProgClass::cameraZoom() { shmPTR->fpv_code = zoom_cam; }
 
 void ProgClass::takePhoto360() {
 	static int32_t cam__time = 0;
-	static float cam_yaw = 0,cam_pitch = 0;
+	static double cam_yaw = 0,cam_pitch = 0;
 	const int32_t _ct = millis_();
 	if (cam__time == 0) {
 		cam__time = _ct + 6e3;
@@ -152,7 +152,7 @@ void ProgClass::Do_Action() {
 
 void ProgClass::loop(){
 	const int32_t _ct = millis_();
-	float dt = 0.001*(_ct - begin_time);
+	double dt = 0.001*(_ct - begin_time);
 	
 	if (do_action)
 		Do_Action();
@@ -168,8 +168,8 @@ void ProgClass::loop(){
 					distFlag = true;
 				}
 				else {
-					const float advance_dist = Stabilization.getDist_XY(max_speed_xy);
-					const float acur = fmax(fmax(ACCURACY_XY, GPS.loc.accuracy_hor_pos_), advance_dist);
+					const double advance_dist = Stabilization.getDist_XY(max_speed_xy);
+					const double acur = fmax(fmax(ACCURACY_XY, GPS.loc.accuracy_hor_pos_), advance_dist);
 					distFlag = Stabilization.get_dist2goal() <= acur;
 				}
 			}
@@ -194,7 +194,7 @@ void ProgClass::loop(){
 
 #define MAX_TIME_LONG_FLIGHT  1200
 bool ProgClass::program_is_OK(){
-	float timeLeft=Telemetry.fly_time_left();
+	double timeLeft=Telemetry.fly_time_left();
 
 	if (prog_data_size >= 14 && prog_steps_count_must_be == steps_count){
 		prog_data_index = 0;
@@ -204,14 +204,14 @@ bool ProgClass::program_is_OK(){
 		next_y = Mpu.get_Est_Y();
 		alt = Mpu.get_Est_Alt();
 		uint8_t step = 1;
-		float fullTime = 0;
+		double fullTime = 0;
 		while (load_next(false)){
 			
 			if (next_y != old_y && next_x != old_x){
-				const float dx = next_x - old_x;
-				const float dy = next_y - old_y;
-				float time = (float)(sqrt(dx*dx + dy*dy) / max_speed_xy);
-				const float dAlt = alt - old_alt;
+				const double dx = next_x - old_x;
+				const double dy = next_y - old_y;
+				double time = (double)(sqrt(dx*dx + dy*dy) / max_speed_xy);
+				const double dAlt = alt - old_alt;
 				time += dAlt / ((dAlt >= 0) ? max_speedZ_P : max_speedZ_M);
 				time *= 1.25f;
 				time += timer;
@@ -230,9 +230,9 @@ bool ProgClass::program_is_OK(){
 			old_alt = alt;
 
 		}
-		const float x2 = next_x - Mpu.get_Est_X();
-		const float y2 = next_y - Mpu.get_Est_Y();
-		const float dist = (float)sqrt(x2*x2 + y2*y2);
+		const double x2 = next_x - Mpu.get_Est_X();
+		const double y2 = next_y - Mpu.get_Est_Y();
+		const double dist = sqrt(x2*x2 + y2*y2);
 		if (dist >= 20 || alt  >= 20){
 			cout << "end poitn to far from star!!!" << "\t"<<millis_() << endl;
 			Telemetry.addMessage(e_PROG_TOO_LONG_FROM_START);
@@ -270,47 +270,47 @@ bool ProgClass::start(){
 }
 
 #define SGN(x) ((x<0)?-1:1)
-//float sgn(const float x){ return (x < 0) ? -1 : 1; }
+//double sgn(const double x){ return (x < 0) ? -1 : 1; }
 
-bool ProgClass::getIntersection(float &x, float &y){
+bool ProgClass::getIntersection(double &x, double &y){
 	if (next_x == old_x && next_y == old_y){
 		//ErrorLog.println("len=0");
 		return false;
 	}
 
-	//float ks = 1;
+	//double ks = 1;
 
-	const float dist_ = Stabilization.get_dist2goal();
+	const double dist_ = Stabilization.get_dist2goal();
 
-	float r = Stabilization.getDist_XY(max_speed_xy);
+	double r = Stabilization.getDist_XY(max_speed_xy);
 	if (r > dist_){
 		//ErrorLog.println("r>dist");
 		return false;
 	}
 	//----------------------------
 
-	const float x2 = next_x - Mpu.get_Est_X();// GPS.loc.from_lat2X((float)(lat - GPS.loc.lat_));
-	const float x1 = old_x - Mpu.get_Est_X();// GPS.loc.from_lat2X((float)(old_lat - GPS.loc.lat_));
-	const float y2 = next_y - Mpu.get_Est_Y();// GPS.loc.form_lon2Y((float)(lon - GPS.loc.lon_));
-	const float y1 = old_y - Mpu.get_Est_Y();// GPS.loc.form_lon2Y((float)(old_lon - GPS.loc.lon_));
-	const float dx = x2 - x1;
-	const float dy = y2 - y1;
-	const float l2 = dx*dx + dy*dy;
-	//const float dr = sqrt(l2);
-	const float D = x1*y2 - x2*y1;
+	const double x2 = next_x - Mpu.get_Est_X();// GPS.loc.from_lat2X((double)(lat - GPS.loc.lat_));
+	const double x1 = old_x - Mpu.get_Est_X();// GPS.loc.from_lat2X((double)(old_lat - GPS.loc.lat_));
+	const double y2 = next_y - Mpu.get_Est_Y();// GPS.loc.form_lon2Y((double)(lon - GPS.loc.lon_));
+	const double y1 = old_y - Mpu.get_Est_Y();// GPS.loc.form_lon2Y((double)(old_lon - GPS.loc.lon_));
+	const double dx = x2 - x1;
+	const double dy = y2 - y1;
+	const double l2 = dx*dx + dy*dy;
+	//const double dr = sqrt(l2);
+	const double D = x1*y2 - x2*y1;
 
-	float discriminant = (r*r*l2) - (D*D);
+	double discriminant = (r*r*l2) - (D*D);
 	if (discriminant <= 0){
 		//ErrorLog.println("dis<0");
     // нахождение от точки до прямой.
 		{
-			const float dot = -x1 * dx - y1 * dy;
-			float param = -1;
+			const double dot = -x1 * dx - y1 * dy;
+			double param = -1;
 			if (l2 == 0) //in case of 0 length line
 				return false;
 
 			param = dot / l2;
-			float xx, yy;
+			double xx, yy;
 
 			if (param < 0) {
 				xx = x1;
@@ -324,20 +324,20 @@ bool ProgClass::getIntersection(float &x, float &y){
 				xx = x1 + param * dx;
 				yy = y1 + param * dy;
 			}
-			float dist2line;
+			double dist2line;
 
 
 			if ((x2 - xx)*(xx - x1)<0 || (y2 - yy)*(yy - y1)<0){//точка не на линии
 				//ErrorLog.println("not on line");
-				float dx = x2 - xx;
-				float dy = y2 - yy;
-				const float dist2 = dx*dx+dy*dy;
+				double dx = x2 - xx;
+				double dy = y2 - yy;
+				const double dist2 = dx*dx+dy*dy;
 				dx = x1 - xx;
 				dy = y1 - yy;
-				const float dist1 = dx*dx + dy*dy;
-				dist2line = (float)(1.0 + sqrt(fmin(dist2, dist1)));
+				const double dist1 = dx*dx + dy*dy;
+				dist2line = (1.0 + sqrt(fmin(dist2, dist1)));
 			}else
-				dist2line = (float)(1.0 + sqrt(xx * xx + yy * yy));
+				dist2line = (1.0 + sqrt(xx * xx + yy * yy));
 
 			if (dist2line > r){
 				if (dist2line > MAX_DIST_ERROR_TO_FALL){
@@ -353,22 +353,22 @@ bool ProgClass::getIntersection(float &x, float &y){
 	}
 	if (discriminant <= 0)
 		return false;
-	discriminant = (float)sqrt(discriminant);
-	const float rdr2 = 1.0f/l2;
-	float temp = SGN(dy)*dx*discriminant;
-	const float ix1 = (D*dy + temp)*rdr2;
-	const float ix2 = (D*dy - temp)*rdr2;
+	discriminant = sqrt(discriminant);
+	const double rdr2 = 1.0f/l2;
+	double temp = SGN(dy)*dx*discriminant;
+	const double ix1 = (D*dy + temp)*rdr2;
+	const double ix2 = (D*dy - temp)*rdr2;
 	temp = fabs(dy)*discriminant;
-	const float iy1 = (-D*dx + temp)*rdr2;
-	const float iy2 = (-D*dx - temp)*rdr2;
+	const double iy1 = (-D*dx + temp)*rdr2;
+	const double iy2 = (-D*dx - temp)*rdr2;
 
-	float tx = x2 - ix1;
-	float ty = y2 - iy1;
-	const float dist1 = tx*tx + ty*ty;
+	double tx = x2 - ix1;
+	double ty = y2 - iy1;
+	const double dist1 = tx*tx + ty*ty;
 
 	tx = x2 - ix2;
 	ty = y2 - iy2;
-	const float dist2 = tx*tx + ty*ty;
+	const double dist2 = tx*tx + ty*ty;
 
 	if (dist1<dist2){
 		x = ix1;
@@ -414,7 +414,7 @@ bool ProgClass::load_next(bool loadf) {
 	}
 	
 	if (prog[prog_data_index] & SPEED_Z) {
-		float speedZ = fabs(prog[wi++]);
+		double speedZ = fabs(prog[wi++]);
 		if (speedZ < 1)
 			speedZ = 1;
 		if (speedZ > MAX_VER_SPEED_PLUS)
@@ -442,7 +442,7 @@ bool ProgClass::load_next(bool loadf) {
 
 
 	if (prog[prog_data_index] & DIRECTION){
-		oldDir = 1.4173228f*(float)prog[wi++];
+		oldDir = 1.4173228*(double)prog[wi++];
 		if (loadf)
 			Autopilot.setYaw(-oldDir);
 	}

@@ -77,18 +77,20 @@ int zzz = 1;
 
 
 
-int setup(int cnt) {////--------------------------------------------- SETUP ------------------------------
+int init(int cnt) {////--------------------------------------------- INITIALIZATION ------------------------------
 	Log.init(cnt);
 	Settings.read();
 	cout << "___setup___\n";
-	cout << "commander init...\n";
+	GPS.init();
 	Commander.init();
-	cout << "Autopilot init...\n";
+	Mpu.init();
+	Hmc.init();
+	Balance.init();
+	MS5611.init();
 	Autopilot.init();
 	Telemetry.init_();
 	Telemetry.testBatteryVoltage();
-	cout << "telemetry init OK \n";
-	GPS.init();
+
 	Settings.read_all();
 	return 0;
 
@@ -408,7 +410,7 @@ int counter = test_4_counterFile();
 	mega_i2c.init();
 
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	if (setup(counter) == 0) {
+	if (init(counter) == 0) {
 		shmPTR->reboot = 0;
 		while (shmPTR->run_main){
 			if (loop()) {

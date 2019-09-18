@@ -297,7 +297,7 @@ int SettingsClass::write_all() {
 	fprintf(f, "0,%s", (r0(Balance.get_set())).c_str());
 	fprintf(f, "1,%s", (r0(Stabilization.get_z_set())).c_str());
 	fprintf(f, "2,%s", (r0(Stabilization.get_xy_set())).c_str());
-	fprintf(f, "3,%s", (r0(Autopilot.get_set())).c_str());
+	fprintf(f, "3,%s", (r0(Autopilot.get_set(true))).c_str());
 	fprintf(f, "4,%s", (r0(Mpu.get_set())).c_str());
 	fprintf(f, "5,%s", (r0(Hmc.get_set())).c_str());
 	fprintf(f, "6,%s", (r0(Commander.get_set())).c_str());

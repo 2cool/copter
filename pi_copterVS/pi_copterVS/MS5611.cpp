@@ -43,13 +43,13 @@ int MS5611Class::writeReg(char bar_zero) {
 	return 0;
 }
 
-float MS5611Class::alt() {
+double MS5611Class::alt() {
 	return altitude_;
 }
 #ifndef WORK_WITH_WIFI
 int cntssdde = 0;
 #endif
-float fspeed = 0;
+double fspeed = 0;
 
 #define MAX_D_PRESSURE 300.0
 
@@ -59,8 +59,8 @@ bool MS5611Class::fault() {
 
 #define ALT_NOT_SET -10000
 double MS5611Class::getAltitude(const double pressure) {
-	static float old_alt= ALT_NOT_SET;
-	static float gps_barometr_alt_dif = ALT_NOT_SET;
+	static double old_alt= ALT_NOT_SET;
+	static double gps_barometr_alt_dif = ALT_NOT_SET;
 	static uint init_cnt = 0;
 
 #define gps_alt (GPS.loc.altitude - gps_barometr_alt_dif)
@@ -122,9 +122,9 @@ uint8_t MS5611Class::loop(){
 		return 0;
 
 
-	const float dt = 0.05;// (millis_() - timet)*0.001;
-	ttimet = millis_();
-		const float new_altitude = Emu.get_alt();
+//	const double dt = 0.05;// (millis_() - timet)*0.001;
+//	ttimet = millis_();
+	const double new_altitude = Emu.get_alt();
 
 	//speed = (new_altitude - altitude_) / dt;
 	shmPTR->altitude_ = altitude_ = new_altitude;
@@ -285,7 +285,7 @@ void MS5611Class::phase2() {
 
 
 
-		//float pr = (float)(D1 * SENS / 2097152 - OFF) * 0.000030517578125;
+		//double pr = (D1 * SENS / 2097152 - OFF) * 0.000030517578125;
 
 		int32_t tP = ((((int64_t)D1*SENS) / 2097152 - OFF) / 32768);
 
@@ -322,7 +322,7 @@ void MS5611Class::phase2() {
 void MS5611Class::update(){}
 
 
-float MS5611Class::get_pressure(float h) {
+double MS5611Class::get_pressure(double h) {
 	return PRESSURE_AT_0 * pow(1 - h*2.25577e-5, 5.25588);
 }
 

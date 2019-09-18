@@ -18,22 +18,23 @@ class ProgClass
 #define PROG_MEMORY_SIZE 20000
  protected:
 	 bool go_next, distFlag, altFlag, do_action;
-	 float next_x, next_y, old_x, old_y;
+	 double next_x, next_y, old_x, old_y;
 	 uint8_t action;
 
 	 uint8_t oldTimer;
-	 float old_alt,alt, oldDir, old_cam_angle;
+	 double old_alt, alt;
+	 double oldDir, old_cam_angle;
 	 uint16_t prog_data_size,prog_data_index;
 	 uint16_t prog_steps_count_must_be;
 	 uint8_t step_index,steps_count;
 	 byte prog[PROG_MEMORY_SIZE];
-	 float speed_X, speed_Y, speed_Z;
+	 double speed_X, speed_Y, speed_Z;
 	 bool program_is_OK();
-	 float r_time,time4step2done,speed_corected_delta;
+	 double r_time,time4step2done,speed_corected_delta;
 
 	 int32_t begin_time;
-	 float max_speed_xy,timer;
-	 float max_speedZ_P, max_speedZ_M;
+	 double max_speed_xy,timer;
+	 double max_speedZ_P, max_speedZ_M;
 	 void takePhoto360();
 	 bool takePhoto();
 	 bool startVideo();
@@ -43,9 +44,9 @@ class ProgClass
 	 void Do_Action();
  public:
 	 bool intersactionFlag;
-	 float need_speedX, need_speedY;
-	bool getIntersection(float &distX, float &distY);
-	float altitude, direction, cam_pitch;
+	 double need_speedX, need_speedY;
+	bool getIntersection(double &distX, double &distY);
+	double altitude, direction, cam_pitch;
 	 void init();
 	// GeoDotClass gd;
 	 bool add(byte*buf);

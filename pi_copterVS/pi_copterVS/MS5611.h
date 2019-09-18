@@ -71,7 +71,7 @@ public:
 	bool fault();
 	bool compensation;
 
-	float alt();
+	double alt();
 	uint8_t ms5611_count;
 	int init();
 	uint8_t loop();
@@ -84,7 +84,7 @@ public:
 	int8_t i_readTemperature;
 	double getAltitude(const double pres);
 
-	float get_pressure(float h);
+	double get_pressure(double h);
 	//---------------------------------------------------------------
 
 
@@ -103,7 +103,7 @@ private:
 	int64_t OFF;
 	int64_t SENS;
 	int32_t P;
-	float oldAltt;
+	double oldAltt;
 	int bar_task;
 	int64_t b_timeDelay;
 	uint8_t bar_D[3];

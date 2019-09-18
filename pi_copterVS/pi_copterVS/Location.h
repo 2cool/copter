@@ -20,10 +20,9 @@ class LocationClass
 public:
 	
 	//double cosDirection, sinDirection;
-//	float dir_angle_GRAD;
+//	double dir_angle_GRAD;
 	double dt, rdt;
-	double add_lat_need, add_lon_need;
-	long lat_, lon_, lat_zero, lon_zero;
+	long lat_, lon_, _lat_zero, _lon_zero;
 	double altitude, alt_zero;
 	uint8_t accuracy_ver_pos_,accuracy_hor_pos_;
 	unsigned long mseconds;
@@ -40,7 +39,7 @@ public:
 	//void bearing_dist(double &bearing, double & distance);
 	
 	double dX, dY, speedX, speedY,speedZ,startAlt,old_alt;
-	double dist2zero_2, x_from_zero_2_home, y_from_zero_2_home;
+	double  x_from_zero_2_home, y_from_zero_2_home, dist2home;
 	//---------------
 	int32_t last_gps_data__time, last_gps_accuracy_ok;
 	
@@ -66,7 +65,7 @@ public:
 		return y * r_kd_lon;
 	}
 
-	void fromLoc2Pos(long lat, long lon, float &x, float&y);
+	void fromLoc2Pos(long lat, long lon, double &x, double&y);
 private:
 	double set_cos_sin_dir();
 	void xy();
@@ -75,8 +74,9 @@ private:
 	double mspeedx, mspeedy;
 
 
-	double oldDist_2;
+	double oldDist;
 	void update();
+	void get(double& dx, double& dy);
 	double kd_lon_, kd_lat_;
 	double r_kd_lon, r_kd_lat;
 
