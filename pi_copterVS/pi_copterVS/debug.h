@@ -30,7 +30,9 @@ class DebugClass
 	 int n_debug;
 	 void init();
 	 void dump(const long f1, long f2, long f3, long f4);
-	 void dump(const float f1, float f2, float f3, float f4);
+	 void dump(const double f1, double f2, double f3, double f4);
+
+
 	 void dump(const uint8_t f1, uint8_t f2, uint8_t f3, uint8_t f4);
 	 void load(const uint8_t i, const float x, const float y);
 	 void load(const uint8_t i, const float x, const float y,const float z);

@@ -23,6 +23,7 @@ public:
 //	double dir_angle_GRAD;
 	double dt, rdt;
 	long lat_, lon_, _lat_zero, _lon_zero;
+	double lat_zero, lon_zero;
 	double altitude, alt_zero;
 	uint8_t accuracy_ver_pos_,accuracy_hor_pos_;
 	unsigned long mseconds;
@@ -51,21 +52,12 @@ public:
 	void proceed(SEND_I2C *d);
 	//void clearSpeedCorrection(){ lat_needV_ = lat_needR_; lon_needV_ = lon_needR_; }
 
-	double from_lat2X(const double lat){
-		return lat*kd_lat_;
-	}
-	double from_X2Lat(const double x){ 
-		return x *r_kd_lat; 
-	}
+	double from_lat2X(const double lat);
+	double from_X2Lat(const double x);
+	double form_lon2Y(const double lon);
+	double from_Y2Lon(const double y);
 
-	double form_lon2Y(const double lon){
-		return lon*kd_lon_;
-	}
-	double from_Y2Lon(const double y){
-		return y * r_kd_lon;
-	}
-
-	void fromLoc2Pos(long lat, long lon, double &x, double&y);
+	void fromLoc2Pos(const long &lat, const long &lon, double &x, double&y);
 private:
 	double set_cos_sin_dir();
 	void xy();
@@ -76,6 +68,7 @@ private:
 
 	double oldDist;
 	void update();
+	void get(const long &lat, const long &lon, double& dx, double &dy);
 	void get(double& dx, double& dy);
 	double kd_lon_, kd_lat_;
 	double r_kd_lon, r_kd_lat;

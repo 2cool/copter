@@ -30,18 +30,47 @@
 #define DELTA_A_RAD (DELTA_ANGLE_C*GRAD2RAD)
 #define DELTA_A_E7 (DELTA_ANGLE_C*10000000)
 
-void LocationClass::fromLoc2Pos(long lat, long lon, double &x, double&y) {
-	y = form_lon2Y((_lon_zero - lon));
-	x = from_lat2X((_lat_zero - lat));
+
+double LocationClass::from_lat2X(const double lat) {
+	return lat * kd_lat_;
+}
+double LocationClass::form_lon2Y(const double lon) {
+	return lon * kd_lon_;
+}
+
+
+double LocationClass::from_X2Lat(const double x) {
+	return x * r_kd_lat;
+}
+
+
+double LocationClass::from_Y2Lon(const double y) {
+	return y * r_kd_lon;
+}
+
+
+
+
+
+
+
+
+void LocationClass::fromLoc2Pos(const long &lat, const long &lon, double &x, double&y) {
+	get(lat, lon, x, y);
+//	y = form_lon2Y((_lon_zero - lon));
+	//x = from_lat2X((_lat_zero - lat));
 }
 void LocationClass::xy(){
-	double t = form_lon2Y((_lon_zero - lon_));
-	double tspeedY = (t - dY) *rdt;
-	dY = t;
+	double tx, ty;
+	get(tx, ty);
+	
+	//double t = form_lon2Y((_lon_zero - lon_));
+	double tspeedY = (ty - dY) *rdt;
+	dY = ty;
 	shmPTR->speedY=speedY = constrain(tspeedY,-25,25);
-	t = from_lat2X((_lat_zero - lat_));
-	double tspeedX = (t - dX) * rdt;
-	dX = t;
+	//t = from_lat2X((_lat_zero - lat_));
+	double tspeedX = (tx - dX) * rdt;
+	dX = tx;
 	shmPTR->speedX=speedX=constrain(tspeedX,-25,25);
 	//update z
 	double tsz = (altitude - old_alt)*rdt;
@@ -55,10 +84,15 @@ void LocationClass::xy(){
 }
 
 void LocationClass::get(double& dx, double& dy) {
-
-	double lat = 1.74532925199433e-9 * (double)lat_;  //radians
-	double lon = 1.74532925199433e-9 * (double)lon_;
-	//double zero
+	get(lat_, lon_, dx, dy);
+}
+void LocationClass::get(const long &l_lat, const long &l_lon, double& dx, double& dy){
+	const double lat = 1.74532925199433e-9 * (double)l_lat;  //radians
+	const double lon = 1.74532925199433e-9 * (double)l_lon;
+	const double bearing = bearing_(lat, lon, lat_zero, lon_zero);
+	const double distance = distance_(lat, lon, lat_zero, lon_zero);
+	dy = distance * sin(bearing);
+	dx = distance * cos(bearing);
 }
 void LocationClass::update(){
 
@@ -131,6 +165,8 @@ void LocationClass::proceed(SEND_I2C *d) {
 	if (_lat_zero == 0 && _lon_zero == 0 && accuracy_hor_pos_ <= Autopilot.min_hor_accuracy_2_start) {
 		_lat_zero = lat_;
 		_lon_zero = lon_;
+		lat_zero = 1.74532925199433e-9 * (double)lat_;  //radians
+		lon_zero = 1.74532925199433e-9 * (double)lon_;
 		alt_zero = altitude;
 	}
 

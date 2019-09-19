@@ -96,6 +96,7 @@ void StabilizationClass::setNeedPos(double x, double y) {
 
 
 void StabilizationClass::fromLoc2Pos(long lat, long lon, double &x, double &y) {
+	
 	GPS.loc.fromLoc2Pos(lat, lon, x, y);
 	Mpu.getXYRelative2Zero(x, y);
 }

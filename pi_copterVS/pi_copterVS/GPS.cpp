@@ -104,9 +104,11 @@ void GPSClass::loop(){
 		lon = FALSE_LON + (long)(loc.from_Y2Lon(Emu.get_y()));
 #endif
 
-		if (loc.lat_zero == 0 && loc.lon_zero == 0) {
-			loc.lat_zero = lat;
-			loc.lon_zero = lon;
+		if (loc._lat_zero == 0 && loc._lon_zero == 0) {
+			loc._lat_zero = lat;
+			loc._lon_zero = lon;
+			loc.lat_zero = 1.74532925199433e-9 * (double)lat;  //radians
+			loc.lon_zero = 1.74532925199433e-9 * (double)lon;
 			//alt_zero = altitude;
 		}
 

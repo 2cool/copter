@@ -20,7 +20,7 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 	 void DebugClass::dump(const long f1, long f2, long f3, long f4) {
 		 printf("\n%q,%q,%q,%q\n", f1, f2, f3, f4);
 	 }
-	 void DebugClass::dump(const float f1, float f2, float f3, float f4) {
+	 void DebugClass::dump(const double f1, double f2, double f3, double f4) {
 
 		 int32_t t = millis_();
 		 if (t - old_time < d_delay)//20)

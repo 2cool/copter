@@ -46,7 +46,7 @@
 #define NO_GPS__DATA 10e3
 
 #define MIN_ACUR_HOR_POS_2_START_ 5
-#define MIN_ACUR_HOR_POS_4_JAMM 20
+#define MIN_ACUR_HOR_POS_4_JAMM 30
 
 
 #define MAX_ANGLE 35

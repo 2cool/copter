@@ -368,7 +368,7 @@ void AutopilotClass::set(const float ar[]){
 			shmPTR->fly_at_start = lowest_height + 1;
 		if (motors_is_on()==false)
 			Telemetry.set_bat_capacity(ar[i++]);
-		min_hor_accuracy_2_start = ((ar[i] > 10) ? 10 : ar[i]);
+		min_hor_accuracy_2_start = ((ar[i] > MIN_ACUR_HOR_POS_4_JAMM) ? MIN_ACUR_HOR_POS_4_JAMM : ar[i]);
 		i++;
 		ignore_the_lack_of_internet_at_startup = (ar[i++] > 0);
 
@@ -613,10 +613,10 @@ bool AutopilotClass::is_all_OK(bool print){
 			Telemetry.addMessage(e_NO_INTERNET);
 			cout << "inet dont work" << "\t" << _ct << endl;
 		}
-//#ifndef DEBUG
+#ifndef DEBUG
 		if (!ignore_the_lack_of_internet_at_startup)
 			return false;
-//#endif
+#endif
 	}
 
 	if (Hmc.do_compass_motors_calibr || (Mpu.gyro_calibratioan && Hmc.calibrated)) {
@@ -635,9 +635,9 @@ bool AutopilotClass::is_all_OK(bool print){
 				mega_i2c.beep_code(B_GPS_ACCURACY_E);
 				Telemetry.addMessage(e_GPS_ERROR);
 			}
-//#ifndef DEBUG
+#ifndef DEBUG
 			return false;
-//#endif 
+#endif 
 		}
 		if (print)
 			cout << "OK" << "\t" << _ct << endl;

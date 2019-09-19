@@ -1,6 +1,6 @@
 
  
-#define PROG_VERSION "ver 3.190916\n"
+#define PROG_VERSION "ver 3.190919\n"
 #define SIM800_F
 
 
