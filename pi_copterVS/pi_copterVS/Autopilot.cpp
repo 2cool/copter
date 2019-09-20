@@ -191,14 +191,11 @@ static int32_t last_beep__time = 0;
 
 
 void AutopilotClass::loop(){/////////////////////////////////////////////////////////////////////////////////////////////////
-
-	
-	
 	const int32_t _ct = millis_();
-	float dt = (float)((_ct - control_DeltaTime)*1e-3); 
-	//if (dt < 0.01)
-	//	return;
-	dt = constrain(dt, 0.01, 0.03);
+	float dt = (float)((_ct - control_DeltaTime) * 1e-3);
+	if (dt < 0.033)
+		return;
+	dt = constrain(dt, 0.033, 0.1);
 	control_DeltaTime = _ct;
 
 	if (shmPTR->control_bits_4_do)
@@ -206,12 +203,7 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 	shmPTR->control_bits_4_do = 0;
 	shmPTR->control_bits = control_bits;
 
-
-	
 	gimBalRollCorrection();
-
-	
-
 
 #ifdef LOST_BEEP
 	
