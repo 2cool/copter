@@ -121,10 +121,12 @@ public class DrawView extends View {
         if (old_tel_counter < Telemetry.get_counter()) {
             old_tel_counter=Telemetry.get_counter();
 
-            cam_p_c.gimbal_pitch_add(0,Commander.fpv_zoom);//update
+            cam_p_c.gimbal_pitch_add(0,0,Commander.fpv_zoom);//update
             if (motors_on[0].is_pressed()==motors_on[1].is_pressed()) {
                 motors_on[0].set(MainActivity.motorsOnF());
                 motors_on[1].set(MainActivity.motorsOnF());
+
+
             }
             go_to_home.set(MainActivity.toHomeF());
 //------------------------------------------------------------------------------------------------------
@@ -472,6 +474,9 @@ public class DrawView extends View {
         if ( motors_on[0].is_pressed()==motors_on[1].is_pressed() && MainActivity.motorsOnF()!=motors_on[0].is_pressed() &&
                 ((motors_on[0].getStat())==3 || (motors_on[1].getStat())==3)) {
             MainActivity.start_stop();
+
+            yaw_off.set(true);
+            j_left.set_block_X(true);
             //Log.d("PWR","PWR+"+Integer.toString(stat1)+" "+Integer.toString(stat2));
         }
     }

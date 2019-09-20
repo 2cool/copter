@@ -81,6 +81,7 @@ class AutopilotClass
 	 float getGimbalPitch(){ return gimbalPitch; }
 	 void control_falling(const string msg);
 	 void gimBalPitchADD(const float add);
+	 void gimBalRollADD(const float add);
 	 void set_gimBalPitch(const float angle);
 
 	 float corectedAltitude4tel();

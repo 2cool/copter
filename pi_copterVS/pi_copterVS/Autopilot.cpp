@@ -810,6 +810,12 @@ void AutopilotClass::set_gimBalPitch(const float angle) {
 	if (mega_i2c.gimagl(gimBalPitchZero + angle, gimBalRollZero))
 		gimbalPitch = angle;
 }
+
+void AutopilotClass::gimBalRollADD(const float add) {
+	if (!progState())
+		if (mega_i2c.gimagl((gimBalPitchZero + gimbalPitch), gimBalRollZero+add))
+			gimBalRollZero += add;
+}
 void AutopilotClass::gimBalPitchADD(const float add) {
 	if (!progState())
 		if (mega_i2c.gimagl((gimBalPitchZero + gimbalPitch + add), gimBalRollZero))
@@ -874,10 +880,20 @@ bool AutopilotClass::set_control_bits(uint32_t bits) {
 		}
 	}
 
-	if (bits & GIMBAL_PLUS)
-		gimBalPitchADD(1);
-	if (bits & GIMBAL_MINUS)
-		gimBalPitchADD(-1);
+	
+	if (bits & GIMBAL_PLUS) {
+		if (bits & GIMBAL_AXIS)
+			gimBalRollADD(0.1);
+		else
+			gimBalPitchADD(1);
+	}
+
+	if (bits & GIMBAL_MINUS) {
+		if (bits & GIMBAL_AXIS)
+			gimBalRollADD(-0.1);
+		else
+			gimBalPitchADD(-1);
+	}
 	if (control_bits & CONTROL_FALLING) {
 		cout << "<< CONTROL_FALLING " << millis_() << endl;
 		return false;
@@ -977,17 +993,16 @@ int  AutopilotClass::exit() {
 #define MAX_GIMAGL_PITCH 20
 #define MAX_GIMBAL_ROLL 20
 void AutopilotClass::gimBalRollCorrection() {
-	static float old_g_roll = 1000;
 	const float roll = Mpu.get_roll();
+	float roll_correction;
 	if (fabs(roll) > MAX_GIMBAL_ROLL)
-		gimBalRollZero = -2 * (roll - ((roll > 0) ? MAX_GIMBAL_ROLL : -MAX_GIMBAL_ROLL));
+		roll_correction = -2 * (roll - ((roll > 0) ? MAX_GIMBAL_ROLL : -MAX_GIMBAL_ROLL));
 	else
-		gimBalRollZero = 0;
+		roll_correction = 0;
 
+	if (roll_correction!=0) {
+		mega_i2c.gimagl((gimBalPitchZero + gimbalPitch), gimBalRollZero + roll_correction);
 
-	if (old_g_roll != gimBalRollZero) {
-		mega_i2c.gimagl((gimBalPitchZero + gimbalPitch), gimBalRollZero);
-		old_g_roll = gimBalRollZero;
 	}
 }
 
