@@ -463,7 +463,7 @@ bool ProgClass::load_next(bool loadf) {
 		//printf("camera ang=%f\n", old_cam_angle);
 		if (loadf)
 			Autopilot.set_gimBalPitch(old_cam_angle);
-			//mega_i2c.gimagl(Autopilot.gimBalPitchZero+old_cam_angle,Autopilot.gimBalRollZero);
+
 	}
 
 #define TIME2TEKE_PHOTO360 160

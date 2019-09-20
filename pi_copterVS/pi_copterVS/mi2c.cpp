@@ -225,7 +225,7 @@ void Megai2c::sim800_reset() {
 }
 //0.35555555555555555555555555555556 = 1град
 bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с коптером пра опред обст
-	if (pitch <= 80 && pitch >= -45) { 
+	if (pitch <= 80 && pitch >= -45 && roll > -75 && roll < 110) { 
 
 		//Serial.printf("camAng="); Serial.println(angle);
 		pitch = pwm_OFF_THROTTLE + (180 - pitch)*44.444444;

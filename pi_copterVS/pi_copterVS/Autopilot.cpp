@@ -113,8 +113,8 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	aPitch = aRoll = 0;
 	control_DeltaTime = 0;
 
-	gimBalPitchZero = gimBalRollZero= gimbalPitch=0;
-	mega_i2c.gimagl(gimBalPitchZero, gimBalRollZero);
+	gimbalRoll= gimbalPitch=0;
+	mega_i2c.gimagl(gimbalPitch, gimbalRoll);
 
 }
 int32_t AutopilotClass::powerOnTime() {
@@ -807,18 +807,19 @@ void AutopilotClass::calibration() {////////////////////////////////////////////
 }
 
 void AutopilotClass::set_gimBalPitch(const float angle) {
-	if (mega_i2c.gimagl(gimBalPitchZero + angle, gimBalRollZero))
+	if (mega_i2c.gimagl(angle, gimbalRoll))
 		gimbalPitch = angle;
 }
 
 void AutopilotClass::gimBalRollADD(const float add) {
 	if (!progState())
-		if (mega_i2c.gimagl((gimBalPitchZero + gimbalPitch), gimBalRollZero+add))
-			gimBalRollZero += add;
+		if (mega_i2c.gimagl((gimbalPitch), gimbalRoll + add))
+			gimbalRoll += add;
+
 }
 void AutopilotClass::gimBalPitchADD(const float add) {
 	if (!progState())
-		if (mega_i2c.gimagl((gimBalPitchZero + gimbalPitch + add), gimBalRollZero))
+		if (mega_i2c.gimagl(( gimbalPitch + add), gimbalRoll))
 			gimbalPitch += add;
 
 }
@@ -883,14 +884,14 @@ bool AutopilotClass::set_control_bits(uint32_t bits) {
 	
 	if (bits & GIMBAL_PLUS) {
 		if (bits & GIMBAL_AXIS)
-			gimBalRollADD(0.1);
+			gimBalRollADD(0.3);
 		else
 			gimBalPitchADD(1);
 	}
 
 	if (bits & GIMBAL_MINUS) {
 		if (bits & GIMBAL_AXIS)
-			gimBalRollADD(-0.1);
+			gimBalRollADD(-0.3);
 		else
 			gimBalPitchADD(-1);
 	}
@@ -994,15 +995,16 @@ int  AutopilotClass::exit() {
 #define MAX_GIMBAL_ROLL 20
 void AutopilotClass::gimBalRollCorrection() {
 	const float roll = Mpu.get_roll();
-	float roll_correction;
+	static float roll_correction=0;
+	float rc;
 	if (fabs(roll) > MAX_GIMBAL_ROLL)
-		roll_correction = -2 * (roll - ((roll > 0) ? MAX_GIMBAL_ROLL : -MAX_GIMBAL_ROLL));
+		rc = -2 * (roll - ((roll > 0) ? MAX_GIMBAL_ROLL : -MAX_GIMBAL_ROLL));
 	else
-		roll_correction = 0;
+		rc = 0;
 
-	if (roll_correction!=0) {
-		mega_i2c.gimagl((gimBalPitchZero + gimbalPitch), gimBalRollZero + roll_correction);
-
+	if (roll_correction!=rc) {
+		mega_i2c.gimagl((gimbalPitch), gimbalRoll + roll_correction);
+		roll_correction = rc;
 	}
 }
 

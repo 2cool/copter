@@ -120,7 +120,7 @@ class AutopilotClass
 
 	// bool get_smart_cntr_flag(){ return smart_ctrl; }
 
-	 float gimBalPitchZero, gimBalRollZero, gimbalPitch;
+	 float gimbalPitch,gimbalRoll;
 	 float height_to_lift_to_fly_to_home = HIGHT_TO_LIFT_ON_TO_FLY_TO_HOME;
 
 	 bool going2HomeON(const bool hower);
