@@ -191,11 +191,14 @@ static int32_t last_beep__time = 0;
 
 
 void AutopilotClass::loop(){/////////////////////////////////////////////////////////////////////////////////////////////////
+
+	
+	
 	const int32_t _ct = millis_();
-	float dt = (float)((_ct - control_DeltaTime) * 1e-3);
+	float dt = (float)((_ct - control_DeltaTime)*1e-3); 
 	if (dt < 0.033)
 		return;
-	dt = constrain(dt, 0.033, 0.1);
+	dt= constrain(dt, 0.033, 0.1);
 	control_DeltaTime = _ct;
 
 	if (shmPTR->control_bits_4_do)
@@ -203,7 +206,12 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 	shmPTR->control_bits_4_do = 0;
 	shmPTR->control_bits = control_bits;
 
+
+	
 	gimBalRollCorrection();
+
+	
+
 
 #ifdef LOST_BEEP
 	
@@ -218,7 +226,7 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 	//-----------------------------------------
 	static int uspd_cnt = 0;
 	if (motors_is_on() && fabs(Mpu.get_roll()) > 110 && Mpu.get_Est_Alt() < 5) {
-		if (uspd_cnt++ > 30)
+		if (uspd_cnt++ > 10)
 			off_throttle(true, "USD");
 	}else
 		uspd_cnt = 0;
