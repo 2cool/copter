@@ -37,7 +37,7 @@ struct Memory {
 	long lat_, lon_, lat_home, lon_home;
 	float  speedX, speedY, speedZ, dist2home;
 	int32_t gps_altitude_, altitude_;
-	uint32_t pressure;
+	int32_t pressure;
 	float voltage, voltage_at_start;
 	float m_current[4];
 

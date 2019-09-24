@@ -46,17 +46,6 @@ void StabilizationClass::init(){
 	//----------------------------------------------------------------------------
 	d_speedX=d_speedY=mc_z=0;
 }
-//bool flx = false, fly = false;
-
-double StabilizationClass::accxy_stab(double dist, double maxA, double timeL) {
-	
-	return sqrt(2 * maxA*dist) - maxA*timeL;
-
-}
-double StabilizationClass::accxy_stab_rep(double speed, double maxA, double timeL) {
-	double t = speed / maxA + timeL;
-	return 0.5*maxA*t*t;
-}
 
 void StabilizationClass::setDefaultMaxSpeeds(){//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	max_speed_xy = MAX_HOR_SPEED;
@@ -65,11 +54,11 @@ void StabilizationClass::setDefaultMaxSpeeds(){//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 
-void StabilizationClass::max_speed_limiter(double &x, double &y) {
+void StabilizationClass::max_speed_limiter(float &x, float &y) {
 	const double speed2 = (x*x + y * y);
 	const double maxSpeed2 = max_speed_xy * max_speed_xy;
 	if (speed2 > maxSpeed2) {
-		const double k = (double)sqrt(maxSpeed2 / speed2);
+		const float k = (float)sqrt(maxSpeed2 / speed2);
 		x *= k;
 		y *= k;
 	}
@@ -77,37 +66,36 @@ void StabilizationClass::max_speed_limiter(double &x, double &y) {
 void StabilizationClass::setNeedPos2Home() {
 	needXR = needXV = needYR = needYV = 0;
 }
-void StabilizationClass::dist2speed(double &x, double &y) {
+void StabilizationClass::dist2speed(float &x, float &y) {
 	x = dist2speed_XY * x;
 	y = dist2speed_XY * y;
 	max_speed_limiter(x, y);
 
 }
-void StabilizationClass::speed2dist(double &x, double &y) {
+void StabilizationClass::speed2dist(float &x, float &y) {
 	max_speed_limiter(x, y);
 	x /= dist2speed_XY;
 	y /= dist2speed_XY;
 }
 
-void StabilizationClass::setNeedPos(double x, double y) {
+void StabilizationClass::setNeedPos(float x, float y) {
 	needXR=needXV = x;
 	needYR=needYV = y;
 }
 
 
-void StabilizationClass::fromLoc2Pos(long lat, long lon, double &x, double &y) {
-	
+void StabilizationClass::fromLoc2Pos(long lat, long lon, double&x, double&y) {
 	GPS.loc.fromLoc2Pos(lat, lon, x, y);
 	Mpu.getXYRelative2Zero(x, y);
 }
-void StabilizationClass::setNeedLoc(long lat, long lon, double &x, double &y) {
+void StabilizationClass::setNeedLoc(long lat, long lon, double&x, double&y) {
 	fromLoc2Pos(lat, lon, x, y);
 	setNeedPos(x, y);
 	
 }
 
 
-void StabilizationClass::add2NeedPos(double speedX, double speedY, double dt) {
+void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 	static bool flagzx = false;
 	static bool flagzy = false;
 	if (speedX == 0) {
@@ -118,7 +106,7 @@ void StabilizationClass::add2NeedPos(double speedX, double speedY, double dt) {
 	}
 	else {
 		flagzx = false;
-		double distX = speedX, distY = speedY;
+		float distX = speedX, distY = speedY;
 		speed2dist(distX, distY);
 		needXR += speedX * dt;
 		needXV = needXR + distX;
@@ -131,23 +119,23 @@ void StabilizationClass::add2NeedPos(double speedX, double speedY, double dt) {
 	}
 	else {
 		flagzy = false;
-		double distX = speedX, distY = speedY;
+		float distX = speedX, distY = speedY;
 		speed2dist(distX, distY);
 		needYR += speedY * dt;
 		needYV = needYR + distY;
 	}
 }
-double StabilizationClass::get_dist2goal(){
+float StabilizationClass::get_dist2goal(){
 	double dx= Mpu.get_Est_X() - needXV;
 	double dy = Mpu.get_Est_Y() - needYV;
-	return sqrt(dx*dx + dy * dy);
+	return (float)sqrt(dx*dx + dy * dy);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//double old_gps_bearing = 0, cos_bear = 1,  sin_bear = 0;
+//float old_gps_bearing = 0, cos_bear = 1,  sin_bear = 0;
 void StabilizationClass::XY(float &pitch, float&roll){//dont work 
-		double need_speedX, need_speedY;
-		double tx, ty;
+		float need_speedX, need_speedY;
+		float tx, ty;
 		if (Autopilot.progState() && Prog.intersactionFlag) {
 			need_speedX = -Prog.need_speedX;
 			need_speedY = -Prog.need_speedY;
@@ -165,11 +153,11 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 
 	//	mc_x += (mc_pitch - Mpu.get_Est_SpeedZ() - mc_z)*Z_FILTER;
 	//	mc_z = constrain(mc_z, -max_acc_z, max_acc_z);
-	//	const double accX_C =  ((d_speedX * speed_2_acc_XY) - Mpu.w_accX)*acc_2_angle;
-	//	const double accY_C = ((d_speedY * speed_2_acc_XY) - Mpu.w_accY)*acc_2_angle;
+	//	const float accX_C =  ((d_speedX * speed_2_acc_XY) - Mpu.w_accX)*acc_2_angle;
+	//	const float accY_C = ((d_speedY * speed_2_acc_XY) - Mpu.w_accY)*acc_2_angle;
 
-		const double w_pitch = -(pids[SPEED_X_SPEED].get_pid(d_speedX, Mpu.get_dt()));
-		const double w_roll = pids[SPEED_Y_SPEED].get_pid(d_speedY, Mpu.get_dt());
+		const float w_pitch = -(pids[SPEED_X_SPEED].get_pid(d_speedX, Mpu.get_dt()));
+		const float w_roll = pids[SPEED_Y_SPEED].get_pid(d_speedY, Mpu.get_dt());
 
 		
 
@@ -182,19 +170,19 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double StabilizationClass::Z(){
+float StabilizationClass::Z(){
 
 
 	//-------------stab
 
-	const double need_speedZ = getSpeed_Z(Autopilot.fly_at_altitude() - Mpu.get_Est_Alt());
+	const float need_speedZ = getSpeed_Z(Autopilot.fly_at_altitude() - Mpu.get_Est_Alt());
 
 	mc_z += (need_speedZ - Mpu.get_Est_SpeedZ() - mc_z)*Z_FILTER;
-	//const double accZ_C = ((mc_z * speed_2_acc_Z) - Mpu.faccZ)*acc_2_power;
+	//const float accZ_C = ((mc_z * speed_2_acc_Z) - Mpu.faccZ)*acc_2_power;
 
 
 
-	double fZ = HOVER_THROTHLE +  pids[SPEED_Z_PID].get_pid(mc_z, Mpu.get_dt())*Balance.powerK();
+	float fZ = HOVER_THROTHLE +  pids[SPEED_Z_PID].get_pid(mc_z, Mpu.get_dt())*Balance.powerK();
 	return fZ;
 }
 

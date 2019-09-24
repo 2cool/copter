@@ -145,6 +145,8 @@
     <ClInclude Include="GPS_Loger.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="KalmanFilter.h" />
+    <ClInclude Include="KalmanFilter_.h" />
+    <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Mpu.h" />
     <ClInclude Include="myButton.h" />
     <ClInclude Include="MyMath.h" />
@@ -164,6 +166,8 @@
     <ClCompile Include="GPS_Loger.cpp" />
     <ClCompile Include="graph.cpp" />
     <ClCompile Include="KalmanFilter.cpp" />
+    <ClCompile Include="KalmanFilter_.cpp" />
+    <ClCompile Include="Matrix33.cpp" />
     <ClCompile Include="Mpu.cpp" />
     <ClCompile Include="myButton.cpp" />
     <ClCompile Include="MyMath.cpp" />

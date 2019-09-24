@@ -32,15 +32,6 @@ THG out of Perimetr high
 #define CALIBRATION__TIMEOUT 60e3
 #endif
 
-
-#define WIND_X 10
-#define WIND_Y 10
-#define WIND_Z 0.5
-
-
-
-
-
 #include "define.h"
 #include "WProgram.h"
 
@@ -86,9 +77,7 @@ using namespace std;
 
 void AutopilotClass::init(){/////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef FLY_EMULATOR
-	Emu.init(WIND_X, WIND_Y, WIND_Z);
-#endif
+
 	shmPTR->sim800_reset = false;
 	time_at__start = old_time_at__start = 0;
 	lowest_height = shmPTR->lowest_altitude_to_fly;

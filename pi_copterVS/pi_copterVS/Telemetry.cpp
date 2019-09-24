@@ -27,7 +27,7 @@
 #include "Log.h"
 
 #define BALANCE_DELAY 120
-#define MAX_FLY_TIME 600
+#define MAX_FLY_TIME 1800
 #define BAT_ZERO 350.0f
 #define BAT_50P 385.0f
 #define BAT__timeout 50

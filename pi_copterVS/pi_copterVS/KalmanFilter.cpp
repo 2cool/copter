@@ -29,12 +29,12 @@ P - error covariance
 
 
 KalmanFilter::KalmanFilter(
-	const Eigen::MatrixXd& A,
-	const Eigen::VectorXd& B,
-	const Eigen::MatrixXd& H,
-	const Eigen::MatrixXd& Q,
-	const Eigen::MatrixXd& R,
-	const Eigen::MatrixXd& P)
+	const Eigen::MatrixXf& A,
+	const Eigen::VectorXf& B,
+	const Eigen::MatrixXf& H,
+	const Eigen::MatrixXf& Q,
+	const Eigen::MatrixXf& R,
+	const Eigen::MatrixXf& P)
 	: A(A), B(B), H(H), Q(Q), R(R), P0(P),
 	m(H.rows()), n(A.rows()), initialized(false),
 	I(n, n), x_hat(n), x_hat_new(n)
@@ -44,7 +44,7 @@ KalmanFilter::KalmanFilter(
 
 KalmanFilter::KalmanFilter() {}
 
-void KalmanFilter::init(const Eigen::VectorXd& x0) {
+void KalmanFilter::init(const Eigen::VectorXf& x0) {
 	x_hat = x0;
 	P = P0;
 
@@ -69,7 +69,7 @@ void KalmanFilter::update() {
 	x_hat = A * x_hat + B; //B added 2cool
 
 }
-void KalmanFilter::update(const Eigen::VectorXd& y) {
+void KalmanFilter::update(const Eigen::VectorXf& y) {
 
 	if (!initialized)
 		throw std::runtime_error("Filter is not initialized!");
@@ -83,8 +83,11 @@ void KalmanFilter::update(const Eigen::VectorXd& y) {
 
 
 }
+void  KalmanFilter::base(const int ib) {
+	x_hat[0] -= ib;
 
-void KalmanFilter::update(const Eigen::VectorXd& y, const Eigen::MatrixXd A) {
+}
+void KalmanFilter::update(const Eigen::VectorXf& y, const Eigen::MatrixXf A) {
 
 	this->A = A;
 

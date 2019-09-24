@@ -68,8 +68,8 @@ void GPSClass::loop(){
 		loc.mseconds = gpsttime;
 	else
 		return;
-	shmPTR->accuracy_hor_pos_=loc.accuracy_hor_pos_ = 8;
-	shmPTR->accuracy_ver_pos_=loc.accuracy_ver_pos_ = 8;
+	shmPTR->accuracy_hor_pos_=loc.accuracy_hor_pos_ = 1;
+	shmPTR->accuracy_ver_pos_=loc.accuracy_ver_pos_ = 1;
 	shmPTR->gps_altitude_=loc.altitude = Emu.get_alt();
 
 

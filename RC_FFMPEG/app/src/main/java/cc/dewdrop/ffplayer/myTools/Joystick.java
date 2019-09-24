@@ -12,28 +12,38 @@ public class Joystick {
     private float x,y,size;
     private String label="";
     private float trackX,trackY,old_posX,old_posY,shiftX,shiftY;
-    private float jx,jy;
+    private float j_x,j_y;
     private int index;
-    public float getX(){return jx;}
-    public float get_neg_Y(){return -jy;}
+
+    public float get_JX(){
+        double r=Math.max(1,Math.sqrt(j_x*j_x+j_y*j_y));
+        return (float)(j_x/r);
+    }
+    public float get_JY(){
+        double r=Math.max(1,Math.sqrt(j_x*j_x+j_y*j_y));
+        return (float)(j_y/r);
+    }
+
+
+    public float get_neg_Y(){return -get_JY();}
     public void setLabel(String s){label=s;}
     public float setJosticX(float x){
 
-        jx=(block_X)?0: Math.min(1,Math.max(-1,x));
+        j_x=(block_X)?0: Math.min(1,Math.max(-1,x));
 
-        return jx;
+        return get_JX();
     }
     public float setJosticY(float y)
     {
-        jy=(block_Y)?0: Math.min(1,Math.max(-1,y));
+        j_y=(block_Y)?0: Math.min(1,Math.max(-1,y));
         old_posY=this.y+(y+1)*size*0.5f;
-        return jy;
+        return get_JY();
     }
 
     private boolean setJX(float xp){
         float t_jx=(xp-x - size*0.5f)/(size*0.5f);
         if (t_jx<=1 && t_jx>=-1){
-            jx=t_jx;
+            j_x=t_jx;
 
             return true;
         }else
@@ -42,7 +52,7 @@ public class Joystick {
     private boolean setJY(float yp){
         float t_jy=(yp-y-size*0.5f)/(size*0.5f);
         if (t_jy<=1 && t_jy>=-1){
-            jy= t_jy;
+            j_y= t_jy;
             return true;
         }else
             return false;
@@ -50,12 +60,12 @@ public class Joystick {
     private void end(){
         index=-1;
         if (return_backX) {
-            jx=0;
+            j_x=0;
             old_posX=x+size*0.5f;
         }else
             old_posX-=shiftX;
         if (return_backY) {
-            jy=0;
+            j_y=0;
             old_posY=y+size*0.5f;
         }else
             old_posY-=shiftY;
@@ -151,13 +161,16 @@ public class Joystick {
                 break;
         }
         if (block_X){
-            jx=def_jx;
+            j_x=def_jx;
 
         }
         if (block_Y){
-            jy=def_jy;
+            j_y=def_jy;
 
         }
+
+
+
 
         //  Log.d("JOSTIC",Float.toString(jx)+" , "+Float.toString(jy));
         return ret;
@@ -182,11 +195,11 @@ public class Joystick {
     }
     public void set_block_X(boolean b){
         block_X=b;
-        def_jx=jx;
+        def_jx=get_JX();
     }
     public void set_block_Y(boolean b){
         block_Y=b;
-        def_jy=jy;
+        def_jy=get_JY();
     }
     public Joystick(
             float _x,
@@ -212,7 +225,7 @@ public class Joystick {
         cc.setStrokeWidth(1);
         index=-1;
         end();
-        jx = jy = 0;
+        j_x = j_y = 0;
         shiftY=shiftX=0;
         old_posX=x+size*0.5f;
         old_posY=y+size*0.5f;
@@ -224,11 +237,11 @@ public class Joystick {
 
 
         //sensor emulator
-        c.drawCircle( x+(size+jx*size)*0.5f, y+(size+jy*size)*0.5f , size/10, white);
+        c.drawCircle( x+(size+get_JX()*size)*0.5f, y+(size+get_JY()*size)*0.5f , size/10, white);
         if (label!=null && label.length()>0) {
             Rect r=new Rect();
             white.getTextBounds(label,0,label.length(),r);
-            c.drawText(label, x + (size+jx*size-r.right+r.left) * 0.5f, y + (size+jy*size+r.bottom-r.top) * 0.5f, white);
+            c.drawText(label, x + (size+get_JX()*size-r.right+r.left) * 0.5f, y + (size+get_JY()*size+r.bottom-r.top) * 0.5f, white);
         }
 
         c.drawCircle(x+size*0.5f, y+size*0.5f , size*0.5f, white);

@@ -673,7 +673,7 @@ public class DrawView extends View {
 
                 //отключить флаг управления всегда включен
                 Commander.heading=(float)MainActivity.yaw;
-                heading += 45 * j_left.getX() * dt;
+                heading += 45 * j_left.get_JX() * dt;
                 heading=(float)wrap_180(heading);
                 heading=Commander.headingOffset = (yaw_off.is_pressed())?0: heading;
 
@@ -681,9 +681,9 @@ public class DrawView extends View {
                 //Log.d("COMM", heading +" "+j_left.getX()+ "dt="+dt);
 
             }else{                          //new control type
-                if (j_left.getX()!=0)
+                if (j_left.get_JX()!=0)
                     Commander.heading =  Telemetry.heading; //ok
-                Commander.headingOffset =  j_left.getX()*90;
+                Commander.headingOffset =  j_left.get_JX()*90;
             }
         }else{
             Commander.headingOffset=0;
@@ -704,7 +704,7 @@ public class DrawView extends View {
 
       //  Log.d("JLEFT",Double.toString(j_left.getY()));
 
-        Commander.roll = j_right.getX() * maxAngle;
+        Commander.roll = j_right.get_JX() * maxAngle;
         Commander.pitch = -j_right.get_neg_Y() * maxAngle;
 
 

@@ -392,19 +392,22 @@ int Graph::decode_Log() {
 
 
 
-		/*
-		if (flags[FILTER]==false)//кастиль
+		
+		//if (flags[FILTER]==false)//кастиль
 		if (control_bits & 1) {
 			if (zeroEstX == 0 && zeroEstY == 0) {
-				zeroEstX = sensors_data[n - 2].sd[SX];
-				zeroEstY = sensors_data[n - 2].sd[SY];
+				zeroEstX = mpu.estX;
+				zeroEstY = mpu.estY;
 			}
 		}
-		*/
+		else {
+			zeroEstX = zeroEstY = 0;
+		}
+		
 			
 
-		sensors_data[n].sd[SX] = mpu.estX+zeroEstX;
-		sensors_data[n].sd[SY] = mpu.estY+zeroEstY;
+		sensors_data[n].sd[SX] = mpu.estX;// -zeroEstX;
+		sensors_data[n].sd[SY] = mpu.estY;// -zeroEstY;
 
 
 

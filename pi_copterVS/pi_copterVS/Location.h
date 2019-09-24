@@ -57,7 +57,7 @@ public:
 	double form_lon2Y(const double lon);
 	double from_Y2Lon(const double y);
 
-	void fromLoc2Pos(const long &lat, const long &lon, double &x, double&y);
+	void fromLoc2Pos(const long &lat, const long &lon, double&x, double&y);
 private:
 	double set_cos_sin_dir();
 	void xy();

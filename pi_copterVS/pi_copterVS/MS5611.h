@@ -75,14 +75,14 @@ public:
 	uint8_t ms5611_count;
 	int init();
 	uint8_t loop();
-	
-	double pressure , powerK;
+	int32_t pressure;
+	double powerK;
 
 
 	
 
 	int8_t i_readTemperature;
-	double getAltitude(const double pres);
+	double getAltitude(const int32_t pres);
 
 	double get_pressure(double h);
 	//---------------------------------------------------------------

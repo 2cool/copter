@@ -27,13 +27,14 @@ public:
 	*   R - Measurement noise covariance
 	*   P - Estimate error covariance
 	*/
+	void base(int const b);
 	KalmanFilter(
-		const Eigen::MatrixXd& A,
-		const Eigen::VectorXd& B,
-		const Eigen::MatrixXd& H,
-		const Eigen::MatrixXd& Q,
-		const Eigen::MatrixXd& R,
-		const Eigen::MatrixXd& P
+		const Eigen::MatrixXf& A,
+		const Eigen::VectorXf& B,
+		const Eigen::MatrixXf& H,
+		const Eigen::MatrixXf& Q,
+		const Eigen::MatrixXf& R,
+		const Eigen::MatrixXf& P
 	);
 
 	/**
@@ -49,32 +50,32 @@ public:
 	/**
 	* Initialize the filter with a guess for initial states.
 	*/
-	void init(const Eigen::VectorXd& x0);
+	void init(const Eigen::VectorXf& x0);
 
 	/**
 	* Update the estimated state based on measured values. The
 	* time step is assumed to remain constant.
 	*/
-	void update(const Eigen::VectorXd& y);
+	void update(const Eigen::VectorXf& y);
 
 	/**
 	* Update the estimated state based on measured values,
 	* using the given time step and dynamics matrix.
 	*/
-	void update(const Eigen::VectorXd& y, const Eigen::MatrixXd A);
+	void update(const Eigen::VectorXf& y, const Eigen::MatrixXf A);
 	void update();
 	/**
 	* Return the current state and time.
 	*/
-	Eigen::VectorXd state() { return x_hat; };
+	Eigen::VectorXf state() { return x_hat; };
 
 	void initU(const double x0);
 
-	Eigen::VectorXd B;
-	Eigen::MatrixXd getP() { return P; }
-	Eigen::MatrixXd getK() { return K; }
+	Eigen::VectorXf B;
+	Eigen::MatrixXf getP() { return P; }
+	Eigen::MatrixXf getK() { return K; }
 
-	Eigen::MatrixXd A, H, Q, R, P, K, P0;
+	Eigen::MatrixXf A, H, Q, R, P, K, P0;
 
 private:
 
@@ -94,8 +95,8 @@ private:
 	bool initialized;
 
 	// n-size identity
-	Eigen::MatrixXd I;
+	Eigen::MatrixXf I;
 
 	// Estimated states
-	Eigen::VectorXd x_hat, x_hat_new;
+	Eigen::VectorXf x_hat, x_hat_new;
 };

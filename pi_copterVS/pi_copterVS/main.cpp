@@ -76,9 +76,15 @@ int zzz = 1;
 
 
 
+#define WIND_X 3
+#define WIND_Y 3
+#define WIND_Z 0.5
 
 int init(int cnt) {////--------------------------------------------- INITIALIZATION ------------------------------
 	Log.init(cnt);
+#ifdef FLY_EMULATOR
+	Emu.init(WIND_X, WIND_Y, WIND_Z);
+#endif
 	Settings.read();
 	cout << "___setup___\n";
 	GPS.init();
@@ -92,6 +98,11 @@ int init(int cnt) {////--------------------------------------------- INITIALIZAT
 	Telemetry.testBatteryVoltage();
 
 	Settings.read_all();
+	for (int i = 0; i < 3; i++) {
+		MS5611.loop();
+		usleep(20000);
+	}
+	cout << "press "<<MS5611.pressure<<" alt " << MS5611.alt()<<" temp "<<(int)MS5611.i_readTemperature << endl;
 	return 0;
 
 }

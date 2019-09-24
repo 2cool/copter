@@ -33,7 +33,7 @@ class MpuClass
  protected:
 
 
-	 double tiltPower_CF;
+	 float tiltPower_CF;
 	 void log_emu();
 	 void log();
 
@@ -53,57 +53,58 @@ class MpuClass
 	MPU6050 accelgyro;
 	//-----------------
 
-	double pitch, roll;
-	double est_alt_, est_speedZ;
-	double estX, estY, est_speedX, est_speedY;
+	float pitch, roll;
+	float est_alt, est_speedZ;
+	float estX, estY, est_speedX, est_speedY;
 
 
-	double yaw,yaw_offset;
-	void test_vibration( double x,  double y,  double z);
+	float yaw,yaw_offset;
+	void test_vibration(float x, float y, float z);
 private:
-	double altitude_at_zero,XatZero,YatZero;
+	int base_z, base_y, base_x;
+	float alt_at_zero,x_at_zero,y_at_zero;
 	void gyro_calibr();
 	void test_Est_Alt();
 	void test_Est_XY();
-	void rotateCW(double &x, double &y);
-	void rotateCCW(double &x, double &y);
+	void rotateCW(float&x, float&y);
+	void rotateCCW(float&x, float&y);
 	double dt;
  public:
 	 inline double get_dt() { return dt; }
 
-	 void getXYRelative2Zero(double&x, double&y) { x -= XatZero; y -= YatZero; }
+	 void getXYRelative2Zero(double&x, double&y) { x -= x_at_zero; y -= y_at_zero; }
 	// void set_cos_sin_dir();
 	// double dir_angle_GRAD, cosDirection, sinDirection;
-	 double yaw_correction_angle;
-	 double get_Est_X() { return estX-XatZero; }
-	 double get_Est_Y() { return estY-YatZero; }
-	 double get_Est_SpeedX() { return est_speedX; }
-	 double get_Est_SpeedY() { return est_speedY; }
-	 double get_Est_SpeedZ() { return est_speedZ; }
-	 double get_Est_Alt() { return est_alt_-altitude_at_zero; }
+	 float yaw_correction_angle;
+	 double get_Est_X() { return (double)(estX-x_at_zero)+base_x; }
+	 double get_Est_Y() { return (double)(estY-y_at_zero)+base_y; }
+	 float get_Est_SpeedX() { return est_speedX; }
+	 float get_Est_SpeedY() { return est_speedY; }
+	 float get_Est_SpeedZ() { return est_speedZ; }
+	 double get_Est_Alt() { return (double)(est_alt-alt_at_zero)+base_z; }
 	 void set_XYZ_to_Zero();
 
-	 double vibration;
+	 float vibration;
 	 int64_t acc_callibr_time;
 	 
 
 	 int64_t time,mpu_time, hmc_time, autopilot_time,  ms5611_time,telem_time,com_time;
 
 
-	 double cor_c_pitch, cor_c_roll;
+	 float cor_c_pitch, cor_c_roll;
 	 int64_t oldmpuTime;
-	 double cosYaw,sinYaw;
+	 float cosYaw,sinYaw;
 	 void initYaw(const double angle);
 	
 	 void new_calibration(const bool onlyGyro);
 	 
-	 double get_yaw();
-	 double get_pitch();
-	 double get_roll();
+	 float get_yaw();
+	 float get_pitch();
+	 float get_roll();
 	 bool mpu_calibrated,gyro_calibratioan;
-	double accZ,accY,accX,tiltPower,cosPitch,cosRoll,sinPitch,sinRoll;
-	double w_accX, w_accY;
-	double  gyroPitch, gyroYaw, gyroRoll;
+	 float accZ,accY,accX,tiltPower,cosPitch,cosRoll,sinPitch,sinRoll;
+	 float w_accX, w_accY;
+	 float  gyroPitch, gyroYaw, gyroRoll;
 	string get_set();
 	void set(const float  *ar);
 	

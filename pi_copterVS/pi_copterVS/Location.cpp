@@ -55,8 +55,9 @@ double LocationClass::from_Y2Lon(const double y) {
 
 
 
-void LocationClass::fromLoc2Pos(const long &lat, const long &lon, double &x, double&y) {
+void LocationClass::fromLoc2Pos(const long &lat, const long &lon, double&x, double&y) {
 	get(lat, lon, x, y);
+
 //	y = form_lon2Y((_lon_zero - lon));
 	//x = from_lat2X((_lat_zero - lat));
 }

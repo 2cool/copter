@@ -58,14 +58,15 @@ bool MS5611Class::fault() {
 }
 
 #define ALT_NOT_SET -10000
-double MS5611Class::getAltitude(const double pressure) {
+double MS5611Class::getAltitude(const int32_t i_pressure) {
+	const double pressure = i_pressure;
 	static double old_alt= ALT_NOT_SET;
 	static double gps_barometr_alt_dif = ALT_NOT_SET;
 	static uint init_cnt = 0;
 
 #define gps_alt (GPS.loc.altitude - gps_barometr_alt_dif)
 	
-	double alt = (44330.0f * (1.0f - pow(pressure / PRESSURE_AT_0, 0.1902949f)));
+	double alt = (44330.0 * (1.0 - pow(pressure / PRESSURE_AT_0, 0.1902949)));
 	if (old_alt == ALT_NOT_SET)
 		old_alt = alt;
 
@@ -101,7 +102,7 @@ void MS5611Class::log_sens() {
 	if (Log.writeTelemetry) {
 		Log.block_start(LOG::MS5611_SENS);// (LOG::MPU_SENS);
 		Log.loadByte(i_readTemperature);
-		Log.loadFloat(pressure);
+		Log.loadFloat((float)pressure);
 		//Log.loaduint32t(P);
 		Log.block_end();
 	}

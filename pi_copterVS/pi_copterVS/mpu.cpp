@@ -36,6 +36,7 @@ int64_t  mpu_time_ ;
 //4g
 
 //3G
+#define MAX_LEN 32
 
 const int mn = 3; // Number of states
 const int m = 1; // Number of measurements
@@ -47,21 +48,21 @@ KalmanFilter* kf[3];
 #define DIM 3
 //WiFiClass wi_fi;
 
-double MpuClass::get_yaw() { return yaw; }
+float MpuClass::get_yaw() { return yaw; }
 //-----------------------------------------------------
 void  MpuClass::initYaw(const double angle){
 	yaw = angle;
 }
 //-----------------------------------------------------
-double MpuClass::get_pitch() { return pitch; }
-double MpuClass::get_roll() { return roll; }
+float MpuClass::get_pitch() { return pitch; }
+float MpuClass::get_roll() { return roll; }
 
 //-----------------------------------------------------------
 
 void MpuClass::set_XYZ_to_Zero() {
-	XatZero = estX;
-	YatZero = estY;
-	altitude_at_zero = est_alt_;
+	x_at_zero = estX+base_x;
+	y_at_zero = estY+base_y;
+	alt_at_zero = est_alt+base_z;
 }
 
 
@@ -85,11 +86,11 @@ void MpuClass::log() {
 		Log.loadFloat(accY);
 		Log.loadFloat(accZ);
 
-		Log.loadFloat(est_alt_);
+		Log.loadFloat(est_alt+base_z);
 		Log.loadFloat(est_speedZ);
-		Log.loadFloat(estX);
+		Log.loadFloat(estX+base_x);
 		Log.loadFloat(est_speedX);
-		Log.loadFloat(estY);
+		Log.loadFloat(estY+base_y);
 		Log.loadFloat(est_speedY);
 
 		Log.block_end();
@@ -117,9 +118,9 @@ void MpuClass::log_emu() {
 }
 //-----------------------------------------------------
 #ifdef FLY_EMULATOR
-double newQ4z = 0.1, newR4z = 0.2, newQ4xy = 0.1, newR4xy = 5;
+float newQ4z = 0.1, newR4z = 0.2, newQ4xy = 0.1, newR4xy = 5;
 #else
-double newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.05, newR4xy = 1;
+float newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.05, newR4xy = 1;
 #endif
 //-----------------------------------------------------
 void MpuClass::init()
@@ -127,7 +128,8 @@ void MpuClass::init()
 	yaw_correction_angle = 19 * GRAD2RAD;
 
 	tiltPower_CF = 0.05;
-	altitude_at_zero = XatZero = YatZero = 0;
+	alt_at_zero = x_at_zero = y_at_zero = 0;
+	base_x = base_y = base_z = 0;
 	acc_callibr_time = 0;
 	w_accX = w_accY = 0;
 	sinPitch = sinRoll = 0;
@@ -143,11 +145,11 @@ void MpuClass::init()
 	oldmpuTime = mpu_time_ = micros_();
 
 
-	Eigen::MatrixXd A(mn, mn); // System dynamics matrix
-	Eigen::MatrixXd H(m, mn); // Output matrix
-	Eigen::MatrixXd Q(mn, mn); // Process noise covariance
-	Eigen::MatrixXd R(m, m); // Measurement noise covariance
-	Eigen::MatrixXd P(mn, mn); // Estimate error covariance
+	Eigen::MatrixXf A(mn, mn); // System dynamics matrix
+	Eigen::MatrixXf H(m, mn); // Output matrix
+	Eigen::MatrixXf Q(mn, mn); // Process noise covariance
+	Eigen::MatrixXf R(m, m); // Measurement noise covariance
+	Eigen::MatrixXf P(mn, mn); // Estimate error covariance
 	//Z beg
 	// Discrete LTI projectile motion, measuring position only
 	A <<1, 0.005, 0,0, 1, 0.005,0, 0, 1;
@@ -156,10 +158,10 @@ void MpuClass::init()
 	Q <<newQ4z, newQ4z, .0,	newQ4z, newQ4z, .0,	.0, .0, .0;
 	R << newR4z;
 	P <<.1, .1, .1,.1, 10000, 10,.1, 10, 100;
-	VectorXd B(mn);
+	VectorXf B(mn);
 	B << 0, 0, 0;
 	kf[Z] = new KalmanFilter(A, B, H, Q, R, P);
-	Eigen::VectorXd x0(mn);
+	Eigen::VectorXf x0(mn);
 	x0 << 0, 0, 0;
 	kf[Z]->init(x0);
 	//Z end
@@ -280,18 +282,18 @@ int16_t MpuClass::getGX(){
 	return x;
 }
 //-----------------------------------------------------
-const double n003 = 0.030517578;
+const float n003 = 0.030517578;
 //const double n006 =  0.061035156f;
 //4g
 //const double n122 = 1.220740379e-4;
-const double n305 = 3.0518509475e-5;
+const float n305 = 3.0518509475e-5;
 
 //2g
 //const double n604 = 0.00006103515625f;
 
 
 
-const double to_98g = 0.0005981445312;
+const float to_98g = 0.0005981445312;
 
 #ifdef FLY_EMULATOR
 
@@ -413,14 +415,14 @@ uint8_t GetGravity(VectorFloat *v, Quaternion_ *q) {
 #define ROLL_COMPENSATION_IN_YAW_ROTTATION 0.02
 #define PITCH_COMPENSATION_IN_YAW_ROTTATION 0.025
 
-double agpitch = 0, agroll = 0, agyaw = 0;
+float agpitch = 0, agroll = 0, agyaw = 0;
 int32_t cal_g_pitch = 0, cal_g_roll = 0, cal_g_yaw = 0,  cal_g_cnt = 0;
 
 bool compas_flip = false;
 #define _2PI 6.283185307179586476925286766559
 bool pitch_flag;
 
-static void toEulerianAngle(const Quaternion_& q, double& roll, double& pitch, double& yaw)
+static void toEulerianAngle(const Quaternion_& q, float& roll, float& pitch, float& yaw)
 {
 	// roll (x-axis rotation)
 	double sinr = +2.0 * (q.w * q.x + q.y * q.z);
@@ -441,15 +443,15 @@ static void toEulerianAngle(const Quaternion_& q, double& roll, double& pitch, d
 	yaw = atan2(siny, cosy);
 }
 
-void MpuClass::test_vibration( double x,  double y,  double z){
-	static double lx = 0, ly = 0, lz = 0;
+void MpuClass::test_vibration(float x, float y, float z){
+	static float lx = 0, ly = 0, lz = 0;
 	lx += (x - lx)*0.1;
 	ly += (y - ly)*0.1;
 	lz += (z - lz)*0.1;
 	x -= lx;
 	y -= ly;
 	z -= lz;
-	const double vibr = sqrt(x * x + y * y + z * z);
+	const float vibr = sqrt(x * x + y * y + z * z);
 	vibration += (vibr - vibration)*0.01;
 	
 }
@@ -469,9 +471,9 @@ void MpuClass::gyro_calibr() {
 			cal_g_roll += g[0];
 			cal_g_yaw += g[2];
 			cal_g_cnt++;
-			agpitch = n003 * ((double)cal_g_pitch / (double)cal_g_cnt);
-			agroll = n003 * ((double)cal_g_roll / (double)cal_g_cnt);
-			agyaw = n003 * ((double)cal_g_yaw / (double)cal_g_cnt);
+			agpitch = n003 * ((float)cal_g_pitch / (float)cal_g_cnt);
+			agroll = n003 * ((float)cal_g_roll / (float)cal_g_cnt);
+			agyaw = n003 * ((float)cal_g_yaw / (float)cal_g_cnt);
 		}
 		else {
 			AHRS.setBeta(0.01);
@@ -481,15 +483,13 @@ void MpuClass::gyro_calibr() {
 }
 
 bool MpuClass::loop() {//-------------------------------------------------L O O P-------------------------------------------------------------
-	
+	static int ecnt = 0;
 	bool ret = true;
 	time = micros_();
 	mpu_dt = (double)(time - mpu_time_) * 1e-6;
-	if (mpu_dt >= 1) {
-		cout << "MPU DT to long:" << mpu_dt<<". uptime:"<<(time/1e6)<<"\n";
+	if (mpu_dt >= 1 && ecnt++) {
+		cout << "MPU DT to long:" << mpu_dt << ". uptime:" << (time / 1e6) << "\n";
 		mega_i2c.beep_code(B_MPU_TOO_LONG);
-		double uptime = std::stod(exec("awk '{print $1}' /proc/uptime"));
-		cout << "UPTIME=" << uptime << endl;
 	}
 	mpu_dt = constrain(mpu_dt,0.002, 0.03);
 	mpu_time_ = time;
@@ -520,12 +520,12 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 		return ret;
 	}
 
-	gyroPitch =  n003 * (double)g[1] - agpitch;
-	gyroRoll =  n003 * (double)g[0] - agroll;
-	gyroYaw =  n003 * (double)g[2] - agyaw;
-	double ax = n305 * 2 * (double)a[0];
-	double ay = n305 * 2 * (double)a[1];
-	double az = n305 * 2 * (double)a[2];
+	gyroPitch =  n003 * (float)g[1] - agpitch;
+	gyroRoll =  n003 * (float)g[0] - agroll;
+	gyroYaw =  n003 * (float)g[2] - agyaw;
+	float ax = n305 * 2 * (float)a[0];
+	float ay = n305 * 2 * (float)a[1];
+	float az = n305 * 2 * (float)a[2];
 
 	AHRS.MadgwickAHRSupdate(q, GRAD2RAD * gyroRoll, GRAD2RAD * gyroPitch, GRAD2RAD * gyroYaw, ax, ay, az,  Hmc.fmx, Hmc.fmy, Hmc.fmz, mpu_dt);
 	//AHRS.MadgwickAHRSupdate(q, GRAD2RAD * gyroRoll, GRAD2RAD * gyroPitch, GRAD2RAD * gyroYaw, 0, 0, 10, Hmc.fmx, Hmc.fmy, -Hmc.fmz, mpu_dt);
@@ -605,16 +605,16 @@ void MpuClass::test_Est_Alt() {
 
 	
 	double alt = MS5611.alt();
-
-	double static old_bar_alt = 0,old_accZ=0;
-	kf[Z]->A(3) = kf[Z]->A(7)= mpu_dt;
+	static double old_bar_alt = 0;
+	static float old_accZ = 0;
+	kf[Z]->A(3) = kf[Z]->A(7) = mpu_dt;
 	kf[Z]->B[2] = accZ - old_accZ;
 	old_accZ = accZ;
 
 	if (alt != old_bar_alt) { 
 		old_bar_alt = alt;
-		Eigen::VectorXd z(m);
-		z << old_bar_alt;
+		Eigen::VectorXf z(m);
+		z << (old_bar_alt-base_z);
 		kf[Z]->update(z);
 
 	}
@@ -622,14 +622,25 @@ void MpuClass::test_Est_Alt() {
 		kf[Z]->update();
 	}
 	est_speedZ = kf[Z]->state()(1);
-	est_alt_ = kf[Z]->state()(0);
+	est_alt = kf[Z]->state()(0);
+
+	if (est_alt >= MAX_LEN) {
+		base_z += MAX_LEN;
+		est_alt -= MAX_LEN;
+		kf[Z]->base(MAX_LEN);
+	}
+	else if (est_alt < -MAX_LEN) {
+		base_z -= MAX_LEN;
+		est_alt += MAX_LEN;
+		kf[Z]->base(-MAX_LEN);
+	}
 	
 	//Debug.dump(est_alt_, est_speedZ, 0, 0);
 
 #ifdef FLY_EMULATOR
-	if (alt <= 0) {
-		est_alt_ = 0;
-		est_speedZ = 0;
+	if (alt <= -0.5) {
+		est_alt = -0.5;
+		est_speedZ = -0.5;
 	}
 
 #endif
@@ -646,25 +657,25 @@ void MpuClass::test_Est_Alt() {
 	
 }
 
-void MpuClass::rotateCW(double &x, double &y) {
-	const double _x = (cosYaw * x - sinYaw * y); //relative to copter xy
-	const double _y = (cosYaw * y + sinYaw * x);
+void MpuClass::rotateCW(float&x, float&y) {
+	const float _x = (cosYaw * x - sinYaw * y); //relative to copter xy
+	const float _y = (cosYaw * y + sinYaw * x);
 	x = _x;
 	y = _y;
 }
-void MpuClass::rotateCCW(double &x, double &y) {
-	const double _x = (cosYaw * x + sinYaw * y);
-	const double _y = (cosYaw * y - sinYaw * x);
+void MpuClass::rotateCCW(float&x, float&y) {
+	const float _x = (cosYaw * x + sinYaw * y);
+	const float _y = (cosYaw * y - sinYaw * x);
 	x = _x;
 	y = _y;
 }
 
 
-double XY_KF_DIST = 0.05;
-double XY_KF_SPEED = 0.05;
+float XY_KF_DIST = 0.05;
+float XY_KF_SPEED = 0.05;
 
-double est_XError = 0, est_XErrorI = 0;
-double est_YError = 0, est_YErrorI = 0;
+float est_XError = 0, est_XErrorI = 0;
+float est_YError = 0, est_YErrorI = 0;
 #define ACC_Cr 10000.0
 void MpuClass::test_Est_XY() {
 	if (GPS.loc._lat_zero == 0 && GPS.loc._lon_zero == 0)
@@ -672,7 +683,8 @@ void MpuClass::test_Est_XY() {
 
 	w_accX = (-cosYaw * accX + sinYaw * accY); //relative to world
 	w_accY = (-cosYaw * accY - sinYaw * accX);
-	static double old_X = 0, old_accX = 0, old_Y, old_accY;
+	static double old_X = 0,old_Y=0;
+	static float old_accX = 0, old_accY=0;
 	//XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 	kf[X]->A(3) = kf[X]->A(7) = mpu_dt;
 	kf[X]->B[2] = w_accX - old_accX;
@@ -680,8 +692,8 @@ void MpuClass::test_Est_XY() {
 
 	if (GPS.loc.dX != old_X) {
 		old_X = GPS.loc.dX;
-		Eigen::VectorXd x(m);
-		x << old_X;
+		Eigen::VectorXf x(m);
+		x << (old_X - base_x);
 		kf[X]->update(x);
 	}
 	else
@@ -689,6 +701,17 @@ void MpuClass::test_Est_XY() {
 
 	est_speedX = kf[X]->state()(1);
 	estX = kf[X]->state()(0);
+	if (estX >= MAX_LEN) {
+		base_x += MAX_LEN;
+		estX -= MAX_LEN;
+		kf[X]->base(MAX_LEN);
+	}
+	else if (estX < -MAX_LEN) {
+		base_x -= MAX_LEN;
+		estX += MAX_LEN;
+		kf[X]->base(-MAX_LEN);
+	}
+	
 	//YYYYYYYYYYYYYYYYYYYYYYYYYY
 	kf[Y]->A(3) = kf[Y]->A(7) = mpu_dt;
 	kf[Y]->B[2] = w_accY - old_accY;
@@ -696,8 +719,8 @@ void MpuClass::test_Est_XY() {
 
 	if (GPS.loc.dY != old_Y) {
 		old_Y = GPS.loc.dY;
-		Eigen::VectorXd y(m);
-		y << old_Y;
+		Eigen::VectorXf y(m);
+		y << (old_Y - base_y);
 		kf[Y]->update(y);
 	}
 	else
@@ -705,6 +728,18 @@ void MpuClass::test_Est_XY() {
 
 	est_speedY = kf[Y]->state()(1);
 	estY = kf[Y]->state()(0);
+
+	if (estY >= MAX_LEN) {
+		base_y += MAX_LEN;
+		estY -= MAX_LEN;
+		kf[Y]->base(MAX_LEN);
+	}
+	else if (estY < -MAX_LEN) {
+		base_y -= MAX_LEN;
+		estY += MAX_LEN;
+		kf[Y]->base(-MAX_LEN);
+	}
+
 	//double t[] = { estX, est_speedX, estY, est_speedY };
 	//Debug.load(0, Mpu.w_accX, Mpu.w_accY);
 	//Debug.dump();
