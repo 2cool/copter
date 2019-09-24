@@ -428,8 +428,20 @@ int Graph::decode_Log() {
 		sensors_data[n].sd[F2] = bal.f2;
 		sensors_data[n].sd[F3] = bal.f3;
 		sensors_data[n].sd[THROTTLE] = bal.thr;
+
+//#define D_ROTATE
+#ifdef D_ROTATE
+		double cosYaw = cos(90*GRAD2RAD);
+		double sinYaw = sin(90*GRAD2RAD);
+		double ap_roll  = RAD2GRAD*(-cosYaw * bal.ap_roll*GRAD2RAD + sinYaw * bal.ap_pitch*GRAD2RAD); //relative to world
+		double ap_pitch = RAD2GRAD * (-cosYaw * bal.ap_pitch*GRAD2RAD - sinYaw * bal.ap_roll*GRAD2RAD);
+		sensors_data[n].sd[C_PITCH] = ap_pitch;
+		sensors_data[n].sd[C_ROLL] = ap_roll;
+#else
+
 		sensors_data[n].sd[C_PITCH] = bal.ap_pitch;
 		sensors_data[n].sd[C_ROLL] = bal.ap_roll;
+#endif
 	//	sensors_data[n].sd[C_YAW] = bal.ap_yaw;
 
 		sensors_data[n].sd[C_YAW] = hmc.heading;
