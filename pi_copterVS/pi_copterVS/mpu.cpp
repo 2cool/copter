@@ -390,7 +390,7 @@ bool MpuClass::loop(){
 	delay(1);
 	gyro_calibratioan = true;
 
-	log_emu();
+	log();
 
 	shmPTR->pitch = pitch;
 	shmPTR->roll = roll;

@@ -505,7 +505,7 @@ bool AutopilotClass::go2HomeProc(const float dt){
 
 	if (GPS.loc.dist2home - dist2home_at_begin > MAX_DIST_ERROR_TO_FALL){
 		cout << GPS.loc.dist2home - dist2home_at_begin<<" STRONG_WIND\n";
-		// Autopilot.off_throttle(false, e_TOO_STRONG_WIND);
+		Autopilot.off_throttle(false, e_TOO_STRONG_WIND);
 	}
 
 	return true;

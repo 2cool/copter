@@ -29,12 +29,12 @@ P - error covariance
 
 
 KalmanFilter::KalmanFilter(
-	const Eigen::MatrixXd& A,
-	const Eigen::VectorXd& B,
-	const Eigen::MatrixXd& H,
-	const Eigen::MatrixXd& Q,
+	const Eigen::Matrix3d& A,
+	const Eigen::Vector3d& B,
+	const Eigen::RowVector3d& H,
+	const Eigen::Matrix3d& Q,
 	const Eigen::MatrixXd& R,
-	const Eigen::MatrixXd& P)
+	const Eigen::Matrix3d& P)
 	: A(A), B(B), H(H), Q(Q), R(R), P0(P),
 	m(H.rows()), n(A.rows()), initialized(false),
 	I(n, n), x_hat(n), x_hat_new(n)

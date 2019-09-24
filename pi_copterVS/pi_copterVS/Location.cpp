@@ -132,7 +132,7 @@ void LocationClass::updateXY(){
 	shmPTR->dist2home = (float)dist2home;
 	if (fabs(dist2home - oldDist) > MAX_DIST2UPDATE){
 		oldDist = dist2home;
-		update();
+		update(); //for emulator
 	}
 	xy();
 }

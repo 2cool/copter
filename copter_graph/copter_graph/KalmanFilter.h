@@ -28,12 +28,12 @@ public:
 	*   P - Estimate error covariance
 	*/
 	KalmanFilter(
-		const Eigen::MatrixXd& A,
-		const Eigen::VectorXd& B,
-		const Eigen::MatrixXd& H,
-		const Eigen::MatrixXd& Q,
+		const Eigen::Matrix3d& A,
+		const Eigen::Vector3d& B,
+		const Eigen::RowVector3d& H,
+		const Eigen::Matrix3d& Q,
 		const Eigen::MatrixXd& R,
-		const Eigen::MatrixXd& P
+		const Eigen::Matrix3d& P
 	);
 
 	/**
