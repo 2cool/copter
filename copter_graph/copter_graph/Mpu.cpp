@@ -44,11 +44,11 @@ int m = 1; // Number of measurements
 
 double dt = 1.0 / 30; // Time step
 
-Eigen::Matrix3d A(mn, mn); // System dynamics matrix
-Eigen::RowVector3d H(m, mn); // Output matrix
-Eigen::Matrix3d Q(mn, mn); // Process noise covariance
+Eigen::Matrix3d A; // System dynamics matrix
+Eigen::RowVector3d H; // Output matrix
+Eigen::Matrix3d Q; // Process noise covariance
 Eigen::MatrixXd R(m, m); // Measurement noise covariance
-Eigen::Matrix3d P(mn, mn); // Estimate error covariance
+Eigen::Matrix3d P; // Estimate error covariance
 
 
 enum {X,Y,Z};
@@ -364,14 +364,14 @@ void Mpu::init() {
 	Q <<newQ, newQ, .0,newQ, newQ, .0,.0, .0, .0;
 	R << newR;
 	P <<.1, .1, .1,.1, 10000, 10,.1, 10, 100;
-	Vector3d B(mn);
+	Vector3d B;
 	B << 0, 0, 0;
 	// Construct the filter
 	kf[X] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[Y] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[Z] = new KalmanFilter( A,B ,H, Q, R, P);
 	// Construct the filter
-	Eigen::VectorXd x0(3);
+	Eigen::Vector3d x0;
 	x0 << 0, 0, 0;
 	kf[X]->init(x0);
 	kf[Y]->init(x0);

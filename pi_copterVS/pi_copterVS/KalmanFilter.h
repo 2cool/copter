@@ -29,12 +29,12 @@ public:
 	*/
 	void base(int const b);
 	KalmanFilter(
-		const Eigen::MatrixXf& A,
-		const Eigen::VectorXf& B,
-		const Eigen::MatrixXf& H,
-		const Eigen::MatrixXf& Q,
+		const Eigen::Matrix3f& A,
+		const Eigen::Vector3f& B,
+		const Eigen::RowVector3f& H,
+		const Eigen::Matrix3f& Q,
 		const Eigen::MatrixXf& R,
-		const Eigen::MatrixXf& P
+		const Eigen::Matrix3f& P
 	);
 
 	/**
@@ -50,7 +50,7 @@ public:
 	/**
 	* Initialize the filter with a guess for initial states.
 	*/
-	void init(const Eigen::VectorXf& x0);
+	void init(const Eigen::Vector3f& x0);
 
 	/**
 	* Update the estimated state based on measured values. The
@@ -62,20 +62,24 @@ public:
 	* Update the estimated state based on measured values,
 	* using the given time step and dynamics matrix.
 	*/
-	void update(const Eigen::VectorXf& y, const Eigen::MatrixXf A);
+	//void update(const Eigen::VectorXf& y, const Eigen::MatrixXf A);
 	void update();
 	/**
 	* Return the current state and time.
 	*/
-	Eigen::VectorXf state() { return x_hat; };
+	Eigen::Vector3f state() { return x_hat; };
 
 	void initU(const double x0);
 
-	Eigen::VectorXf B;
-	Eigen::MatrixXf getP() { return P; }
-	Eigen::MatrixXf getK() { return K; }
+	Eigen::Vector3f B;
+	Eigen::Matrix3f getP() { return P; }
+	Eigen::Vector3f getK() { return K; }
 
-	Eigen::MatrixXf A, H, Q, R, P, K, P0;
+	Eigen::MatrixXf R;
+	Eigen::Matrix3f A, Q, P, P0;
+	RowVector3f H;
+	Vector3f K;
+
 
 private:
 
@@ -95,8 +99,8 @@ private:
 	bool initialized;
 
 	// n-size identity
-	Eigen::MatrixXf I;
+	Eigen::Matrix3f I;
 
 	// Estimated states
-	Eigen::VectorXf x_hat, x_hat_new;
+	Eigen::Vector3f x_hat, x_hat_new;
 };

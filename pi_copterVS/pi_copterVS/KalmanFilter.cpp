@@ -29,12 +29,12 @@ P - error covariance
 
 
 KalmanFilter::KalmanFilter(
-	const Eigen::MatrixXf& A,
-	const Eigen::VectorXf& B,
-	const Eigen::MatrixXf& H,
-	const Eigen::MatrixXf& Q,
+	const Eigen::Matrix3f& A,
+	const Eigen::Vector3f& B,
+	const Eigen::RowVector3f& H,
+	const Eigen::Matrix3f& Q,
 	const Eigen::MatrixXf& R,
-	const Eigen::MatrixXf& P)
+	const Eigen::Matrix3f& P)
 	: A(A), B(B), H(H), Q(Q), R(R), P0(P),
 	m(H.rows()), n(A.rows()), initialized(false),
 	I(n, n), x_hat(n), x_hat_new(n)
@@ -44,7 +44,7 @@ KalmanFilter::KalmanFilter(
 
 KalmanFilter::KalmanFilter() {}
 
-void KalmanFilter::init(const Eigen::VectorXf& x0) {
+void KalmanFilter::init(const Eigen::Vector3f& x0) {
 	x_hat = x0;
 	P = P0;
 
@@ -87,9 +87,11 @@ void  KalmanFilter::base(const int ib) {
 	x_hat[0] -= ib;
 
 }
+/*
 void KalmanFilter::update(const Eigen::VectorXf& y, const Eigen::MatrixXf A) {
 
 	this->A = A;
 
 	update(y);
 }
+*/

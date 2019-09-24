@@ -49,7 +49,7 @@ public:
 	/**
 	* Initialize the filter with a guess for initial states.
 	*/
-	void init(const Eigen::VectorXd& x0);
+	void init(const Eigen::Vector3d& x0);
 
 	/**
 	* Update the estimated state based on measured values. The
@@ -61,21 +61,23 @@ public:
 	* Update the estimated state based on measured values,
 	* using the given time step and dynamics matrix.
 	*/
-	void update(const Eigen::VectorXd& y, const Eigen::MatrixXd A);
+
 	void update();
 	/**
 	* Return the current state and time.
 	*/
-	Eigen::VectorXd state() { return x_hat; };
+	Eigen::Vector3d state() { return x_hat; };
 
 	void initU(const double x0);
 
-	Eigen::VectorXd B;
-	Eigen::MatrixXd getP() { return P; }
-	Eigen::MatrixXd getK() { return K; }
+	Eigen::Vector3d B;
+	Eigen::Matrix3d getP() { return P; }
+	Eigen::Vector3d getK() { return K; }
 
-Eigen::MatrixXd A, H, Q, R, P, K, P0;
-
+Eigen::MatrixXd  R;
+Eigen::Matrix3d A, Q, P,P0;
+RowVector3d H;
+Vector3d K;
 private:
 
 	// Matrices for computation
@@ -94,8 +96,8 @@ private:
 	bool initialized;
 
 	// n-size identity
-	Eigen::MatrixXd I;
+	Eigen::Matrix3d I;
 
 	// Estimated states
-	Eigen::VectorXd x_hat, x_hat_new;
+	Eigen::Vector3d x_hat, x_hat_new;
 };

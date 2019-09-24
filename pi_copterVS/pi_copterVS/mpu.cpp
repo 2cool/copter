@@ -145,11 +145,11 @@ void MpuClass::init()
 	oldmpuTime = mpu_time_ = micros_();
 
 
-	Eigen::MatrixXf A(mn, mn); // System dynamics matrix
-	Eigen::MatrixXf H(m, mn); // Output matrix
-	Eigen::MatrixXf Q(mn, mn); // Process noise covariance
+	Eigen::Matrix3f A; // System dynamics matrix
+	Eigen::RowVector3f H; // Output matrix
+	Eigen::Matrix3f Q; // Process noise covariance
 	Eigen::MatrixXf R(m, m); // Measurement noise covariance
-	Eigen::MatrixXf P(mn, mn); // Estimate error covariance
+	Eigen::Matrix3f P; // Estimate error covariance
 	//Z beg
 	// Discrete LTI projectile motion, measuring position only
 	A <<1, 0.005, 0,0, 1, 0.005,0, 0, 1;
@@ -158,10 +158,10 @@ void MpuClass::init()
 	Q <<newQ4z, newQ4z, .0,	newQ4z, newQ4z, .0,	.0, .0, .0;
 	R << newR4z;
 	P <<.1, .1, .1,.1, 10000, 10,.1, 10, 100;
-	VectorXf B(mn);
+	Vector3f B(mn);
 	B << 0, 0, 0;
 	kf[Z] = new KalmanFilter(A, B, H, Q, R, P);
-	Eigen::VectorXf x0(mn);
+	Eigen::Vector3f x0;
 	x0 << 0, 0, 0;
 	kf[Z]->init(x0);
 	//Z end

@@ -44,7 +44,7 @@ KalmanFilter::KalmanFilter(
 
 KalmanFilter::KalmanFilter() {}
 
-void KalmanFilter::init(const Eigen::VectorXd& x0) {
+void KalmanFilter::init(const Eigen::Vector3d& x0) {
 	x_hat = x0;
 	P = P0;
 
@@ -84,9 +84,4 @@ void KalmanFilter::update(const Eigen::VectorXd& y) {
 
 }
 
-void KalmanFilter::update(const Eigen::VectorXd& y, const Eigen::MatrixXd A) {
 
-	this->A = A;
-
-	update(y);
-}
