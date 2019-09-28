@@ -8,6 +8,7 @@
 #include <iostream> 
 #include <string> 
 #include "MyMath.h"
+#include "G.h"
 
 using namespace Gdiplus;
 #pragma comment (lib,"Gdiplus.lib")
@@ -80,6 +81,8 @@ struct SEND_I2C {
 
 
 
+#include "G.h"
+
 class Graph
 	
 {
@@ -128,6 +131,9 @@ private:
 	int parser(byte buf[]);
 public:
 	int readLog();
+
+
+
 	bool flags[ALL_ELEMENTS];
 	Color color[ALL_ELEMENTS];
 	std::wstring name[ALL_ELEMENTS];

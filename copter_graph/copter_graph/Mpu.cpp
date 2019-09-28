@@ -155,13 +155,14 @@ void Mpu::loadmax_min(const int mn, const double val, bool simetric) {
 	if (_max_minC[mn] == 0) {
 		_max[mn] = _min[mn] = val;
 		_max_minC[mn]++;
+		
 	}
 	else {
-		_max[mn] = max(mpu._max[mn], val);
-		_min[mn] = min(mpu._min[mn], val);
+		_max[mn] = max(_max[mn], val);
+		_min[mn] = min(_min[mn], val);
 		if (simetric) {
-			_max[mn] = max(mpu._max[mn], -val);
-			_min[mn] = min(mpu._min[mn], -val);
+			_max[mn] = max(_max[mn], -val);
+			_min[mn] = min(_min[mn], -val);
 		}
 	}
 }
@@ -179,7 +180,7 @@ using namespace std;
 
 
 
-void Mpu::parser(byte buf[], int j, int len, bool filter) {
+void Mpu::parser(byte buf[], int j, int len,int cont_bits, bool filter) {
 
 
 	len += j;
@@ -216,6 +217,11 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 	pitch= *(float*)&buf[j]; j += 4;
 	roll= *(float*)&buf[j]; j += 4;
 	yaw = *(float*)&buf[j]; j += 4;;
+
+	cosYaw = cos(yaw*GRAD2RAD);
+	sinYaw = sin(yaw * GRAD2RAD);
+
+
 	gyroPitch = *(float*)&buf[j]; j += 4;
 	gyroRoll = *(float*)&buf[j]; j += 4;
 	gyroYaw = *(float*)&buf[j]; j += 4;
@@ -346,12 +352,25 @@ void Mpu::parser(byte buf[], int j, int len, bool filter) {
 	loadmax_min(mACCY, accY, true);
 	loadmax_min(mACCZ, accZ, true);
 */
-	
-	loadmax_min(SZ, est_alt, true);
+	if (cont_bits & 1) {
+		loadmax_min(SZ, est_alt, true);
 
-	loadmax_min(mEX,estX);
-	loadmax_min(mEY,estY);
+		loadmax_min(mEX, estX);
+		loadmax_min(mEY, estY);
+	}
+	else {
+		start_pos[SZ] = est_alt;
+		start_pos[mEX] = estX;
+		start_pos[mEY] = estY;
 
+	}
+
+	/*
+	float npitch = (float)(mpu.cosYaw * pitch + mpu.sinYaw * roll);
+	float nroll = (float)(mpu.cosYaw * roll - mpu.sinYaw * pitch);
+	pitch = npitch;
+	roll = nroll;
+	*/
 
 }
 

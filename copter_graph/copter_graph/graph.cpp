@@ -208,7 +208,7 @@ int Graph::parser(byte buf[]) {
 			if (len == 5)
 				press.parser(buf,i, flags[FILTER]);
 			else
-				mpu.parser(buf, i, len, flags[FILTER]);
+				mpu.parser(buf, i, len, control_bits, flags[FILTER]);
 			break;
 		}
 		case MS5611_SENS: {
@@ -239,7 +239,7 @@ int Graph::parser(byte buf[]) {
 			break;
 		}
 		case BAL: {
-			bal.parser(buf, i);
+			bal.parser(buf, i, control_bits);
 			break;
 		}
 		}
@@ -278,7 +278,7 @@ int findLOg(int &pos, int lsize,char * buffer) {
 int indexes[] = { 0,0,0,0,0,0,0,0,0,0,0 };
 
 
-float zeroEstX = 0, zeroEstY = 0; //костіль
+
 
 int Graph::decode_Log() {
 	/*
@@ -309,11 +309,10 @@ int Graph::decode_Log() {
 
 	modesI = 0;
 	*/
-
+	bal.init();
 	press.init();
 	mpu.init();
 
-	zeroEstX = zeroEstY = 0;
 
 	int t1 = load_int16_((byte*)buffer, 0);
 	int t2 = load_int16_((byte*)buffer, 2);
@@ -391,26 +390,8 @@ int Graph::decode_Log() {
 
 
 
-
-		
-		//if (flags[FILTER]==false)//кастиль
-		if (control_bits & 1) {
-			if (zeroEstX == 0 && zeroEstY == 0) {
-				zeroEstX = mpu.estX;
-				zeroEstY = mpu.estY;
-			}
-		}
-		else {
-			zeroEstX = zeroEstY = 0;
-		}
-		
-			
-
-		sensors_data[n].sd[SX] = mpu.estX;// -zeroEstX;
-		sensors_data[n].sd[SY] = mpu.estY;// -zeroEstY;
-
-
-
+		sensors_data[n].sd[SX] = mpu.estX;
+		sensors_data[n].sd[SY] = mpu.estY;
 
 
 		sensors_data[n].sd[SPEED_X] = mpu.est_speedX;
@@ -925,10 +906,15 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 
 
 
-	draw(g, rect, 15, -20, SX);
-	draw(g, rect, 100, -10, SY);
-	draw(g, rect, 15, -20, GSX);
-	draw(g, rect, 100, -10, GSY);
+
+
+	//(mpu._max[mEX]-mpu._min[mEX])
+	//distX_start
+
+	draw(g, rect, mpu._max[mEX]+2.93, mpu._min[mEX]+2.93, SX);
+	draw(g, rect, mpu._max[mEY]-10.59, mpu._min[mEY]-10.59, SY);
+	draw(g, rect, mpu._max[mEX] + 2.93, mpu._min[mEX] + 2.93, GSX);
+	draw(g, rect, mpu._max[mEY] - 10.59, mpu._min[mEY] - 10.59, GSY);
 
 	draw(g, rect, 15, -15, SPEED_X);
 	draw(g, rect, 15, -15, SPEED_Y);

@@ -149,6 +149,7 @@
     <ClInclude Include="Mpu.h" />
     <ClInclude Include="myButton.h" />
     <ClInclude Include="MyMath.h" />
+    <ClInclude Include="PID.h" />
     <ClInclude Include="Pressure.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Stab.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="Mpu.cpp" />
     <ClCompile Include="myButton.cpp" />
     <ClCompile Include="MyMath.cpp" />
+    <ClCompile Include="PID.cpp" />
     <ClCompile Include="Pressure.cpp" />
     <ClCompile Include="Stab.cpp" />
     <ClCompile Include="stdafx.cpp">

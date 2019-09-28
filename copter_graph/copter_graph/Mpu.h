@@ -15,7 +15,7 @@ public:
 
 	void init();
 
-	void parser(byte buf[], int n, int len, bool filter);
+	void parser(byte buf[], int j, int len, int cont_bits, bool filter);
 	void toEulerianAngle();
 
 
@@ -23,7 +23,7 @@ public:
 	int _max_minC[mALL_E] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 	float _max[mALL_E], _min[mALL_E];
 
-
+	float start_pos[mALL_E];
 	float dt, time, rdt;
 
 	uint8_t devStatus;      // return status after each device operation
