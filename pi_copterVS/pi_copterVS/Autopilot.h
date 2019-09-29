@@ -62,7 +62,7 @@ class AutopilotClass
 	// float get_dist();
 	 float lowest_height;
 	 float fall_thr;
-	
+	 uint8_t hall_ok;
 
 	 
  public:
@@ -87,7 +87,7 @@ class AutopilotClass
 	 float corectedAltitude4tel();
 
 	void reset_compas_motors_calibr_bit() {control_bits &= (~COMPASS_MOTOR_CALIBR);}
-
+	void hall_test();
 	bool motors_onState(){ return control_bits&MOTORS_ON; }
 	bool z_stabState(){ return control_bits&Z_STAB; }
 	bool xy_stabState(){ return control_bits&XY_STAB; }

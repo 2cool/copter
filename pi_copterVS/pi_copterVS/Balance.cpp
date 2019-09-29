@@ -364,6 +364,7 @@ bool BalanceClass::loop()
 				if ((_ct32 - Autopilot.time_at__start) < speedup_time || (Autopilot.time_at__start - Autopilot.old_time_at__start) > 8e3) {
 					true_throttle = MIN_THROTTLE;
 					f_[0] = f_[1] = f_[2] = f_[3] = throttle = true_throttle;
+					Autopilot.hall_test();//put only there
 				}
 
 

@@ -77,7 +77,7 @@ using namespace std;
 
 void AutopilotClass::init(){/////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+	hall_ok = 255;
 	shmPTR->sim800_reset = false;
 	time_at__start = old_time_at__start = 0;
 	lowest_height = shmPTR->lowest_altitude_to_fly;
@@ -120,6 +120,13 @@ void AutopilotClass::add_2_need_yaw(float speed, const float dt){
 	aYaw_ = wrap_180(aYaw_);
 }
 
+
+void AutopilotClass::hall_test() {
+	if (hall_ok == 255)
+		hall_ok = 0;
+	for (int i = 0; i < 4; i++)
+		hall_ok |= ((Telemetry.get_current(i) >= 0.2))<<i;
+}
 
 
 void AutopilotClass::add_2_need_altitude(float speed, const float dt){
@@ -586,8 +593,15 @@ bool AutopilotClass::holdLocationStartStop(){///////////////////////////////////
 bool AutopilotClass::is_all_OK(bool print){
 	const int32_t _ct = millis_();
 	//printf( "\MS5611 err: %f\n",MS5611.getErrorsK());
-#ifndef FLY_EMULATOR
 
+	if (hall_ok<0b1111) {
+		cout << "\n!!!hall_error!!!" << CALIBRATION__TIMEOUT - (int)_ct << " sec." << "\t" << _ct << endl;
+		mega_i2c.beep_code(B_MS611_ERROR);
+		return false;
+	}
+
+#ifndef FLY_EMULATOR
+	
 	if (_ct < CALIBRATION__TIMEOUT) {
 		if (print) {
 			cout << "\n!!!calibrating!!! to end:" << CALIBRATION__TIMEOUT - (int)_ct << " sec." << "\t" << _ct << endl;
