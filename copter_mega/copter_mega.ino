@@ -5,7 +5,7 @@
 #include <avr/wdt.h>
 #include <stdint.h>
 #include <Wire.h>
-#include "Adafruit_NeoPixel-master\Adafruit_NeoPixel.h"
+#include "Adafruit_NeoPixel.h"
 #include <EEPROM.h>
 #ifdef __AVR__
 #include <avr/power.h>
@@ -61,8 +61,8 @@ volatile uint8_t beep_code = 0;
 
 uint8_t beeps_coder[] = { 0, B00001000,B00001001,B00001010,B00001011,B00001100,B00001101,B00001110,B00001111,B00000001,B00000010,B00000011,B00000100,B00000101,B00000110,B00000111 };//4 beeps if 0 short 1 long beep
 
+enum { ESC_CALIBR_ADR0, ESC_CALIBR_ADR1, ESC_CALIBR_ADR2, ESC_CALIBR_ADR3 };
 
-#define ESC_CALIBR_ADR	0
 #define b10 {100,0,0}
 #define b01 {0,100,0}
 #define b00 {0,0,0}
@@ -284,8 +284,17 @@ void receiveEvent(int countToRead) {
 		overloadVal = *((uint16_t*)&inBuf[1]);
 		//printf(overloadVal);
 		//printf(inBuf[3]);
-		if (inBuf[3])
-			EEPROM.write(ESC_CALIBR_ADR, inBuf[3]);
+		for (int i = 0; i < 4; i++) {
+			printf((int)inBuf[i + 3]);
+			if (inBuf[i + 3]) {
+				EEPROM.write(ESC_CALIBR_ADR0 + i, inBuf[i + 3]);
+			}
+		}
+		
+
+
+
+
 		break;
 	}
 	case 3: 
@@ -372,25 +381,38 @@ void requestEvent() {
 
 void setup()
 {
-	on(48000);
-	overloadVal = 1000; //shutdown 
-	const byte esc_calibr=EEPROM.read(ESC_CALIBR_ADR);
-	if (esc_calibr) {
-		EEPROM.write(ESC_CALIBR_ADR, 0);
-		OCR0 = OCR1 = OCR2 = OCR3 = pwm_MAX_THROTTLE;
-		delay((long)esc_calibr * 1000L);
-		OCR0 = OCR1 = OCR2 = OCR3 = pwm_OFF_THROTTLE;
-	}
-	else {
-		OCR0 = OCR1 = OCR2 = OCR3 = pwm_OFF_THROTTLE;
-	}
 #ifdef PRINT
 	Serial.begin(115200);
 	//while (!Serial);
 	//SIM800.begin(9600);
 	printf("HI");
-	Serial.println("_____________________");
+
 #endif
+
+	on(48000);
+	overloadVal = 1000; //shutdown 
+	byte esc_calibr[4];
+
+	for (int i = 0; i < 4; i++) 
+		if (esc_calibr[i] = EEPROM.read(ESC_CALIBR_ADR0+i))
+			EEPROM.write(ESC_CALIBR_ADR0+i, 0);
+		
+	const long t = millis();
+	do {
+		const long now = millis();
+		OCR0 = (esc_calibr[0] && now < t + 1000 * (long)esc_calibr[0]) ? pwm_MAX_THROTTLE : pwm_OFF_THROTTLE;
+		OCR1 = (esc_calibr[1] && now < t + 1000 * (long)esc_calibr[1]) ? pwm_MAX_THROTTLE : pwm_OFF_THROTTLE;
+		OCR2 = (esc_calibr[2] && now < t + 1000 * (long)esc_calibr[2]) ? pwm_MAX_THROTTLE : pwm_OFF_THROTTLE;
+		OCR3 = (esc_calibr[3] && now < t + 1000 * (long)esc_calibr[3]) ? pwm_MAX_THROTTLE : pwm_OFF_THROTTLE;
+		printf(OCR0);
+		printf(OCR1);
+		printf(OCR2);
+		printf(OCR3);
+		delay(1000);
+	} while (OCR0 != pwm_OFF_THROTTLE || OCR1 != pwm_OFF_THROTTLE || OCR2 != pwm_OFF_THROTTLE || OCR3 != pwm_OFF_THROTTLE);
+
+	printf("---------");
+
 	gps_setup();
 	pinMode(BUZZER, OUTPUT);
 	pinMode(RING, INPUT);
@@ -452,7 +474,7 @@ void loop()
 	fb[2] += ((float)(ar)-fb[2])*CF;
 	ar = analogRead(MI3);
 	overloadF |= ((ar < overloadVal)<<3);
-	fb[3] += ((float)(analogRead(ar)) - fb[3])*CF;
+	fb[3] += ((float)(ar)-fb[3])*CF;
 	
 	fb[4] += ((float)(analogRead(BAT)) - fb[4])*CF;  //volt
 

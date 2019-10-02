@@ -124,11 +124,13 @@ float current = 0;
 void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 	if (millis_() > startTime){
 		if (baseI < 1000){
-			current  += Telemetry.get_current(motor_index);
-			_base[0] += fmx;
-			_base[1] += fmy;
-			_base[2] += fmz;
-			baseI++;
+			if (Balance.gf(motor_index) == 0 || Balance.gf(motor_index) > MIN_THROTTLE) {
+				current += Telemetry.get_current(motor_index);
+				_base[0] += fmx;
+				_base[1] += fmy;
+				_base[2] += fmz;
+				baseI++;
+			}
 		}
 		else{
 			if (motors_is_on_){

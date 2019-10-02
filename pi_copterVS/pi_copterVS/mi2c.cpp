@@ -32,7 +32,7 @@ int Megai2c::getsim(char * str) {
 
 
 //add flag for next poweron start with full throthle
-void Megai2c::settings(float overCurrentVal, uint8_t esc_calibr) {
+void Megai2c::settings(float overCurrentVal, uint8_t esc_calibr0, uint8_t esc_calibr1, uint8_t esc_calibr2, uint8_t esc_calibr3) {
 	char send_buf[6];
 	send_buf[0] = 2;
 
@@ -40,9 +40,13 @@ void Megai2c::settings(float overCurrentVal, uint8_t esc_calibr) {
 		overCurrentVal = HALL_EFFECT_SENSOR_MAX_CURRENT;
 	uint16_t overloadVal = (uint16_t)1024 - ((overCurrentVal / HALL_EFFECT_SENSOR_MAX_CURRENT) * 1024);
 	*((uint16_t*)&send_buf[1]) = overloadVal;
-	send_buf[3] = esc_calibr;
+	send_buf[3] = esc_calibr0;
+	send_buf[4] = esc_calibr1;
+	send_buf[5] = esc_calibr2;
+	send_buf[6] = esc_calibr3;
 
-	write(fd, send_buf, 4);
+
+	write(fd, send_buf, 7);
 }
 /*
 int Megai2c::send2sim(const char *str, int len) {
@@ -153,7 +157,7 @@ int Megai2c::init()
 	write(fd, buf, 7);
 	shmPTR->sim800_reset_time = 0;
 
-	mega_i2c.settings(OVER_CURRENT, ESC_CALIBR);
+	mega_i2c.settings(OVER_CURRENT, ESC_CALIBR, ESC_CALIBR, ESC_CALIBR, ESC_CALIBR);
 	return 0;
 }
 

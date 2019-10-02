@@ -41,7 +41,7 @@ void BalanceClass::init()
 	old_time = micros_();
 
 	//set_pitch_roll_pids(0.001, 0.001, 0.3);  // 10
-	set_pitch_roll_pids(0.0008, 0.001, 0.3);//9
+	set_pitch_roll_pids(0.0007, 0.001, 0.3);//9
 
 
 	yaw_stabKP = 2;
@@ -184,8 +184,8 @@ bool BalanceClass::set_min_max_throttle(const float max, const float min) {
 
 
 void BalanceClass::speed_up_control(float n[]) {
-#define START_THROTTHLE 0.15
-#define SPEEDUP_CNT 200
+#define START_THROTTHLE 0.05
+#define SPEEDUP_CNT 500
 	static uint32_t start_cnt[4];
 	static float max_thr[4];
 	for (int i = 0; i < 4; i++) {
@@ -196,7 +196,7 @@ void BalanceClass::speed_up_control(float n[]) {
 		else {
 			if (start_cnt[i] < SPEEDUP_CNT && n[i] > max_thr[i]) {
 				n[i] = max_thr[i];
-				max_thr[i] = START_THROTTHLE + (float)start_cnt[i] * (0.15 / SPEEDUP_CNT);
+				max_thr[i] = START_THROTTHLE + (float)start_cnt[i] * 0.0006;
 				start_cnt[i]++;
 			}
 		}
@@ -359,7 +359,7 @@ bool BalanceClass::loop()
 				throttle = HOVER_THROTHLE;
 			}
 			else {
-				const int32_t speedup_time = 5e3;
+				const int32_t speedup_time = 5e3; 
 				const int32_t _ct32 = _ct / 1e3;
 				if ((_ct32 - Autopilot.time_at__start) < speedup_time || (Autopilot.time_at__start - Autopilot.old_time_at__start) > 8e3) {
 					true_throttle = MIN_THROTTLE;

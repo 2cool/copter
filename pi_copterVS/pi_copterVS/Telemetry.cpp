@@ -249,18 +249,38 @@ Max Continuous Power 220 Watts
 
 
 #define CUR_K ((float)HALL_EFFECT_SENSOR_MAX_CURRENT / 1024)
+	const float addI = Autopilot.motors_is_on() ? 0.5 : 0.12;
 
-	shmPTR->m_current[0] = m_current[0] = 0.1 + HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[0] * CUR_K;
-	shmPTR->m_current[1] = m_current[1] = 0.1 + HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[1] * CUR_K;
-	shmPTR->m_current[2] = m_current[2] = 0.1 + HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[2] * CUR_K;
-	shmPTR->m_current[3] = m_current[3] = 0.1 + HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[3] * CUR_K;
+	shmPTR->m_current[0] = m_current[0] = addI + 1.25*(HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[0] * CUR_K);
+	shmPTR->m_current[1] = m_current[1] = addI + 1.25*(HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[1] * CUR_K);
+	shmPTR->m_current[2] = m_current[2] = addI + 2.5*(HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[2] * CUR_K);
+	shmPTR->m_current[3] = m_current[3] = addI + 1.25*(HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[3] * CUR_K);
 	shmPTR->voltage = voltage = 1.733*(float)(data[4]);
 	full_power = (m_current[0] + m_current[1] + m_current[2] + m_current[3]) * voltage;
 
 
-
-	//Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);  
+	
+	 /*
 	//Debug.dump((float)data[0], (float)data[1], (float)data[2], (float)data[3]);
+	static float maxi[4] = { 0,0,0,0 };
+	bool bbb = false;
+	for (int i = 0; i < 4; i++) {
+		if (m_current[i] > 1) {
+			
+				maxi[i] += (m_current[i]-maxi[i])*0.05;
+				Debug.dump(maxi[i],i, 0, 0);
+			
+			bbb = true;
+		}
+	}
+	
+	if (!bbb) {
+		maxi[0] = maxi[1] = maxi[2] = maxi[3] = 0;
+	}
+	//Debug.dump((motor>=0)?m_current[motor]:-1, powerI-restI,0,0);
+	*/
+	//Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);
+
 #endif
 
 	if (old_volt_init == false) {

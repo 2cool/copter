@@ -242,7 +242,7 @@ int SettingsClass::read_all() {
 	FILE *f = fopen("/home/igor/copter_set.txt", "r");
 	if (f == NULL)
 	{
-		cout << "Error opening settings file!\n";
+		cout << "No settings file!\n";
 		return -1;
 	}
 	char buf[1000];
@@ -287,7 +287,7 @@ int SettingsClass::write_all() {
 	FILE *f = fopen("/home/igor/copter_set.txt", "w");
 	if (f == NULL)
 	{
-		cout << "Error opening settings file!\n";
+		cout << "Can't writing to settings file!\n";
 		return -1;
 	}
 	//HMC

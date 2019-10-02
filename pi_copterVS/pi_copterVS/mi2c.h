@@ -128,7 +128,7 @@ public:
 	 void sim800_reset();
 	 
 	 //esc_calibr = time betwen max_throtthle and zero_throtthle is seconds If zero no calibration it work in next power on;
-	 void settings(float overCurrentVal, uint8_t esc_calibr);
+	 void settings(float overCurrentVal, uint8_t esc_calibr0, uint8_t esc_calibr1, uint8_t esc_calibr2, uint8_t esc_calibr3);
 	 void throttle(const float n[]);
 
 	 int getiiiiv(char *iiiiv);

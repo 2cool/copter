@@ -125,7 +125,7 @@ void AutopilotClass::hall_test() {
 	if (hall_ok == 255)
 		hall_ok = 0;
 	for (int i = 0; i < 4; i++)
-		hall_ok |= ((Telemetry.get_current(i) >= 0.2))<<i;
+		hall_ok |= ((Telemetry.get_current(i) > 0.55))<<i;
 }
 
 
@@ -597,7 +597,9 @@ bool AutopilotClass::is_all_OK(bool print){
 	if (hall_ok<0b1111) {
 		cout << "\n!!!hall_error!!!" << CALIBRATION__TIMEOUT - (int)_ct << " sec." << "\t" << _ct << endl;
 		mega_i2c.beep_code(B_MS611_ERROR);
+#ifndef DEBUG
 		return false;
+#endif
 	}
 
 #ifndef FLY_EMULATOR
@@ -675,7 +677,8 @@ beep codes
 
 bool AutopilotClass::motors_do_on(const bool start, const string msg){////////////////////////  M O T O R S  D O  ON  /////////////////////////////////////////////////////////////////////////
 	const int32_t _ct = millis_();
-
+	if (_ct - old_time_at__start < 3000)
+		return false;
 	cout << msg << "-";
 	
 	if (start){

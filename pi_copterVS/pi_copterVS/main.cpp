@@ -290,8 +290,9 @@ int find_bigest() {
 		}
 	}
 	fclose(in);
+	counter++;
 	if (counter == 0) {
-		counter = 1;
+		counter = 10000;
 		const int dir_err = system("mkdir /home/igor/logs");
 		if (-1 == dir_err)
 		{

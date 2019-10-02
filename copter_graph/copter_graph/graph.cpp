@@ -197,9 +197,13 @@ int Graph::parser(byte buf[]) {
 	while (i<f_len) {
 		int b = buf[i++];
 		int len = load_uint8_(buf, i);
+		if (len == 0 && b == 9)
+			len = 4;
 		i++;
 		if (len == 0) {
 			len = load_int16_(buf, i);
+			if (len < 0)
+				len = 0;
 			i += 2;
 		}
 		switch (b) {
@@ -332,8 +336,10 @@ int Graph::decode_Log() {
 		i += 2;
 		while (i<f_len) {
 			b = buf[i++];
-			len = load_uint8_(buf, i);
 			
+			len = load_uint8_(buf, i);
+			if (len == 0 && b == 9)
+				len = 4;
 			/*while (true){//f_len <= 0 || f_len>200) {
 				
 				if (findLOg(j, lSize, buffer) == -1)
@@ -346,14 +352,16 @@ int Graph::decode_Log() {
 				len = load_uint8_(buf, i);
 			}
 			*/
+
 			i++;
 			if (len == 0) {
 				len = load_int16_(buf, i);
 				i += 2;
+				if (len < 0)
+					len = 0;
 			}
 			i += len;
-			if (i < 0)
-				i = i;
+
 		}
 		n++;
 		j += i;
