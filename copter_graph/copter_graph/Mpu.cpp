@@ -274,8 +274,10 @@ void Mpu::parser(byte buf[], int j, int len,int cont_bits, bool filter) {
 		
 		//ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
-
-		kf[Z]->B[2] = accZ - old_accZ;
+		static float f_accZ = 0;
+		f_accZ += (accZ - f_accZ) * 1;
+		accZ = 0;// f_accZ;
+		kf[Z]->B[2] =  accZ - old_accZ;
 		old_accZ = accZ;
 		if (press.altitude != old_bar_alt) { 
 			old_bar_alt = press.altitude;

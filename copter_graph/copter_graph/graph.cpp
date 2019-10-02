@@ -239,7 +239,7 @@ int Graph::parser(byte buf[]) {
 			break;
 		}
 		case ZSTAB:{
-			stab.parser(buf, i, len);
+			stab.parser(buf, i, len, flags[FILTER]);
 			break;
 		}
 		case BAL: {

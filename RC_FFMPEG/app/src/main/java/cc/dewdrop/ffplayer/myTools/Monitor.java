@@ -28,8 +28,8 @@ public class Monitor {
         roll=-a;
     }
     public void setHeight(double h){
-        hight_t+=(h*10-hight_t)*0.05;
-        hight = (float) (Math.round(hight_t)*0.1);
+     //   hight_t+=(h*10-hight_t)*0.05;
+        hight = (float) h;//(float) (Math.round(hight_t)*0.1); 
 
     }
     public void setSpeed(double s){

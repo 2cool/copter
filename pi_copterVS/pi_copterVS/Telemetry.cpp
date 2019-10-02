@@ -43,7 +43,7 @@ static float  f_current = 0;
 static float fly_time_lef = 0;
 
 static int old_voltage;
-static bool old_volt_init = false;
+
 
 
 void TelemetryClass::addMessage(const string msg, bool and2sms){
@@ -172,6 +172,12 @@ void TelemetryClass::init_()
 	if (bat_chargedK > 1)
 		bat_chargedK = 1;
 	full_battery_charge=battery_charge = BAT_Ampere_hour * bat_chargedK;
+
+	if (voltage - old_voltage > 5) {
+		total_time += on_power_time / 1000;
+		on_power_time = 0;
+	}
+
 	cout << "telemetry init OK \n";
 }
 
@@ -283,13 +289,7 @@ Max Continuous Power 220 Watts
 
 #endif
 
-	if (old_volt_init == false) {
-		old_volt_init = true;
-		if (voltage - old_voltage > 10) {
-			total_time += on_power_time / 1000;
-			on_power_time = 0;
-		}
-	}
+
 }
 
 

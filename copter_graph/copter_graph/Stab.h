@@ -7,7 +7,7 @@ public:
 	~Stab();
 	float sZ=0, speedZ=0, stab=0, fZ = 0;
 
-	void parser(byte buf[], int n, int len);
+	void parser(byte buf[], int n, int len,const  bool filtr);
 
 
 };

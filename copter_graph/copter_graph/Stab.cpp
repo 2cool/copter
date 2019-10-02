@@ -13,7 +13,7 @@ Stab::~Stab()
 
 
 
-void Stab::parser(byte buf[], int n, int len) {
+void Stab::parser(byte buf[], int n, int len,const bool filtr) {
 
 
 	sZ = *(float*)&buf[n];

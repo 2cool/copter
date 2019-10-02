@@ -270,7 +270,7 @@ bool is_clone() {
 
 
 
-
+#define MIN_N_4_COUNTER 10000
 int find_bigest() {
 	FILE* in;
 	char buff[512];
@@ -291,8 +291,8 @@ int find_bigest() {
 	}
 	fclose(in);
 	counter++;
-	if (counter == 0) {
-		counter = 10000;
+	if (counter < MIN_N_4_COUNTER) {
+		counter = MIN_N_4_COUNTER;
 		const int dir_err = system("mkdir /home/igor/logs");
 		if (-1 == dir_err)
 		{
@@ -304,14 +304,14 @@ int find_bigest() {
 }
 
 int test_4_counterFile() {
-	int counter = 1;
+	int counter = 0;
 	FILE* set = fopen(LOG_COUNTER_NAME, "r");
 	if (set) {
 		fscanf(set, "%i", &counter);
 		fclose(set);
 		usleep(500);
 		remove(LOG_COUNTER_NAME);
-		if (counter <=0)
+		if (counter < MIN_N_4_COUNTER)
 		{
 			counter = find_bigest();
 		}
@@ -327,11 +327,20 @@ int test_4_counterFile() {
 std::ofstream out;
 std::streambuf *coutbuf;// старый буфер
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 
-int counter = test_4_counterFile();
+	int counter = test_4_counterFile();
 	if (counter == 0)
 		return 0;
+
+	FILE* set = fopen(LOG_COUNTER_NAME, "w+");
+	if (set) {
+		fprintf(set, "%i\n", counter + 1);
+		fclose(set);
+	}
+	else
+		return 0;
+
 	if (init_shmPTR())
 		return 0;
 	if (is_clone())
@@ -372,9 +381,7 @@ int counter = test_4_counterFile();
 			if (shmPTR->lowest_altitude_to_fly > shmPTR->fly_at_start)
 				shmPTR->lowest_altitude_to_fly = shmPTR->fly_at_start;
 
-			FILE* set = fopen(LOG_COUNTER_NAME, "w+");
-			fprintf(set, "%i\n", counter + 1);
-			fclose(set);
+			
 			if (argv[3][0] == 'f' || argv[3][0] == 'F') {
 				stdout_file_ext = "/home/igor/logs/log_out" + to_string(counter);
 				fname = stdout_file_ext+".txt";

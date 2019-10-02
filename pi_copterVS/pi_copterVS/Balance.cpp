@@ -183,29 +183,35 @@ bool BalanceClass::set_min_max_throttle(const float max, const float min) {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-void BalanceClass::speed_up_control(float n[]) {
+bool BalanceClass::speed_up_control(float n[]) {
 #define START_THROTTHLE 0.05
 #define SPEEDUP_CNT 500
+	bool speed_up = false;
 	static uint32_t start_cnt[4];
 	static float max_thr[4];
 	for (int i = 0; i < 4; i++) {
 		if (n[i] < START_THROTTHLE) {
 			start_cnt[i] = 0;
 			max_thr[i] = START_THROTTHLE;
+			speed_up = true;
 		}
 		else {
 			if (start_cnt[i] < SPEEDUP_CNT && n[i] > max_thr[i]) {
 				n[i] = max_thr[i];
 				max_thr[i] = START_THROTTHLE + (float)start_cnt[i] * 0.0006;
+				if (max_thr[i] > MIN_THROTTLE)
+					max_thr[i] = MIN_THROTTLE;
 				start_cnt[i]++;
+				speed_up = true;
 			}
 		}
 	}
+
 	//Debug.dump(n[0], n[1], n[2], n[3]);
 	//n[0] = n[1] = n[2] = n[3] = 0;
 	//if (ret && ret!=0b1111)
 	//	cout << ret << endl;
-
+	return speed_up;
 }
 
 
@@ -224,17 +230,7 @@ void BalanceClass::speed_up_control(float n[]) {
 
 
 
-
-
-
-
-
-
-
-
-static bool speed_up = true;
-
-
+bool speed_up = true;
 bool BalanceClass::loop()
 {
 
@@ -366,17 +362,10 @@ bool BalanceClass::loop()
 					f_[0] = f_[1] = f_[2] = f_[3] = throttle = true_throttle;
 					Autopilot.hall_test();//put only there
 				}
-
-
 				//f_[0] = f_[1] = f_[2] = f_[3] = throttle;//!!!!!!!!!!!!!!!!!
-
-
-				
 			}
-			if (speed_up && throttle > HOVER_THROTHLE)
-				speed_up = false;
-
-		}else
+		}
+		else
 			speed_up = true;
 		
 		
@@ -391,9 +380,11 @@ bool BalanceClass::loop()
 		f_[2] = 0;
 		f_[3] = 0;*/
 		
-		speed_up_control(f_);
-		if (speed_up)
+		if (speed_up && (speed_up_control(f_) || true_throttle <= MIN_THROTTLE))
 			PID_reset();
+		else
+			speed_up = false;
+
 		mega_i2c.throttle(f_);  //670 micros
 		log();
 	}

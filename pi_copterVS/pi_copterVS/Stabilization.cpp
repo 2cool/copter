@@ -37,8 +37,8 @@ void StabilizationClass::init(){
 	//--------------------------------------------------------------------------
 
 	alt2speedZ = 0.2;
-	pids[SPEED_Z_PID].kP( 0.18 );
-	pids[SPEED_Z_PID].kI( 0.25 );
+	pids[SPEED_Z_PID].kP( 0.06 );
+	pids[SPEED_Z_PID].kI( 0.12 );
 
 	setMinMaxI_Thr();
 	max_speedZ_P =  MAX_VER_SPEED_PLUS;
