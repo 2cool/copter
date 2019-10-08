@@ -902,12 +902,12 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 	draw(g, rect, 35, -35, C_PITCH);
 	draw(g, rect, 35, -35, C_ROLL);
 
-	draw(g, rect, 180, -180, YAW);
+	draw(g, rect, 370, -10, YAW);
 	draw(g, rect, 180, -180, GPS_YAW);
 
 	draw(g, rect, 20, -20, ACCX);
 	draw(g, rect, 20, -20, ACCY);
-	draw(g, rect, 20, -20, ACCZ);
+	draw(g, rect, 40, -40, ACCZ);
 	draw(g, rect, 30, -30, GYRO_PITCH);
 	draw(g, rect, 30, -30, GYRO_ROLL);
 	draw(g, rect, 30, -30, GYRO_YAW);
@@ -919,10 +919,10 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 	//(mpu._max[mEX]-mpu._min[mEX])
 	//distX_start
 
-	draw(g, rect, mpu._max[mEX]+2.93, mpu._min[mEX]+2.93, SX);
-	draw(g, rect, mpu._max[mEY]-10.59, mpu._min[mEY]-10.59, SY);
-	draw(g, rect, mpu._max[mEX] + 2.93, mpu._min[mEX] + 2.93, GSX);
-	draw(g, rect, mpu._max[mEY] - 10.59, mpu._min[mEY] - 10.59, GSY);
+	draw(g, rect, mpu._max[mEX]+6, mpu._min[mEX]+2.93, SX);
+	draw(g, rect, mpu._max[mEY]+6.59, mpu._min[mEY]-10.59, SY);
+	draw(g, rect, mpu._max[mEX] + 6, mpu._min[mEX] + 2.93, GSX);
+	draw(g, rect, mpu._max[mEY] + 6.59, mpu._min[mEY] - 10.59, GSY);
 
 	draw(g, rect, 15, -15, SPEED_X);
 	draw(g, rect, 15, -15, SPEED_Y);

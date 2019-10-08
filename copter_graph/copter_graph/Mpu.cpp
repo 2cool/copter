@@ -217,6 +217,8 @@ void Mpu::parser(byte buf[], int j, int len,int cont_bits, bool filter) {
 	pitch= *(float*)&buf[j]; j += 4;
 	roll= *(float*)&buf[j]; j += 4;
 	yaw = *(float*)&buf[j]; j += 4;;
+	if (yaw < 0)
+		yaw += 360;
 
 	cosYaw = cos(yaw*GRAD2RAD);
 	sinYaw = sin(yaw * GRAD2RAD);
@@ -276,7 +278,7 @@ void Mpu::parser(byte buf[], int j, int len,int cont_bits, bool filter) {
 
 		static float f_accZ = 0;
 		f_accZ += (accZ - f_accZ) * 1;
-		accZ = 0;// f_accZ;
+		accZ =  f_accZ;
 		kf[Z]->B[2] =  accZ - old_accZ;
 		old_accZ = accZ;
 		if (press.altitude != old_bar_alt) { 

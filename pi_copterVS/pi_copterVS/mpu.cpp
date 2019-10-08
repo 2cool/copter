@@ -180,13 +180,10 @@ void MpuClass::init()
 
 #ifndef FLY_EMULATOR
 
-
-
-
-	accelgyro.initialize(MPU6050_GYRO_FS_1000, MPU6050_ACCEL_FS_2, MPU6050_DLPF_BW_20);
-	//ms_open();
+	accelgyro.initialize(MPU6050_GYRO_FS_2000, MPU6050_ACCEL_FS_16, MPU6050_DLPF_BW_20);
 	sleep(1);
-	accelgyro.initialize(MPU6050_GYRO_FS_1000, MPU6050_ACCEL_FS_2, MPU6050_DLPF_BW_20);
+	accelgyro.initialize(MPU6050_GYRO_FS_2000, MPU6050_ACCEL_FS_16, MPU6050_DLPF_BW_20);
+
 	writeWord(104, MPU6050_RA_XA_OFFS_H, -535);//-5525);
 	writeWord(104, MPU6050_RA_YA_OFFS_H, 219);// -1349);
 	writeWord(104, MPU6050_RA_ZA_OFFS_H, 1214);// 1291);
@@ -194,12 +191,6 @@ void MpuClass::init()
 	writeWord(104, MPU6050_RA_YG_OFFS_USRH, -39);// 36);
 	writeWord(104, MPU6050_RA_ZG_OFFS_USRH, 16);// -49);
 		
-	
-
-	
-	
-
-
 #ifdef GYRO_CALIBR
 	gyro_calibratioan = false;
 #else
@@ -282,18 +273,10 @@ int16_t MpuClass::getGX(){
 	return x;
 }
 //-----------------------------------------------------
-const float n003 = 0.030517578;
-//const double n006 =  0.061035156f;
-//4g
-//const double n122 = 1.220740379e-4;
-const float n305 = 3.0518509475e-5;
-
-//2g
-//const double n604 = 0.00006103515625f;
+const float giroifk = 0.06103515625f;//2000
+const float accifk = 0.00048828125f;//16
 
 
-
-const float to_98g = 0.0005981445312;
 
 #ifdef FLY_EMULATOR
 
@@ -471,9 +454,9 @@ void MpuClass::gyro_calibr() {
 			cal_g_roll += g[0];
 			cal_g_yaw += g[2];
 			cal_g_cnt++;
-			agpitch = n003 * ((float)cal_g_pitch / (float)cal_g_cnt);
-			agroll = n003 * ((float)cal_g_roll / (float)cal_g_cnt);
-			agyaw = n003 * ((float)cal_g_yaw / (float)cal_g_cnt);
+			agpitch = giroifk * ((float)cal_g_pitch / (float)cal_g_cnt);
+			agroll = giroifk * ((float)cal_g_roll / (float)cal_g_cnt);
+			agyaw = giroifk * ((float)cal_g_yaw / (float)cal_g_cnt);
 		}
 		else {
 			AHRS.setBeta(0.01);
@@ -520,12 +503,12 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 		return ret;
 	}
 
-	gyroPitch =  n003 * (float)g[1] - agpitch;
-	gyroRoll =  n003 * (float)g[0] - agroll;
-	gyroYaw =  n003 * (float)g[2] - agyaw;
-	float ax = n305 * 2 * (float)a[0];
-	float ay = n305 * 2 * (float)a[1];
-	float az = n305 * 2 * (float)a[2];
+	gyroPitch =  giroifk * (float)g[1] - agpitch;
+	gyroRoll =  giroifk * (float)g[0] - agroll;
+	gyroYaw =  giroifk * (float)g[2] - agyaw;
+	float ax = accifk * (float)a[0];
+	float ay = accifk * (float)a[1];
+	float az = accifk * (float)a[2];
 
 	AHRS.MadgwickAHRSupdate(q, GRAD2RAD * gyroRoll, GRAD2RAD * gyroPitch, GRAD2RAD * gyroYaw, ax, ay, az,  Hmc.fmx, Hmc.fmy, Hmc.fmz, mpu_dt);
 	//AHRS.MadgwickAHRSupdate(q, GRAD2RAD * gyroRoll, GRAD2RAD * gyroPitch, GRAD2RAD * gyroYaw, 0, 0, 10, Hmc.fmx, Hmc.fmy, -Hmc.fmz, mpu_dt);

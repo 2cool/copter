@@ -593,14 +593,14 @@ bool AutopilotClass::holdLocationStartStop(){///////////////////////////////////
 bool AutopilotClass::is_all_OK(bool print){
 	const int32_t _ct = millis_();
 	//printf( "\MS5611 err: %f\n",MS5611.getErrorsK());
-
+#ifndef DEBUG
 	if (hall_ok<0b1111) {
 		cout << "\n!!!hall_error!!!" << CALIBRATION__TIMEOUT - (int)_ct << " sec." << "\t" << _ct << endl;
 		mega_i2c.beep_code(B_MS611_ERROR);
-#ifndef DEBUG
 		return false;
-#endif
 	}
+#endif
+	
 
 #ifndef FLY_EMULATOR
 	
