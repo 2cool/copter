@@ -469,40 +469,32 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	static int ecnt = 0;
 	bool ret = true;
 	time = micros_();
-	mpu_dt = (double)(time - mpu_time_) * 1e-6;
-	if (mpu_dt >= 1 && ecnt++) {
-		cout << "MPU DT to long:" << mpu_dt << ". uptime:" << (time / 1e6) << "\n";
-		mega_i2c.beep_code(B_MPU_TOO_LONG);
-	}
-	mpu_dt = constrain(mpu_dt,0.002, 0.03);
-	mpu_time_ = time;
-	//double old_tied = timed;
 
-	double _dt = (double)(time - oldmpuTime) * 1e-6;
-	ret = (_dt >= 0.01);
-	if (ret) {
-		Hmc.loop();
-		oldmpuTime = time;
-		dt = constrain(_dt, 0.01, 0.03);
-
-		static uint cnt2l = 0;
-		if (dt > 0.03) {
-			if (cnt2l++) {
-				//cout << "MPU DT too long " << endl;// << dt << ":" << dt << ":" << timed << endl;
-				//cout << endl << ms5611_timed - old_tied << " " << hmc_timed - old_tied << " " << gps_timed - old_tied <<
-					//" " << telem_timed - old_tied << " " << com_timed - old_tied << " " << autopilot_timed - old_tied << " " << mpu_timed - old_tied << endl;
-				mega_i2c.beep_code(B_MPU_TOO_LONG);
-				Telemetry.addMessage(e_MPU_TOO_LONG);
-			}
-		}
-	}
-	
 	if (accelgyro.getMotion6(&a[0], &a[1], &a[2], &g[0], &g[1], &g[2]) == -1) {
 		Telemetry.addMessage(e_MPU_RW_ERROR);
 		mega_i2c.beep_code(B_I2C_ERR);
 		return ret;
 	}
 
+	mpu_dt = (double)(time - mpu_time_) * 1e-6;
+	if (mpu_dt > 0.03)
+		mpu_dt = 0.03;
+	mpu_time_ = time;
+	dt = (double)(time - oldmpuTime) * 1e-6;
+	ret = (dt >= 0.01);
+	if (ret) {
+		Hmc.loop();
+		oldmpuTime = time;
+		static uint cnt2l = 0;
+		if (dt > 0.03 && cnt2l++) {
+			cout << "MPU DT too long " << endl;// << dt << ":" << dt << ":" << timed << endl;
+			mega_i2c.beep_code(B_MPU_TOO_LONG);
+			Telemetry.addMessage(e_MPU_TOO_LONG);
+		}
+		if (dt > 0.03)
+			dt = 0.03;
+	}
+	
 	gyroPitch =  giroifk * (float)g[1] - agpitch;
 	gyroRoll =  giroifk * (float)g[0] - agroll;
 	gyroYaw =  giroifk * (float)g[2] - agyaw;

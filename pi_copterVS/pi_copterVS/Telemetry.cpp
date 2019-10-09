@@ -28,17 +28,17 @@
 
 #define BALANCE_DELAY 120
 #define MAX_FLY_TIME 1800
-#define BAT_ZERO 350.0f
-#define BAT_50P 385.0f
+#define BAT_ZERO 300.0f
+#define BAT_50P 350.0f
 #define BAT__timeout 50
 #define BAT_timeoutRep  2
 //#define BAT_100P 422
 #define MAX_UPD_COUNTER 100
 #define MAX_VOLTAGE_AT_START 406
 
+#define BATTERY_CAPASITY 10;
 
-static int volatage = 0;
-static float BAT_Ampere_hour = 5.5;
+static float BAT_Ampere_hour = BATTERY_CAPASITY;
 static float  f_current = 0;
 static float fly_time_lef = 0;
 
@@ -151,7 +151,7 @@ void TelemetryClass::init_()
 
 	get_saved_voltage();
 
-	BAT_Ampere_hour = 3.5;
+	BAT_Ampere_hour = BATTERY_CAPASITY;
 	init_shmPTR();
 
 	buf = shmPTR->telemetry_buf;
@@ -168,7 +168,9 @@ void TelemetryClass::init_()
 	//Out.println("TELEMETRY INIT");
 	voltage_at_start = 0;
 	full_power = 0;
-	bat_chargedK = ((voltage - (BAT_ZERO * SN)) / (70 * SN));
+
+
+	float bat_chargedK = (voltage/SN - 322)*0.01;
 	if (bat_chargedK > 1)
 		bat_chargedK = 1;
 	full_battery_charge=battery_charge = BAT_Ampere_hour * bat_chargedK;
