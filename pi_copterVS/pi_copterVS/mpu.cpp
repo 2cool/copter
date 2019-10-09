@@ -96,26 +96,7 @@ void MpuClass::log() {
 		Log.block_end();
 	}
 }
-void MpuClass::log_emu() {
-	if (Log.writeTelemetry) {
-		Log.block_start(LOG::MPU_EMU);
 
-		Log.loadByte((uint8_t)(dt * 1000));
-		Log.loadFloat(pitch);
-		Log.loadFloat(roll);
-		Log.loadFloat(yaw);
-		Log.loadFloat(gyroPitch);
-		Log.loadFloat(gyroRoll);
-		Log.loadFloat(gyroYaw);
-		Log.loadFloat(accX);
-		Log.loadFloat(accY);
-		Log.loadFloat(accZ);
-
-		Log.block_end();
-	}
-
-
-}
 //-----------------------------------------------------
 #ifdef FLY_EMULATOR
 float newQ4z = 0.1, newR4z = 0.2, newQ4xy = 0.1, newR4xy = 5;
@@ -142,7 +123,7 @@ void MpuClass::init()
 	vibration = 0;
 
 	q.w = 1; q.x = q.y = q.z = 0;
-	oldmpuTime = mpu_time_ = micros_();
+	mpu_time_ = micros_();
 
 
 	Eigen::Matrix3f A; // System dynamics matrix
@@ -466,34 +447,26 @@ void MpuClass::gyro_calibr() {
 }
 
 bool MpuClass::loop() {//-------------------------------------------------L O O P-------------------------------------------------------------
-	static int ecnt = 0;
-	bool ret = true;
 	time = micros_();
 
 	if (accelgyro.getMotion6(&a[0], &a[1], &a[2], &g[0], &g[1], &g[2]) == -1) {
 		Telemetry.addMessage(e_MPU_RW_ERROR);
 		mega_i2c.beep_code(B_I2C_ERR);
-		return ret;
+		return true;
 	}
 
-	mpu_dt = (double)(time - mpu_time_) * 1e-6;
+	mpu_dt = 1e-6 * (time - mpu_time_);
+	mpu_time_ = time;
+	static uint cnt2l = 0;
+	if (mpu_dt > 0.03 && cnt2l++) {
+		cout << "MPU DT too long " << endl;// << dt << ":" << dt << ":" << timed << endl;
+		mega_i2c.beep_code(B_MPU_TOO_LONG);
+		Telemetry.addMessage(e_MPU_TOO_LONG);
+	}
 	if (mpu_dt > 0.03)
 		mpu_dt = 0.03;
-	mpu_time_ = time;
-	dt = (double)(time - oldmpuTime) * 1e-6;
-	ret = (dt >= 0.01);
-	if (ret) {
-		Hmc.loop();
-		oldmpuTime = time;
-		static uint cnt2l = 0;
-		if (dt > 0.03 && cnt2l++) {
-			cout << "MPU DT too long " << endl;// << dt << ":" << dt << ":" << timed << endl;
-			mega_i2c.beep_code(B_MPU_TOO_LONG);
-			Telemetry.addMessage(e_MPU_TOO_LONG);
-		}
-		if (dt > 0.03)
-			dt = 0.03;
-	}
+
+	
 	
 	gyroPitch =  giroifk * (float)g[1] - agpitch;
 	gyroRoll =  giroifk * (float)g[0] - agroll;
@@ -536,7 +509,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	shmPTR->roll = roll *= RAD2GRAD;
 	shmPTR->yaw = yaw*=RAD2GRAD;
 	log();
-	return ret;
+	return true;
 }
 
 

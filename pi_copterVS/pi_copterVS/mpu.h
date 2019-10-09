@@ -34,7 +34,6 @@ class MpuClass
 
 
 	 float tiltPower_CF;
-	 void log_emu();
 	 void log();
 
 	 // MPU control/status vars
@@ -46,7 +45,7 @@ class MpuClass
 	 int16_t a[3];              // [x, y, z]            accel vector
 	 int16_t g[3];              // [x, y, z]            gyro vector
 	 int16_t c[3];
-	 double mpu_dt;
+	 float mpu_dt;
 	 Quaternion_ q;
 	 
 	 int mean_ax, mean_ay, mean_az, mean_gx, mean_gy, mean_gz;
@@ -68,9 +67,9 @@ private:
 	void test_Est_XY();
 	void rotateCW(float&x, float&y);
 	void rotateCCW(float&x, float&y);
-	double dt;
+
  public:
-	 inline double get_dt() { return dt; }
+	 inline float get_dt() { return mpu_dt; }
 
 	 void getXYRelative2Zero(double&x, double&y) { x -= x_at_zero; y -= y_at_zero; }
 	// void set_cos_sin_dir();
@@ -92,7 +91,6 @@ private:
 
 
 	 float cor_c_pitch, cor_c_roll;
-	 int64_t oldmpuTime;
 	 float cosYaw,sinYaw;
 	 void initYaw(const double angle);
 	

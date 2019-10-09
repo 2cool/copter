@@ -134,35 +134,25 @@ bool loop()
 		//Mpu.new_calibration(false);
 		temp4test = false;
 	}
-
-
 #endif
 
-
-	if (Balance.loop()) {
-		
-
+	Mpu.loop();
+	Hmc.loop();
+	MS5611.loop();
+	GPS.loop();
+	Balance.loop();
 #ifdef WORK_WITH_WIFI
-		Telemetry.loop();
-		//Mpu.telem_time = Mpu.timed;
+	Telemetry.loop();
 #endif
-		Commander.input();
-		//Mpu.com_timed = Mpu.timed;
-		Autopilot.loop();
-		//Mpu.autopilot_timed = Mpu.timed;
-		//mega_i2c.gsm_loop();
-		if (shmPTR->sim800_reset_time > 0 && shmPTR->sim800_reset_time + 40e3 < millis_())
-			shmPTR->sim800_reset_time = 0;
+	Commander.input();
+	Autopilot.loop();
+	if (shmPTR->sim800_reset_time > 0 && shmPTR->sim800_reset_time + 40e3 < millis_())
+		shmPTR->sim800_reset_time = 0;
 
 #ifdef FLY_EMULATOR
 		usleep(3000);
 #endif
 		return true;
-	}
-	else
-		return false;
-
-	
 }
 
 //http://www.cprogramming.com/tutorial/lesson10.html

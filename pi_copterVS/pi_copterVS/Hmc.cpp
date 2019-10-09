@@ -209,6 +209,12 @@ static int32_t comTime = 0;
 #else
 
 void HmcClass::loop(){
+
+	static int hmc_cnt = 0;
+	if (1 & hmc_cnt++)
+		return;
+
+
 	//double ttt = micros();
 	//бельіе ноги
 	int16_t mx,my,mz;
