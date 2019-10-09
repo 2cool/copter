@@ -339,15 +339,16 @@ bool BalanceClass::loop()
 			//yaw_output = 0;
 			//pitch_output=0;
 #endif
+			float m_yaw_output = -yaw_output;  //антираскачивание при низкой мощности на плече
+			if ((throttle + yaw_output) < min_throttle)
+				yaw_output = min_throttle - throttle;
+			if ((throttle + m_yaw_output) < min_throttle)
+				m_yaw_output = min_throttle - throttle;
 
-			f_[3] = f_constrain((throttle + roll_output + pitch_output - yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
+			f_[3] = f_constrain((throttle + roll_output + pitch_output + m_yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
 			f_[1] = f_constrain((throttle + roll_output - pitch_output + yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
 			f_[2] = f_constrain((throttle - roll_output + pitch_output + yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
-			f_[0] = f_constrain((throttle - roll_output - pitch_output - yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
-
-
-			
-			
+			f_[0] = f_constrain((throttle - roll_output - pitch_output + m_yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
 
 			if (Hmc.do_compass_motors_calibr) {
 				f_[0] = f_[1] = f_[2] = f_[3] = 0;

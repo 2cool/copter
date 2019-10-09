@@ -22,7 +22,7 @@ public class DrawView extends View {
 
 
 
-    final static float THROTTLE_K =0.55f;
+    final static float THROTTLE_K =0.5f;
     static public double wrap_180(double x) {return (x < -180 ? x+360 : (x > 180 ? x - 360: x));}
     public static ScaleGestureDetector mScaleGestureDetector;
     final float max_manual_thr_index = 5;

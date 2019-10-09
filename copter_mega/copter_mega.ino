@@ -33,7 +33,11 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ80
 #define _16MHZ CS10
 #define _8MHZ CS11
 
-#define MAX90_THROTTLE 30400
+//490 hz
+#define pwm_COUNTER		 32653
+//333.33(3)hz
+//#define pwm_COUNTER		 48000
+#define MAX90_THROTTLE   30400
 #define pwm_MIN_THROTTLE 17600
 #define pwm_MAX_THROTTLE 32000
 #define pwm_OFF_THROTTLE 16000
@@ -389,7 +393,7 @@ void setup()
 
 #endif
 
-	on(48000);
+	on(pwm_COUNTER);
 	overloadVal = 1000; //shutdown 
 	byte esc_calibr[4];
 

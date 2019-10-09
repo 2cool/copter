@@ -76,7 +76,7 @@
 
 #define MIDDLE_POSITION 0.5f
 #define HOVER_THROTHLE 0.5f
-#define MIN_THROTTLE 0.35f
+#define MIN_THROTTLE 0.4f
 #define FALLING_THROTTLE 0.45f
 
 #define STOP_THROTTLE_ 0.2f
