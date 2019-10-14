@@ -11,8 +11,6 @@ enum {
 	GIMBAL_MINUS = 0x4000, REBOOT = 0x8000, PROGRAM_LOADED= 0x10000, M_ON_AND_GO2HOME = 0x20000, M_ON_AND_PROG_START = 0x40000
 };
 
-
-#define DEFAULT_STATE (Z_STAB|XY_STAB)
 /*
 struct Stat_Fields {
 	unsigned short wifi_Str : 8;    // 0..7   (3 bits)

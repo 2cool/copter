@@ -327,7 +327,13 @@ const uint8_t collors[][8][3] = {
 	{ { RED },{ RED },{ RED },{ RED },{ RED },{ RED },{ RED },{ RED } }, // red
 	{ { RED },{ RED },{ BLE },{ BLE },{ BLE },{ BLE },{ RED },{ RED } }, // blu red
 	{ { RED },{ RED },{ YEL },{ YEL },{ YEL },{ YEL },{ RED },{ RED } }, // yel red
-	{ { BLK },{ BLK },{ BLK },{ BLK },{ BLK },{ BLK },{ BLK },{ BLK } } // black
+	{ { BLK },{ BLK },{ BLK },{ BLK },{ BLK },{ BLK },{ BLK },{ BLK } }, // black
+
+	{ { RED },{ RED },{ RED },{ RED },{ RED },{ RED },{ RED },{ RED } }, // red
+	{ { GRN },{ GRN },{ GRN },{ GRN },{ GRN },{ GRN },{ GRN },{ GRN } }, // green
+	{ { BLE },{ BLE },{ BLE },{ BLE },{ BLE },{ BLE },{ BLE },{ BLE } } // blue
+
+
 };
 	
 void Megai2c::set_led_mode(uint8_t n, uint8_t briht, bool pulse) {

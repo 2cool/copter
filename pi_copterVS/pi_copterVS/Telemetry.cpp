@@ -185,11 +185,13 @@ void TelemetryClass::init_()
 
 uint16_t data[5];
 
-void TelemetryClass::loop()
+bool TelemetryClass::loop()
 {
+	bool ret = false;
 	const int32_t _ct = millis_();
 	if (next_battery_test_time<_ct){
 		next_battery_test_time = _ct + BAT__timeout;
+		ret = true;
 		testBatteryVoltage();
 		uint16_t time_left = check_time_left_if_go_to_home();
 		if (Autopilot.progState() && time_left < 60 && ++no_time_cnt>3){ 
@@ -210,8 +212,10 @@ void TelemetryClass::loop()
 		}
 		
 	}
-	update_buf();
+	
+	ret |=update_buf();
 	message = "";
+	return ret;
 }
 
 int TelemetryClass::get_voltage4one_cell() { return (int)(voltage / SN); }
@@ -390,12 +394,12 @@ bool gps_or_acuracy = false;
 
 
 int32_t last_update_time=0;
-void TelemetryClass::update_buf() {
+bool TelemetryClass::update_buf() {
 	if (shmPTR->connected == 0 || shmPTR->telemetry_buf_len > 0)
-		return;
+		return false;
 	if (Autopilot.busy()) {
 		shmPTR->telemetry_buf_len=4;
-		return;
+		return false;
 	}
 
 	//bzero(buf, 32);
@@ -466,6 +470,7 @@ void TelemetryClass::update_buf() {
 
 	} while (true);
 	shmPTR->telemetry_buf_len = i;
+	return true;
 }
 //nado echo peredat koordinaty starta i visoti ili luche ih androis socharanaet
 

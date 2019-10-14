@@ -125,25 +125,33 @@ int er_cnt = 0;
 long dt_sum=0;
 int max_dt = 0;
 int old_debug = 0;
+
+
+uint64_t timer = 0;
 bool loop()
 {
-	usleep(5000);
-#ifndef WORK_WITH_WIFI
-	if (temp4test && Autopilot.motors_is_on() == false && (int)Mput.timed > 2) {
-		//Autopilot.motors_do_on(true, "FALSE WIFI");
-		//Mpu.new_calibration(false);
-		temp4test = false;
+
+	uint64_t beg = micros_();
+	if (beg - timer < 4900)
+	{
+		usleep(4900- (beg - timer));
+	
 	}
-#endif
+
+	timer = beg;
 
 	Mpu.loop();
-	Hmc.loop();
-	MS5611.loop();
-	GPS.loop();
+
+	if (!Hmc.loop())
+		MS5611.loop();
+
+	if (!Telemetry.loop())
+		GPS.loop();
+
+
 	Balance.loop();
-#ifdef WORK_WITH_WIFI
-	Telemetry.loop();
-#endif
+
+
 	Commander.input();
 	Autopilot.loop();
 	if (shmPTR->sim800_reset_time > 0 && shmPTR->sim800_reset_time + 40e3 < millis_())

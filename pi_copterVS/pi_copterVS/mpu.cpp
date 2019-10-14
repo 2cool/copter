@@ -456,10 +456,11 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	}
 
 	mpu_dt = 1e-6 * (time - mpu_time_);
+	//Debug.dump((double)mpu_dt, 0, 0, 0);
 	mpu_time_ = time;
 	static uint cnt2l = 0;
 	if (mpu_dt > 0.03 && cnt2l++) {
-		cout << "MPU DT too long " << endl;// << dt << ":" << dt << ":" << timed << endl;
+		cout << "MPU DT too long "  << mpu_dt << ", time " << (int)millis_() << endl;
 		mega_i2c.beep_code(B_MPU_TOO_LONG);
 		Telemetry.addMessage(e_MPU_TOO_LONG);
 	}

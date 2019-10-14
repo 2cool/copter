@@ -27,24 +27,44 @@ public class BatteryMonitor {
         charge=(sizeX-border-border)*1;
     }
     public void setVoltage(float volt){
+        /*
+        long ttt=System.currentTimeMillis();
+        ttt/=30;
+        ttt&=511;
+        ttt=511-ttt;
+        volt=ttt;
+*/
 
         if (volt>422)
             volt=422;
         if (volt<300)
             volt=300;
         float bat = (volt-300)/122;
-        charge=(sizeX-border-border)*bat;
-        if (bat>0.5)
+        if (bat>1)
+            bat=1;
+        if (bat>=0.5){
+            green.setColor(Color.rgb((int)(255*(2-bat*2)),255,0));
+        }else{
+            green.setColor(Color.rgb(255,(int)(255*(bat*2)),0));
+        }
+
+
+       /* if (bat>0.5)
             green.setColor(Color.GREEN);
         else if (bat>0.3)
             green.setColor(Color.rgb(200,200,0));
         else
             green.setColor(Color.RED);
-        green.setAlpha(89);
+*/
+
+        charge=(sizeX-border-border)*bat;
+        green.setAlpha(125);
     }
 
     public void paint(Canvas c){
         c.drawRect(x,y,(x+sizeX),(y+sizeY),white);
+        float l=(sizeX-border-border);
         c.drawRect(x+border,y+border,x+charge,y+sizeY-border,green);
+
     }
 }

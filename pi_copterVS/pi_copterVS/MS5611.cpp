@@ -156,21 +156,21 @@ uint8_t MS5611Class::loop(){
 
 #else
 
-uint8_t MS5611Class::loop(){
-	
+bool MS5611Class::loop(){
+	bool ret = false;
 	switch (bar_task)
 	{
 	case 0:
-		phase0();
+		ret = phase0();
 		break;
 	case 1:
-		phase1();
+		ret = phase1();
 		break;
 	default:
-		phase2();
+		ret = phase2();
 	}
 	//Mpu.ms5611_timed = Mpu.timed;
-	return 0;
+	return ret;
 }
 
 #endif
@@ -187,24 +187,25 @@ void MS5611Class::error(const int n) {
 	ct = NORM_CT + NORM_CT;
 }
 
-void MS5611Class::phase0() {
+bool MS5611Class::phase0() {
 	bar_D[0] = bar_D[1] = bar_D[2] = 0;
 
 	if (writeReg(CONV_D2_4096) == -1) {
 		error(11);
-		return;
+		return true;
 	}
 
 	b_timeDelay = micros_() + ct;
 	bar_task = 1;
+	return true;
 }
 #define fc C
-void MS5611Class::phase1()
+bool MS5611Class::phase1()
 {
 	if (micros_()  > b_timeDelay) {
 		if (writeReg(bar_zero) == -1) {
 			error(21);
-			return;
+			return true;
 		}
 
 		bar_task = 2;
@@ -213,7 +214,7 @@ void MS5611Class::phase1()
 		bar_h = read(fd4S, &bar_D, 3);
 		if (bar_h != 3) {
 			error(22);
-			return;
+			return true;
 		}
 
 		D2 = ((int32_t)bar_D[0] << 16) | ((int32_t)bar_D[1] << 8) | bar_D[2];
@@ -232,14 +233,16 @@ void MS5611Class::phase1()
 
 		if (writeReg(CONV_D1_4096) == -1) {
 			error(23);
-			return;
+			return true;
 		}
 		b_timeDelay = micros_() + ct;
-		
+		return true;
 	}
+	else
+		return false;
 }
 
-void MS5611Class::phase2() {
+bool MS5611Class::phase2() {
 	if (micros_()  > b_timeDelay)
 	{
 		bar_task = 0;
@@ -247,14 +250,14 @@ void MS5611Class::phase2() {
 		bar_zero = 0;
 		if (writeReg(bar_zero) == -1) {
 			error(31);
-			return;
+			return true;
 		}
 
 		bar_h = read(fd4S, &bar_D, 3);
 
 		if (bar_h != 3) {
 			error(32);
-			return;
+			return true;
 		}
 
 		D1 = ((int32_t)bar_D[0] << 16) | ((int32_t)bar_D[1] << 8) | bar_D[2];
@@ -293,7 +296,7 @@ void MS5611Class::phase2() {
 		if (tP < 80000 || tP > 107000) {
 			cout << "PRESSURE ERROR " << tP << "\t"<<millis_() << endl;
 			error(33);
-			return;
+			return true;
 		}
 		else {
 			wrong_altitude_cnt = 0;
@@ -316,8 +319,10 @@ void MS5611Class::phase2() {
 		}
 #endif
 
-		
+		return true;
 	}
+	else
+		return false;
 }
 
 void MS5611Class::update(){}

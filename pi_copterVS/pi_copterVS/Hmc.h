@@ -108,7 +108,7 @@ class HmcClass
 	 bool motors_power_on;
 	 
 	void init();
-	void loop();
+	bool loop();
 	bool ok;
 	bool calibration(const bool newc=false);
 

@@ -5,5 +5,10 @@
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
     <RemoteDebuggerCommandArguments>y y</RemoteDebuggerCommandArguments>
     <RemoteTarget>-263017476;192.168.100.112 (username=, port=22, authentication=Password)</RemoteTarget>
+    <PreLaunchCommand>y y</PreLaunchCommand>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <PreLaunchCommand>y y</PreLaunchCommand>
+    <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

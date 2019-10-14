@@ -59,7 +59,7 @@ void telegram_send_video_frame(string name);
 
 #ifdef FORTEST
 //#include "../../../../2coolz/pi_copter_mega/pi_copterVS/pi_copterVS/glob_header.h"
-#include "C:/Users/Igor/pi_copter_mega/pi_copterVS/pi_copterVS/glob_header.h"
+#include "C:/Users/2coolz/copter/pi_copterVS/pi_copterVS/glob_header.h"
 
 #else
 #include "../pi_copterVS/glob_header.h"
@@ -79,10 +79,6 @@ void pipe_handler(int sig) {
 }
 
 
-
-
-
-#define PPP_INET
 #define TELEGRAM_BOT_RUN
 #define LOGER_RUN
 
@@ -234,7 +230,7 @@ string down_case(string &str) {
 	}
 	return str;
 }
-const static int  com_bit[] = { MOTORS_ON ,GO2HOME,CONTROL_FALLING,REBOOT,SHUTDOWN,GIMBAL_PLUS,GIMBAL_MINUS,PROGRAM,Z_STAB,XY_STAB,NOT_USED1,NOT_USED2,MPU_GYRO_CALIBR,COMPASS_CALIBR };
+const static int  com_bit[] = { MOTORS_ON ,GO2HOME,CONTROL_FALLING,REBOOT,SHUTDOWN,GIMBAL_PLUS,GIMBAL_MINUS,PROGRAM,Z_STAB,XY_STAB,GIMBAL_AXIS,NOT_USED2,MPU_GYRO_CALIBR,COMPASS_CALIBR };
 const static string str_com[] = { "motorson","go2home","cntrf","reboot","shutdown","gimbp","gimbm","prog","zstab","xystab","compason","horizonton","mpugyrocalibr","compasscalibr","stat", "help","image" };
 const static int arr_size = sizeof(com_bit) / 4;
 //-----------------------------------------------------------------------------
@@ -760,41 +756,47 @@ void loger_loop() {
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool wifi_inet = false;
+
 int start_ppp() {
+	wifi_inet = false;
 	if (shmPTR->inet_ok == true)
 		return 0;
 	delay(500);
 	while (shmPTR->sim800_reset_time > 0)
 		delay(100);
-
-
 	shmPTR->ppp_run = true;
-#ifdef PPP_INET
-	cout << "starting ppp...\n";
-	system("poff -a");
-	delay(3000);
-	system("pon  vodafon115200");
-	delay(3000);
-	system("route add default dev ppp0");
-	delay(3000);
-#endif
+	string ret = exec("ping -w 5 -c 1 8.8.8.8");
+	if (ret.find("1 received") == string::npos) {
+		cout << "starting ppp...\n";
+		system("poff -a");
+		delay(3000);
+		system("pon  vodafon115200");
+		delay(3000);
+		system("route add default dev ppp0");
+		delay(3000);
+	}
+	else
+		wifi_inet = true;
 	return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
 static int no_inet_errors = 0;
-void stop_ppp(bool test_inet=true) {
+void stop_ppp(bool test_inet = true) {
 	if (!f_start_ppp)
 		return;
 
 	if (test_inet && shmPTR->inet_ok == false)
 		return;
-#ifdef PPP_INET
-	system("route add default dev wlan0");
-	delay(3000);
-	system("poff -a");
-	delay(3000);
-	cout << "---------PPP STOPED---------\n";
-#endif
+
+	if (!wifi_inet) {
+		system("route add default dev wlan0");
+		delay(3000);
+		system("poff -a");
+		delay(3000);
+		cout << "---------PPP STOPED---------\n";
+	}
+
 	shmPTR->inet_ok = telegram_inet_ok = loger_inet_ok = false;
 	delay(1000);
 }

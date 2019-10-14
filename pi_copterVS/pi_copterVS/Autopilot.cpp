@@ -74,6 +74,10 @@ THG out of Perimetr high
 using namespace std;
 
 
+//#define DEFAULT_STATE (Z_STAB|XY_STAB)
+//#define DEFAULT_STATE 0 
+
+
 
 void AutopilotClass::init(){/////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -97,7 +101,7 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	aPitch = aRoll = aYaw_=0;
 
 	//was_connected_to_wifi = NO_WIFI_WATCH_DOG_IN_SECONS < 30;
-	control_bits = DEFAULT_STATE;
+	control_bits = Z_STAB | XY_STAB;
 	old_control_bits = 0;
 	aPitch = aRoll = 0;
 	control_DeltaTime = 0;
@@ -696,10 +700,10 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 		Mpu.set_XYZ_to_Zero();  // все берем из мпу. при  старте x y z = 0;
 		//tflyAtAltitude = flyAtAltitude = 0;// Mpu.get_Est_Alt();
 
-		if (control_bits&Z_STAB) 
-			holdAltitude(shmPTR->fly_at_start);
-		if (control_bits&XYSTAB)
-			holdLocation(GPS.loc.lat_, GPS.loc.lon_);
+		//if (control_bits&Z_STAB) 
+		//	holdAltitude(shmPTR->fly_at_start);
+		//if (control_bits&XYSTAB)
+		//	holdLocation(GPS.loc.lat_, GPS.loc.lon_);
 		Stabilization.resset_z();
 		Stabilization.resset_xy_integrator();
 		aYaw_ = -Mpu.get_yaw();
@@ -746,8 +750,7 @@ bool AutopilotClass::off_throttle(const bool force, const string msg){//////////
 		cout << "force motors_off " << msg << ", alt: " << (int)Mpu.get_Est_Alt() << ", time " << (int)millis_() << endl;
 		Balance.set_off_th_();
 		Telemetry.addMessage(msg);
-		static uint32_t prog = control_bits & PROGRAM_LOADED;
-		control_bits = DEFAULT_STATE|prog;
+		control_bits &= -1 ^ (MOTORS_ON | GO2HOME | CONTROL_FALLING | PROGRAM);
 		return true;
 	}
 	else{

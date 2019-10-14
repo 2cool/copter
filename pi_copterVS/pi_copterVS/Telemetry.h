@@ -36,7 +36,7 @@ class TelemetryClass
 	 float m_current[4];
 	 
 	 string message;
-	 void update_buf();
+	 bool update_buf();
 	 float full_power;
  public:
 	 int on_power_time = 0, total_time=0;
@@ -65,7 +65,7 @@ class TelemetryClass
 
 	 void init_();
 
-	 void loop();
+	 bool loop();
 
 	 float get_voltage(){ return voltage; }
 	 float get_current(const int i) { return m_current[i&3]; }

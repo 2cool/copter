@@ -15,7 +15,7 @@
 #include "MS5611.h"
 #include "debug.h"
 #include "Log.h"
-
+#include "GPS.h"
 
 #define DEFAULT_DEV "/dev/i2c-0"
 
@@ -208,11 +208,11 @@ static int32_t comTime = 0;
 
 #else
 
-void HmcClass::loop(){
+bool HmcClass::loop(){
 
 	static int hmc_cnt = 0;
 	if (1 & hmc_cnt++)
-		return;
+		return false;
 
 
 	//double ttt = micros();
@@ -222,7 +222,7 @@ void HmcClass::loop(){
 	if (readBytes(devAddr, HMC5883L_RA_DATAX_H, 6, buffer) == -1) {
 		Telemetry.addMessage(e_COMMPAS_RW_ERROR);
 		mega_i2c.beep_code(B_I2C_ERR);
-		return;
+		return true;
 	}
 	if (mode == HMC5883L_MODE_SINGLE) writeByte(devAddr, HMC5883L_RA_MODE, HMC5883L_MODE_SINGLE << (HMC5883L_MODEREG_BIT - HMC5883L_MODEREG_LENGTH + 1));
 	mx = (((int16_t)buffer[0]) << 8) | buffer[1];
@@ -278,6 +278,7 @@ void HmcClass::loop(){
 	//heading = (float)atan2(Yh, Xh);
 	//log();
 	log_sens();
+	return true;
 
 }
 
@@ -295,9 +296,12 @@ void HmcClass::newCalibration(int16_t sh[]){
 	long cnt = 0;
 	long fcnt = 0;
 	int print_time = millis_();
+	int led_time = print_time;
+	int color = 4;
+	//float f[] = { 0,0,0,0 };
 	while (true){
 		fcnt++;
-		bool new_val = false;
+		int new_val = 0;
 		readBytes(devAddr, HMC5883L_RA_DATAX_H, 6, buffer);
 		if (mode == HMC5883L_MODE_SINGLE) writeByte(devAddr, HMC5883L_RA_MODE, HMC5883L_MODE_SINGLE << (HMC5883L_MODEREG_BIT - HMC5883L_MODEREG_LENGTH + 1));
 		mx = (((int16_t)buffer[0]) << 8) | buffer[1];
@@ -307,38 +311,48 @@ void HmcClass::newCalibration(int16_t sh[]){
 		if (mx > sh[0]){
 			sh[0] = mx;
 			//printf("max_X: %i\n",mx);
-			new_val = true;
+			new_val |= 1;
 		}
 		if (mx < sh[1]){
 			sh[1] = mx;
 			//printf("min_X: %i\n", mx);
-			new_val = true;
+			new_val |= 1;
 		}
 
 		if (my > sh[2]){
 			sh[2] = my;
 			//printf("max_Y: %i\n", my);
-			new_val = true;
+			new_val |= 2;
 		}
 		if (my < sh[3]){
 			sh[3] = my;
 			//printf("min_Y: %i\n", my);
-			new_val = true;
+			new_val |= 2;
 		}
 		if (mz > sh[4]){
 			sh[4] = mz;
 			//printf("max_Z: %i\n", mz);
-			new_val = true;
+			new_val |= 4;
 		}
 		if (mz < sh[5]){
 			sh[5] = mz;
 			//printf("min_Z: %i\n", mz);
-			new_val = true;
+			new_val |= 4;
 		}
-
+		mega_i2c.set_led_mode(color, 10, false);
+		GPS.loop(); //for led
+		//mega_i2c.throttle(f);
 		delay(10);
 		if (new_val) {
-			print_time = millis_()+1000;
+			if (new_val >= 4)
+				color = 8;
+			else if (new_val >= 2)
+				color = 7;
+			else
+				color = 6;
+			const int32_t mill = millis_();
+			print_time = mill + 1000;
+			led_time = mill + 1000;
 			int i = 0;
 			cout <<"X: "<< sh[i++] << "\t" << sh[i++] << endl;
 			cout <<"Y: "<< sh[i++] << "\t" << sh[i++] << endl;
@@ -347,7 +361,10 @@ void HmcClass::newCalibration(int16_t sh[]){
 			cnt = 0;
 		}
 		else {
-			if (millis_() > print_time) {
+			const int32_t mill = millis_();
+			if (mill > led_time)
+				color = 5;
+			if (mill > print_time) {
 				cout << if_no_change_cnt_to_stop - cnt << endl;
 				print_time += 1000;
 			}

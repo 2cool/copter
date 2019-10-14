@@ -60,10 +60,10 @@ protected:
 	 uint64_t ct;
 	 
 
-	  void phase0();
-	  void phase1();
+	  bool phase0();
+	  bool phase1();
 	 
-	  void phase2();
+	  bool phase2();
 
 
 	double altitude_;
@@ -74,7 +74,7 @@ public:
 	double alt();
 	uint8_t ms5611_count;
 	int init();
-	uint8_t loop();
+	bool loop();
 	int32_t pressure;
 	double powerK;
 
