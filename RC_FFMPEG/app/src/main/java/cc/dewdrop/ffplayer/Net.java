@@ -220,7 +220,7 @@ public class Net {
             Commander.link = false;
             if (MainActivity.drawView != null)
                 MainActivity.drawView.postInvalidate();
-            Log.i("UDP", "UDP_CLIENT KILLED!");
+          //  Log.i("UDP", "UDP_CLIENT KILLED!");
 
 
         }

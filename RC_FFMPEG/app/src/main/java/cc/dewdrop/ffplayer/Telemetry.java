@@ -76,12 +76,12 @@ public class Telemetry {
     static public void readMessages(String msg){
         int i;
         if ((i=msg.indexOf("UPS",0))>=0){
-            //Log.i("UPS","read mess "+msg);
+           // Log.i("UPS","read mess "+msg);
             parse_settings(msg, i+3);
             //	i=msg.lastIndexOf(",",i);
         }else {
             messages = msg;
-            Log.d("ERRMSG",msg);
+            Log.d("UPS","unknown message "+msg);
         }
 
 
@@ -445,7 +445,6 @@ public class Telemetry {
         i+=4;
        // Log.i("STRR","str= "+Integer.toString(status));
 
-        //тут читаем сообщения если они кому нужни так как у нас все данніе риходят и муд
         int mes_len=load_int16(buf,i);
         i+=2;
         if ( mes_len >0 ) {

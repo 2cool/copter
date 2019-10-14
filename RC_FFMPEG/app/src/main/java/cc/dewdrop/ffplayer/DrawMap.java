@@ -213,7 +213,7 @@ public class DrawMap extends View {
             screenP.y >>= 1;
         }
 
-        Log.i("MAP", "zoom= "+zoom);
+      //  Log.i("MAP", "zoom= "+zoom);
     }
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -255,7 +255,7 @@ public class DrawMap extends View {
         if (sDirection.onTouchEvent(event)) {
             double angle=360*sDirection.getPos()-180;
 
-            Log.i("MAP","ang="+angle);
+           // Log.i("MAP","ang="+angle);
 
             if (DrawMap.selectedDot>=0)
                 prog.dot[DrawMap.selectedDot].direction=Programmer.direction=angle;

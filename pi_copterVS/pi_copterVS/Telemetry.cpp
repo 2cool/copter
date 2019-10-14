@@ -56,7 +56,7 @@ void TelemetryClass::addMessage(const string msg, bool and2sms){
 }
 
 void TelemetryClass::getSettings(int n){
-	
+
 	if (n > 7 || n < 0)
 		return;
 	cout << "up set: "<<n<<"\n";
@@ -95,7 +95,7 @@ void TelemetryClass::getSettings(int n){
 	else if (o==2)
 		message += " ";*/
 	message += ",";
-	//Out.println(message);
+	//cout<<message<<endl;
 
 }
 static float full_battery_charge;
@@ -213,8 +213,11 @@ bool TelemetryClass::loop()
 		
 	}
 	
-	ret |=update_buf();
-	message = "";
+	if (update_buf()) {
+		message = "";
+		ret = true;
+	}
+
 	return ret;
 }
 

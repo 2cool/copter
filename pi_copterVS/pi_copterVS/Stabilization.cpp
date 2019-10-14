@@ -29,8 +29,8 @@ void StabilizationClass::setMinMaxI_Thr() {
 //"dist to speed","speed to acc","SPEED_KP","SPEED_I","SPEED_imax","max_speed","FILTR"
 void StabilizationClass::init(){
 
-	dist2speed_XY = 0.2f;//0.5
-	set_acc_xy_speed_kp(5);
+	dist2speed_XY = 0.23f;//0.5
+	set_acc_xy_speed_kp(7);
 	set_acc_xy_speed_kI(2.5);
 	set_acc_xy_speed_imax(Balance.get_max_angle());
 	max_speed_xy = MAX_HOR_SPEED;

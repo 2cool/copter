@@ -79,25 +79,25 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
     protected void download_settings(int num, boolean upload_anyway){
       //  String sn=""+num;
        // SharedPreferences settings = getPreferences(MODE_PRIVATE);
-        Log.i("UPS", "SET_EDIT_TEXT");
+       // Log.i("UPS", "SET_EDIT_TEXT");
         if (upload_anyway || Telemetry.n_settings!=num ||  Telemetry.settings[0]==Commander.NO_DATA) {
 
             Commander.upload_settings = num;//Integer.parseInt(n.getText().toString());
             //   Commander.button="UP"+Integer.parseInt(n.getText().toString());
-            Log.i("UPS", "DOWNLOADING SETINGS");
+           // Log.i("UPS", "DOWNLOADING SETINGS");
             Telemetry.n_settings=-2;
             boolean uploaded=false;
             for (int i=0; i<5; i++) {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
-                    Log.i("UPS", "sleep Error");
+                   // Log.i("UPS", "sleep Error");
                     e.printStackTrace();
                 }
                 if (Telemetry.n_settings!= -2){
-                    Log.i("UPS", "DOWNLOADING DONE");
+                   // Log.i("UPS", "DOWNLOADING DONE");
                     if ( Telemetry.n_settings != num){//Integer.parseInt(n.getText().toString()) ){
-                        Log.i("UPS", "DOWNLOADING ERROR");
+                       // Log.i("UPS", "DOWNLOADING ERROR");
                         uploaded=false;
                     }else {
                         uploaded=true;
@@ -136,7 +136,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
     void update(){
        try {
            download_settings(menu_n,true);
-           Log.i("UPS", "UPDATE in");
+         //  Log.i("UPS", "UPDATE in");
            int i = 0;
            for (; i < 10; i++) {
 
@@ -169,10 +169,10 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
 
 
            set.setEnabled(Telemetry.n_settings>=0);
-           Log.i("UPS", "UPDATE out");
+          // Log.i("UPS", "UPDATE out");
        } catch (Exception ex) {
            Thread.currentThread().interrupt();
-           Log.i("UPS", "UPDATE ERROR  EXCEPTION "+ex.toString());
+          // Log.i("UPS", "UPDATE ERROR  EXCEPTION "+ex.toString());
        }
     }
 
@@ -238,7 +238,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
            // download_settings(menu_n,true);
 
         }catch (Exception e){
-            Log.i("ERROR","settings "+e.toString());
+           // Log.i("ERROR","settings "+e.toString());
         }
     }
 
@@ -247,7 +247,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
     public void upload_settings(View view) {
         if (Telemetry.n_settings!= -2) {
 
-            Log.i("SETT1", "UPLOADING SETINGS");
+          //  Log.i("SETT1", "UPLOADING SETINGS");
             Commander.n = menu_n;
             for (int i = 0; i < 10; i++) {
                 if (textV[i].getText().toString().length() > 0)
@@ -256,7 +256,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
                     Commander.sets[i] = 1;
             }
             Commander.settings = true;
-            Log.i("SETT1", "setting=true");
+           // Log.i("SETT1", "setting=true");
             // download_settings(menu_n,true);
             //finish();
             update();

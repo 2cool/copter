@@ -117,7 +117,7 @@ public class Programmer {
 
     static GeoDot add(double x, double y, double alt, double speedHK,double speedVK, double direct,double timer, int _action, int zoom){
         if ( progSize>255) {
-            Log.i("MAP","TIMER or SIZE ERROR");
+          //  Log.i("MAP","TIMER or SIZE ERROR");
             return null;
         }
 

@@ -269,7 +269,7 @@ public class Disk {
                     Telemetry.lat,
                     Telemetry.lon,
                     Telemetry._alt);
-            Log.i("MSGG", "disk close");
+          //  Log.i("MSGG", "disk close");
 
 
             if (fos!=null) {
@@ -282,7 +282,7 @@ public class Disk {
             fos=null;
             myFile=null;
         }catch (Exception e){
-            Log.i("MSGG", "exception");
+          //  Log.i("MSGG", "exception");
             e.printStackTrace();
             return 1;
         }

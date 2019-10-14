@@ -24,7 +24,8 @@ void BalanceClass::set_pitch_roll_pids(const float kp, const float ki, const flo
 	pids[PID_ROLL_RATE].imax(-imax,imax);
 }
 
-
+#define YAW_MAX_DELTA 0.15
+#define MAX_DELTA 0.3
 void BalanceClass::init()
 {
 	max_angle = MAX_ANGLE;
@@ -41,14 +42,14 @@ void BalanceClass::init()
 	old_time = micros_();
 
 	//set_pitch_roll_pids(0.001, 0.001, 0.3);  // 10
-	set_pitch_roll_pids(0.0007, 0.001, 0.3);//9
+	set_pitch_roll_pids(0.0007, 0.001, MAX_DELTA);//9
 
 
 	yaw_stabKP = 2;
 
 	pids[PID_YAW_RATE].kP(0.0017f);  //setup for 9 prop 
 	pids[PID_YAW_RATE].kI(0.0017f);
-	pids[PID_YAW_RATE].imax(-0.2,0.2);
+	pids[PID_YAW_RATE].imax(-YAW_MAX_DELTA, YAW_MAX_DELTA);
 
 	delay(1500);
 
@@ -185,7 +186,7 @@ bool BalanceClass::set_min_max_throttle(const float max, const float min) {
 
 bool BalanceClass::speed_up_control(float n[]) {
 #define START_THROTTHLE 0.05
-#define SPEEDUP_CNT 500
+#define SPEEDUP_CNT 1000
 	bool speed_up = false;
 	static uint32_t start_cnt[4];
 	static float max_thr[4];
@@ -198,7 +199,7 @@ bool BalanceClass::speed_up_control(float n[]) {
 		else {
 			if (start_cnt[i] < SPEEDUP_CNT && n[i] > max_thr[i]) {
 				n[i] = max_thr[i];
-				max_thr[i] = START_THROTTHLE + (float)start_cnt[i] * 0.0006;
+				max_thr[i] = START_THROTTHLE + (float)start_cnt[i] * ((MIN_THROTTLE - START_THROTTHLE) / SPEEDUP_CNT);
 				if (max_thr[i] > MIN_THROTTLE)
 					max_thr[i] = MIN_THROTTLE;
 				start_cnt[i]++;
@@ -303,8 +304,6 @@ bool BalanceClass::loop()
 		roll_stab_output += (f_constrain(pitch_roll_stabKP*(wrap_180(Mpu.get_roll() - c_roll)), -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED)-roll_stab_output)*BAL_F;
 		yaw_stab_output += (f_constrain(yaw_stabKP*wrap_180(-Autopilot.get_yaw() - Mpu.get_yaw()), -MAX_D_YAW_SPEED, MAX_D_YAW_SPEED)-yaw_stab_output)*BAL_F;
 
-		const float max_delta = 0.3;
-		const float yaw_max_delta = 0.2;
 		static float correction = 1;
 		//correction += (0.5 / fmin(throttle,0.5) - correction)*0.2;
 		const int64_t _ct = micros_();
@@ -312,11 +311,11 @@ bool BalanceClass::loop()
 		dt = constrain(dt, 0.001, 0.03);
 		old_time = _ct;
 		float pitch_output = pK*pids[PID_PITCH_RATE].get_pid(correction*(pitch_stab_output + Mpu.gyroPitch), dt);
-		pitch_output = constrain(pitch_output, -max_delta, max_delta);
+		pitch_output = constrain(pitch_output, -MAX_DELTA, MAX_DELTA);
 		float roll_output = pK*pids[PID_ROLL_RATE].get_pid(correction*(roll_stab_output + Mpu.gyroRoll), dt);
-		roll_output = constrain(roll_output, -max_delta, max_delta);
+		roll_output = constrain(roll_output, -MAX_DELTA, MAX_DELTA);
 		float yaw_output = pK*pids[PID_YAW_RATE].get_pid(correction*(yaw_stab_output - Mpu.gyroYaw), dt);
-		yaw_output = constrain(yaw_output, -yaw_max_delta, yaw_max_delta);
+		yaw_output = constrain(yaw_output, -YAW_MAX_DELTA, YAW_MAX_DELTA);
 
 #ifdef YAW_OFF
 		//yaw_output = 0;

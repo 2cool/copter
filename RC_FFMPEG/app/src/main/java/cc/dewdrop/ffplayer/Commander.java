@@ -175,7 +175,7 @@ public class Commander {
         load_32int2buf(buf,i,MainActivity.command_bits_);
         if (MainActivity.command_bits_!=old_commande) {
             // Log.i("COMMANDER", " " + MainActivity.command_bits_);
-            Log.i("COMMANDER", " " + MainActivity.command_bits_);
+           // Log.i("COMMANDER", " " + MainActivity.command_bits_);
             old_commande=MainActivity.command_bits_;
         }
         if ((MainActivity.command_bits_ & MainActivity.Z_STAB) !=0) {
