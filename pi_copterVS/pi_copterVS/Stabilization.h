@@ -45,9 +45,11 @@ private:
 	void set_acc_xy_speed_kI(const float f){ pids[SPEED_X_SPEED].kI(f);	pids[SPEED_Y_SPEED].kI(f); }
 	void set_acc_xy_speed_kD(const float f){ pids[SPEED_X_SPEED].kD(f,3);	pids[SPEED_Y_SPEED].kD(f,3); }
 	void set_acc_xy_speed_imax(const float f){ pids[SPEED_X_SPEED].imax(-f,f);	pids[SPEED_Y_SPEED].imax(-f,f); }
-	
+	float def_max_speedXY,min_stab_hor_speed;
 	
 public:
+	float get_max_speedXY() { return def_max_speedXY; }
+	float get_min_stagXY() { return min_stab_hor_speed; }
 	void setMaxAng();
 	void setMinMaxI_Thr();
 	void setNeedPos2Home();

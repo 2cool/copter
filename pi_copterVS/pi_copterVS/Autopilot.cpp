@@ -90,7 +90,7 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	ignore_the_lack_of_internet_at_startup = false;
 	fall_thr = FALLING_THROTTLE;
 	sens_z = 6;
-	sens_xy = 0.2f;
+	sens_xy = 0.285f;
 
 	newData = false;
 
@@ -180,6 +180,12 @@ void AutopilotClass::smart_commander(const float dt){
 		float speedY = -(addX * sinL - addY *cosL);
 
 		Stabilization.add2NeedPos(speedX, speedY, dt);
+
+		float max_speed = (speedX == 0 && speedY == 0) ? Stabilization.get_min_stagXY() : sqrt(speedX * speedX + speedY * speedY);
+		
+		Stabilization.max_speed_xy = max_speed;
+
+		
 	//}
 	//else{
 	//	GPS.loc.setSpeedZero();

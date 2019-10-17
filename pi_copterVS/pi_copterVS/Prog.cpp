@@ -407,8 +407,8 @@ bool ProgClass::load_next(bool loadf) {
 		max_speed_xy = fabs(prog[wi++]);
 		if (max_speed_xy < 1)
 			max_speed_xy = 1;
-		if (max_speed_xy > MAX_HOR_SPEED)
-			max_speed_xy = MAX_HOR_SPEED;
+		if (max_speed_xy > Stabilization.get_max_speedXY())
+			max_speed_xy = Stabilization.get_max_speedXY();
 		if (loadf)
 			Stabilization.max_speed_xy = max_speed_xy;
 	}

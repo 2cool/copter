@@ -29,11 +29,12 @@ void StabilizationClass::setMinMaxI_Thr() {
 //"dist to speed","speed to acc","SPEED_KP","SPEED_I","SPEED_imax","max_speed","FILTR"
 void StabilizationClass::init(){
 
-	dist2speed_XY = 0.23f;//0.5
-	set_acc_xy_speed_kp(7);
+	dist2speed_XY = 0.2f;//0.5
+	set_acc_xy_speed_kp(6);
 	set_acc_xy_speed_kI(2.5);
 	set_acc_xy_speed_imax(Balance.get_max_angle());
-	max_speed_xy = MAX_HOR_SPEED;
+	def_max_speedXY=max_speed_xy = MAX_HOR_SPEED;
+	min_stab_hor_speed = MIN_STAB_HOR_SPEED;
 	//--------------------------------------------------------------------------
 
 	alt2speedZ = 0.2;
@@ -48,7 +49,7 @@ void StabilizationClass::init(){
 }
 
 void StabilizationClass::setDefaultMaxSpeeds(){//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	max_speed_xy = MAX_HOR_SPEED;
+	max_speed_xy = def_max_speedXY;
 	max_speedZ_P = MAX_VER_SPEED_PLUS;
 	max_speedZ_M = MAX_VER_SPEED_MINUS;
 }
@@ -160,7 +161,7 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		const float w_roll = pids[SPEED_Y_SPEED].get_pid(d_speedY, Mpu.get_dt());
 
 		
-
+	//	Debug.dump(max_speed_xy, 0, 0, 0);
 		//----------------------------------------------------------------преобр. в относительную систему координат
 		pitch = (float)(Mpu.cosYaw*w_pitch - Mpu.sinYaw*w_roll);
 		roll = (float)(Mpu.cosYaw*w_roll + Mpu.sinYaw*w_pitch);
@@ -254,7 +255,8 @@ string StabilizationClass::get_xy_set() {
 		dist2speed_XY << "," << \
 		pids[SPEED_X_SPEED].kP() << "," << \
 		pids[SPEED_X_SPEED].kI() << "," << \
-		max_speed_xy << "," << \
+		def_max_speedXY << "," << \
+		min_stab_hor_speed << "," << \
 		XY_FILTER;
 
 	string ret = convert.str();
@@ -271,7 +273,9 @@ void StabilizationClass::setXY(const float  *ar){
 		t = pids[SPEED_X_SPEED].kI();
 		Settings.set(ar[i++], t);
 			set_acc_xy_speed_kI(t);
-		Settings.set(ar[i++], max_speed_xy);
+		Settings.set(ar[i++], def_max_speedXY);
+		max_speed_xy = def_max_speedXY;
+		Settings.set(ar[i++], min_stab_hor_speed);
 		Settings.set(ar[i++], XY_FILTER);
 
 	}

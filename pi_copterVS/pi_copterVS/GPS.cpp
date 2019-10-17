@@ -57,7 +57,7 @@ long lon = FALSE_LON;
 
 
 float fullX = 0, fullY = 0;
-void GPSClass::loop(){
+bool GPSClass::loop(){
 
 
 
@@ -67,7 +67,7 @@ void GPSClass::loop(){
 	if (loc.mseconds != gpsttime)
 		loc.mseconds = gpsttime;
 	else
-		return;
+		return false;
 	shmPTR->accuracy_hor_pos_=loc.accuracy_hor_pos_ = 1;
 	shmPTR->accuracy_ver_pos_=loc.accuracy_ver_pos_ = 1;
 	shmPTR->gps_altitude_=loc.altitude = Emu.get_alt();
@@ -130,7 +130,7 @@ void GPSClass::loop(){
 				Log.loadSEND_I2C(&posllh);
 				Log.block_end();
 			}
-
+			return true;
 }
 
 #else

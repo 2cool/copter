@@ -188,11 +188,11 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 #ifdef FLY_EMULATOR
 
 
-void HmcClass::loop(){
+bool HmcClass::loop(){
 static int32_t comTime = 0;
 ///#define wrap_180(x) (x < -180 ? x+360 : (x > 180 ? x - 360: x))
 	if (millis_() - comTime < 50)
-		return;
+		return false;
 	comTime = millis_();
 	//heading = Emu.get_heading();
 	
@@ -204,6 +204,7 @@ static int32_t comTime = 0;
 #endif
 	calibrated = true;
 	//log();
+	return true;
 }
 
 #else

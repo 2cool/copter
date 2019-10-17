@@ -11,7 +11,10 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class Disk {
 
@@ -123,9 +126,20 @@ public class Disk {
         try {
             OutputStream os = new FileOutputStream(fname);//"/sdcard/RC/start_location.save");
 
-            String t=lat+","+lon+","+alt;
+            String t=lat+","+lon+","+(int)alt;
             os.write(t.getBytes());
             os.close();
+
+
+            os = new FileOutputStream(fname+"_all.txt",true);
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            Date date = new Date();
+            String tt= dateFormat.format(date);
+            tt+=" "+t+"\n";
+            os.write(tt.getBytes());
+            os.close();
+
+            // Log.d("SAVEE","save_loc");
         } catch (Exception e) {
             e.printStackTrace();
         }

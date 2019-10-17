@@ -118,9 +118,9 @@ void MS5611Class::log_sens() {
 
 
 int32_t ttimet = 0;
-uint8_t MS5611Class::loop(){
+bool MS5611Class::loop(){
 	if (millis_() - ttimet < 50)
-		return 0;
+		return false;
 
 
 //	const double dt = 0.05;// (millis_() - timet)*0.001;
@@ -151,7 +151,7 @@ uint8_t MS5611Class::loop(){
 
 	if (powerK>1.4)
 		powerK = 1.4;
-
+	return true;
 }
 
 #else

@@ -285,20 +285,17 @@ void MpuClass::calc_corrected_ang(){
 ///////////////////////////////////////////////////////////////////
 
 bool MpuClass::loop(){
-
+	static double oldmpuTime = 0;
 	time = micros_();
-	double ___dt = (double)(time - oldmpuTime)*1e-6;
-	if (___dt < 0.005)
+	mpu_dt = (float)(time - oldmpuTime)*1e-6;
+	if (mpu_dt < 0.005)
 		return false;
-	mpu_dt = dt;
+	
 	oldmpuTime = time;
 	Hmc.loop();
 	MS5611.loop();
 	GPS.loop();
-	dt = 0.01;
-	if (dt > 0.01)
-		dt = 0.005;
-
+	mpu_dt = 0.005;
 
 	pitch=Emu.get_pitch();
 	roll = Emu.get_roll();

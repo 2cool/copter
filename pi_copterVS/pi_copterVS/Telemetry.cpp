@@ -229,7 +229,7 @@ int TelemetryClass::check_time_left_if_go_to_home(){
 	float time_left=0;
 
 	if (Autopilot.motors_is_on()) {
-		const double time2home = GPS.loc.dist2home * (1.0 / MAX_HOR_SPEED);
+		const double time2home = GPS.loc.dist2home * (1.0 / Stabilization.get_max_speedXY());
 		const double time2down = fabs((Mpu.get_Est_Alt()) * (1.0 / MAX_VER_SPEED_MINUS));
 		time_left = (time2home + time2down);
 	}
@@ -269,13 +269,13 @@ Max Continuous Power 220 Watts
 	shmPTR->m_current[0] = m_current[0] = addI + 1.25*(HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[0] * CUR_K);
 	shmPTR->m_current[1] = m_current[1] = addI + 1.25*(HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[1] * CUR_K);
 	shmPTR->m_current[2] = m_current[2] = addI + 2.5*(HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[2] * CUR_K);
-	shmPTR->m_current[3] = m_current[3] = addI + 1.25*(HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[3] * CUR_K);
+	shmPTR->m_current[3] = m_current[3] = addI + 1.38*(HALL_EFFECT_SENSOR_MAX_CURRENT - (float)data[3] * CUR_K);
 	shmPTR->voltage = voltage = 1.733*(float)(data[4]);
 	full_power = (m_current[0] + m_current[1] + m_current[2] + m_current[3]) * voltage;
 
 
-	
-	 /*
+	/*
+	 
 	//Debug.dump((float)data[0], (float)data[1], (float)data[2], (float)data[3]);
 	static float maxi[4] = { 0,0,0,0 };
 	bool bbb = false;
@@ -313,7 +313,7 @@ void TelemetryClass::testBatteryVoltage() {
 	old_time = _ct;
 	if (dt > 0.5)
 		dt = 0.5;
-	float current = (m_current[0] + m_current[1] + m_current[2] + m_current[3] + 0.64);
+	float current = (m_current[0] + m_current[1] + m_current[2] + m_current[3]+0.12 );
 
 	f_current += (current - f_current) * 0.03;
 

@@ -193,15 +193,16 @@ public class Net {
                     } catch (IOException e) {
                         if (offline_cnt++>3) {
                             run=false;
-                            if (Commander.link)
-                                Telemetry.hom_pos_is_loaded=false;
+                            if (Commander.link) {
+                                Telemetry.hom_pos_is_loaded = false;
                                 Disk.save_location_(
                                         "/sdcard/RC/lostCon_location.save",
                                         Telemetry.lat,
                                         Telemetry.lon,
                                         Telemetry._alt);
-                            Commander.link = false;
-                            Log.d("UDP", "Error1:");
+                                Commander.link = false;
+                                Log.d("UDP", "Error1:");
+                            }
                         }
                     }
 
