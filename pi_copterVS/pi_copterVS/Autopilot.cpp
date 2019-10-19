@@ -77,7 +77,7 @@ using namespace std;
 //#define DEFAULT_STATE (Z_STAB|XY_STAB)
 //#define DEFAULT_STATE 0 
 
-
+bool set_alt = true;
 
 void AutopilotClass::init(){/////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -134,37 +134,29 @@ void AutopilotClass::hall_test() {
 
 
 void AutopilotClass::add_2_need_altitude(float speed, const float dt){
-	static bool set_alt = false;
+	
+	float speedP=0, speedM=0;
 	if (speed != 0) {
 		set_alt = true;
-		if (speed > 0) {
-			if (speed > MAX_VER_SPEED_PLUS)
-				speed = MAX_VER_SPEED_PLUS;
-		}
-		else
-			if (speed < MAX_VER_SPEED_MINUS)
-				speed = MAX_VER_SPEED_MINUS;
+	//	if (speed < -0.2 && (flyAtAltitude_R < lowest_height || flyAtAltitude_V < lowest_height))
+		//	speed = fmax(-0.2, speed);
 
+		if (speed > 0) 
+			speedP = speed;
+		else 
+			speedM = speed;
+		Stabilization.set_max_sped_ver(speedP, speedM);
 
-		if (speed<-0.2 && (flyAtAltitude_R < lowest_height || flyAtAltitude_V < lowest_height))
-			speed = fmax(-0.2, speed);
-
+		flyAtAltitude_V = Stabilization.getDist_Z(speedP+speedM);
 		flyAtAltitude_R += speed * dt;
-
-		//if (tflyAtAltitude < lowest_height)
-		//	tflyAtAltitude = lowest_height;
-
-		flyAtAltitude_V = flyAtAltitude_R + Stabilization.getDist_Z(speed);
-		//if (flyAtAltitude < lowest_height)
-		//	flyAtAltitude = lowest_height;
-
-		//printf("f@alt %f\n", flyAtAltitude);
+		flyAtAltitude_V += flyAtAltitude_R;
 	}
 	else {
 		if (set_alt) {
 			set_alt = false;
+			Stabilization.set_max_sped_ver(speedP, speedM);
 			flyAtAltitude_V = flyAtAltitude_R= Mpu.get_Est_Alt();
-
+			
 		}
 	}
 }
@@ -181,9 +173,7 @@ void AutopilotClass::smart_commander(const float dt){
 
 		Stabilization.add2NeedPos(speedX, speedY, dt);
 
-		float max_speed = (speedX == 0 && speedY == 0) ? Stabilization.get_min_stagXY() : sqrt(speedX * speedX + speedY * speedY);
-		
-		Stabilization.max_speed_xy = max_speed;
+	
 
 		
 	//}
@@ -394,11 +384,11 @@ void AutopilotClass::set(const float ar[]){
 
 
 void AutopilotClass::set_new_altitude(float alt){
+	set_alt = true;
 	flyAtAltitude_R = flyAtAltitude_V = alt;
 }
 
 bool AutopilotClass::holdAltitude(float alt){
-
 	flyAtAltitude_R = flyAtAltitude_V = alt;
 	control_bits |= Z_STAB;
 	//setbuf(stdout, NULL);
@@ -408,7 +398,7 @@ bool AutopilotClass::holdAltitude(float alt){
 }
 
 bool AutopilotClass::holdAltitudeStartStop(){
-
+	set_alt = true;
 	if (!motors_onState() || go2homeState() || progState())
 		return false;
 	bool h = (control_bits & Z_STAB)==0;
@@ -546,7 +536,7 @@ bool AutopilotClass::going2HomeON(const bool hower){
 }
 
 bool AutopilotClass::going2HomeStartStop(const bool hower){
-	
+	set_alt = true;
 	if (!motors_onState())
 		return false;
 	bool f = (control_bits & GO2HOME);
@@ -845,6 +835,7 @@ void AutopilotClass::program_is_loaded(bool set) {
 		control_bits &= -1 ^ PROGRAM_LOADED;
 }
 bool AutopilotClass::start_stop_program(const bool stopHere){
+	set_alt = true;
 	if (motors_is_on()) {
 		if (progState()) {
 			control_bits ^= PROGRAM;

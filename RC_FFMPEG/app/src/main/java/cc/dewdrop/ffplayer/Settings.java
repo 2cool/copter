@@ -43,7 +43,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             // balance
             {"P_R_rateKP","P_R_rateKI","P_R_rateIMAX","P_R_stabKP","YAW_rate_KP","YAW_rateE_KI","YAW_rate_IMAX","YAW_stab_KP","MAX_ANGLE",_null},
             // Z stab
-            {"alt to speed","SPEED_KP","SPEED_I","MAX_SPEED_P","MAX_SPEED_M","FILTR",_null,_null,_null,_null},
+            {"alt to speed","SPEED_KP","SPEED_I","MAX_SPEED_P","MAX_SPEED_M","min_stab_speed","FILTR",_null,_null,_null},
             // XY stab
             {"dist to speed","SPEED_KP","SPEED_I","max_speed","min_stab_speed","FILTR", _null,_null,_null,_null},
             // secure

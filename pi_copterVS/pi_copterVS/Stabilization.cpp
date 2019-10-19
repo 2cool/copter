@@ -35,6 +35,9 @@ void StabilizationClass::init(){
 	set_acc_xy_speed_imax(Balance.get_max_angle());
 	def_max_speedXY=max_speed_xy = MAX_HOR_SPEED;
 	min_stab_hor_speed = MIN_STAB_HOR_SPEED;
+	min_stab_ver_speed = 0.2;
+	def_max_speedZ_P = max_speedZ_P =  MAX_VER_SPEED_PLUS;
+	def_max_speedZ_M = max_speedZ_M = MAX_VER_SPEED_MINUS;
 	//--------------------------------------------------------------------------
 
 	alt2speedZ = 0.2;
@@ -42,16 +45,15 @@ void StabilizationClass::init(){
 	pids[SPEED_Z_PID].kI( 0.12 );
 
 	setMinMaxI_Thr();
-	max_speedZ_P =  MAX_VER_SPEED_PLUS;
-	max_speedZ_M = MAX_VER_SPEED_MINUS;
+	
 	//----------------------------------------------------------------------------
 	d_speedX=d_speedY=mc_z=0;
 }
 
 void StabilizationClass::setDefaultMaxSpeeds(){//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	max_speed_xy = def_max_speedXY;
-	max_speedZ_P = MAX_VER_SPEED_PLUS;
-	max_speedZ_M = MAX_VER_SPEED_MINUS;
+	max_speedZ_P = def_max_speedZ_P;// MAX_VER_SPEED_PLUS;
+	max_speedZ_M = def_max_speedZ_M;// MAX_VER_SPEED_MINUS;
 }
 
 
@@ -94,9 +96,41 @@ void StabilizationClass::setNeedLoc(long lat, long lon, double&x, double&y) {
 	setNeedPos(x, y);
 	
 }
+void StabilizationClass::set_max_speed_hor(float &s, bool only_test) {
+	const float _max_speed_xy = (s < min_stab_hor_speed) ? min_stab_hor_speed : ( s > def_max_speedXY ? def_max_speedXY : s);
+	s = _max_speed_xy;
+	if (!only_test)
+		max_speed_xy = _max_speed_xy;
+}
+void StabilizationClass::set_max_sped_ver(float &maxP, float &maxM, bool only_test) {
+	float _max_speedZ_P, _max_speedZ_M;
+	if (maxP == 0 && maxM == 0) {
+		_max_speedZ_P = min_stab_ver_speed;
+		_max_speedZ_M = -min_stab_ver_speed;
+	}
+	else {
+		 if (maxP > def_max_speedZ_P)
+			_max_speedZ_P = def_max_speedZ_P;
+		else
+			_max_speedZ_P = maxP;
 
-
+		if (maxM < def_max_speedZ_M)
+			_max_speedZ_M = def_max_speedZ_M;
+		else
+			_max_speedZ_M = maxM;
+	}
+	maxP = _max_speedZ_P;
+	maxM = _max_speedZ_M;
+	if (only_test == false) {
+		max_speedZ_M = _max_speedZ_M;
+		max_speedZ_P = _max_speedZ_P;
+	}
+}
 void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
+
+
+	max_speed_xy = (speedX == 0 && speedY == 0) ? min_stab_hor_speed : sqrt(speedX * speedX + speedY * speedY);
+
 	static bool flagzx = false;
 	static bool flagzy = false;
 	if (speedX == 0) {
@@ -161,7 +195,7 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		const float w_roll = pids[SPEED_Y_SPEED].get_pid(d_speedY, Mpu.get_dt());
 
 		
-	//	Debug.dump(max_speed_xy, 0, 0, 0);
+	//	Debug.dump(max_speed_xy, max_speedZ_P, max_speedZ_M, 0);
 		//----------------------------------------------------------------преобр. в относительную систему координат
 		pitch = (float)(Mpu.cosYaw*w_pitch - Mpu.sinYaw*w_roll);
 		roll = (float)(Mpu.cosYaw*w_roll + Mpu.sinYaw*w_pitch);
@@ -215,8 +249,9 @@ string StabilizationClass::get_z_set() {
 		alt2speedZ << "," << \
 		pids[SPEED_Z_PID].kP() << "," << \
 		pids[SPEED_Z_PID].kI() << "," << \
-		max_speedZ_P << "," << \
-		max_speedZ_M << "," << \
+		def_max_speedZ_P << "," << \
+		def_max_speedZ_M << "," << \
+		min_stab_ver_speed << "," << \
 		Z_FILTER;
 	string ret = convert.str();
 	return string(ret);
@@ -234,9 +269,14 @@ void StabilizationClass::setZ(const float  *ar) {
 		t = pids[SPEED_Z_PID].kI();
 		Settings.set(ar[i++], t);
 		pids[SPEED_Z_PID].kI(t);
-		Settings.set(ar[i++], max_speedZ_P);
-		Settings.set(ar[i++], max_speedZ_M);
+		Settings.set(ar[i++], def_max_speedZ_P);
+		Settings.set(ar[i++], def_max_speedZ_M);
+		Settings.set(ar[i++], min_stab_ver_speed);
 		Settings.set(ar[i++], Z_FILTER);
+		if (Z_FILTER > 1)
+			Z_FILTER = 1;
+		else if (Z_FILTER < 0.01)
+			Z_FILTER = 0.01;
 	}
 
 	cout << "Stabilization Z set:\n";
@@ -274,9 +314,12 @@ void StabilizationClass::setXY(const float  *ar){
 		Settings.set(ar[i++], t);
 			set_acc_xy_speed_kI(t);
 		Settings.set(ar[i++], def_max_speedXY);
-		max_speed_xy = def_max_speedXY;
 		Settings.set(ar[i++], min_stab_hor_speed);
 		Settings.set(ar[i++], XY_FILTER);
+		if (XY_FILTER > 1)
+			XY_FILTER = 1;
+		else if (XY_FILTER < 0.01)
+			XY_FILTER = 0.01;
 
 	}
 	for (uint8_t ii = 0; ii < i; ii++) {

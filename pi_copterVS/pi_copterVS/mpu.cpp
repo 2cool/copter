@@ -98,11 +98,9 @@ void MpuClass::log() {
 }
 
 //-----------------------------------------------------
-#ifdef FLY_EMULATOR
-float newQ4z = 0.1, newR4z = 0.2, newQ4xy = 0.1, newR4xy = 5;
-#else
+
 float newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.05, newR4xy = 1;
-#endif
+
 //-----------------------------------------------------
 void MpuClass::init()
 {
@@ -333,6 +331,7 @@ bool MpuClass::loop(){
 	accZ = Emu.get_accZ();
 
 	//faccZ += (accZ - faccZ)*ACC_Z_CF;
+	Debug.dump(WaccX, WaccY, accZ,0);
 
 	accX = (cosYaw * WaccX + sinYaw * WaccY); //relative to copter xy
 	accY = (cosYaw * WaccY - sinYaw * WaccX);

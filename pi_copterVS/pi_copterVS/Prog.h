@@ -33,8 +33,8 @@ class ProgClass
 	 double r_time,time4step2done,speed_corected_delta;
 
 	 int32_t begin_time;
-	 double max_speed_xy,timer;
-	 double max_speedZ_P, max_speedZ_M;
+	 double timer;
+	 float max_speedZ_P, max_speedZ_M,max_speed_xy;
 	 void takePhoto360();
 	 bool takePhoto();
 	 bool startVideo();

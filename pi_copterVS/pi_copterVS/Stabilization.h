@@ -45,9 +45,11 @@ private:
 	void set_acc_xy_speed_kI(const float f){ pids[SPEED_X_SPEED].kI(f);	pids[SPEED_Y_SPEED].kI(f); }
 	void set_acc_xy_speed_kD(const float f){ pids[SPEED_X_SPEED].kD(f,3);	pids[SPEED_Y_SPEED].kD(f,3); }
 	void set_acc_xy_speed_imax(const float f){ pids[SPEED_X_SPEED].imax(-f,f);	pids[SPEED_Y_SPEED].imax(-f,f); }
-	float def_max_speedXY,min_stab_hor_speed;
-	
+	float def_max_speedXY, min_stab_hor_speed, max_speed_xy, min_stab_ver_speed;
+	float def_max_speedZ_P, def_max_speedZ_M,max_speedZ_P,max_speedZ_M;
 public:
+	void set_max_speed_hor(float& s, bool only_test = false);
+	void set_max_sped_ver(float &ps, float &ns, bool only_test = false);
 	float get_max_speedXY() { return def_max_speedXY; }
 	float get_min_stagXY() { return min_stab_hor_speed; }
 	void setMaxAng();
@@ -84,7 +86,7 @@ public:
 	
 
 
-	float max_speedZ_P,max_speedZ_M,max_speed_xy;
+	
 	float Z();
 	void XY(float &xF, float&yF);
 

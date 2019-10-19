@@ -405,29 +405,14 @@ bool ProgClass::load_next(bool loadf) {
 
 	if (prog[prog_data_index] & SPEED_XY) {
 		max_speed_xy = fabs(prog[wi++]);
-		if (max_speed_xy < 1)
-			max_speed_xy = 1;
-		if (max_speed_xy > Stabilization.get_max_speedXY())
-			max_speed_xy = Stabilization.get_max_speedXY();
-		if (loadf)
-			Stabilization.max_speed_xy = max_speed_xy;
+		Stabilization.set_max_speed_hor(max_speed_xy,!loadf);
 	}
 	
 	if (prog[prog_data_index] & SPEED_Z) {
-		double speedZ = fabs(prog[wi++]);
-		if (speedZ < 1)
-			speedZ = 1;
-		if (speedZ > MAX_VER_SPEED_PLUS)
-			speedZ = MAX_VER_SPEED_PLUS;
-
+		float speedZ = fabs(prog[wi++]);
 		max_speedZ_P = speedZ;
-		max_speedZ_M = MAX_VER_SPEED_MINUS*(speedZ/ MAX_VER_SPEED_PLUS);
-		if (loadf) {
-			Stabilization.max_speedZ_P = max_speedZ_P;
-			Stabilization.max_speedZ_M = max_speedZ_M;
-		}
-		
-		//printf("max speedZ %f\n", speedZ);
+		max_speedZ_M = -speedZ;
+		Stabilization.set_max_sped_ver(max_speedZ_P, max_speedZ_M, !loadf);	
 	}
 
 	if (prog[prog_data_index] & LAT_LON){
