@@ -107,7 +107,7 @@ private:
 	void set(const float  *ar);
 	
     int16_t getGX();
-	void init();
+	bool init();
 	bool loop();
 	void setDLPFMode_(const uint8_t f);
 };

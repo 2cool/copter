@@ -33,7 +33,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             {0.2,0.2,0.2,0.2,0.2,0.2,1,0.2,0.2,0.2},
             {0.2,0.2,0.2,0.2,0.2,0.2,1,1,1,2},
             {0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
-            {0.2,10,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
+            {0.2,10,3,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
             {0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2}
 
     };
@@ -51,7 +51,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             // mpu
             {"Q_XY","R_XY","Q_Z","R_Z",_null,_null,_null,_null,_null,_null},
             //compas
-            {"m power on,1,0,100","yaw_correction",_null,_null,_null,_null,_null,_null,_null,_null},
+            {"m power on,1,0,100","yaw_correction","calibr_index",_null,_null,_null,_null,_null,_null,_null},
             //rest
             {"vedeoAdr","ppp_inet","telegram",_null,_null,_null,_null,_null,_null,_null}
 
@@ -288,6 +288,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             if (progress!=(int)dk) {
                 double p = progress;
                 f += (p - dk) / dk * maxChange;
+               // f=Math.ceil(f);
             }
         }else {
             String sf[] = a[menu_n][i].split(",");

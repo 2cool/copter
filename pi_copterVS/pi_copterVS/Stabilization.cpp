@@ -35,7 +35,7 @@ void StabilizationClass::init(){
 	set_acc_xy_speed_imax(Balance.get_max_angle());
 	def_max_speedXY=max_speed_xy = MAX_HOR_SPEED;
 	min_stab_hor_speed = MIN_STAB_HOR_SPEED;
-	min_stab_ver_speed = 0.2;
+	min_stab_ver_speed = 0.1;
 	def_max_speedZ_P = max_speedZ_P =  MAX_VER_SPEED_PLUS;
 	def_max_speedZ_M = max_speedZ_M = MAX_VER_SPEED_MINUS;
 	//--------------------------------------------------------------------------

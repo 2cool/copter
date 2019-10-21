@@ -184,18 +184,7 @@ bool SettingsClass::load_(string buf, bool any_ch) {
 }
 
 
-int SettingsClass::read() {
 
-	ifstream f;
-	f.open("/home/igor/eeprom.set");
-	if (f.is_open()) {
-		f.read(EEPROM_MEM, EEPROM_SIZE);
-		f.close();
-		return 0;
-	}
-	cout << "\n can't read settings \n";
-	return -1;
-}
 
 #define MAX_CHANGE 0.2
 void SettingsClass::set(const float  val_, float &set) {
@@ -311,6 +300,102 @@ int SettingsClass::write_all() {
 #endif
 	return 0;
 
+
+}
+
+int SettingsClass::read_commpas_callibration(const int index, int16_t sh[]) {
+	cout << "load compass calibr: ";
+	ifstream source;
+	string fn = "/home/igor/hmc_calibration_";
+	fn += to_string(index);
+	fn += ".txt";
+	source.open(fn.c_str(), fstream::in);
+	if (source.is_open()) {
+		cout << "#"<<index<<":\n";
+		for (int i = 0; i < 6; i++) {
+			source >> sh[i];
+			cout << sh[i] << ",";
+		}
+		cout << endl;
+		return 0;
+	}
+	cout << "FAILL!!!\n";
+	return -1;
+}
+int SettingsClass::read_commpas_motors_correction(float sh[]) {
+	cout << "load compass motor correcton: ";
+	ifstream source;
+	source.open("/home/igor/hmc_motors_correction.txt", fstream::in);
+	if (source.is_open()) {
+		cout << "compas mot:\n";
+		for (int i = 0; i < 12; i++) {
+			source >> sh[i];
+			cout << sh[i] << ",";
+		}
+		cout << endl;
+		return 0;
+	}
+	cout << "FAILL!!!\n";
+	return -1;
+}
+
+int  SettingsClass::write_commpas_motors_correction(const float sh[]) {
+	cout<< "write compass motors correction is ";
+	ofstream f;
+	f.open("/home/igor/hmc_motors_correction.txt", fstream::out | fstream::trunc);
+	if (f.is_open()) {
+		for (int i = 0; i < 12; i++) {
+			f << to_string(sh[i]) << endl;
+		}
+
+
+		float dd[12];
+		read_commpas_motors_correction(dd);
+		cout << "OK/n";
+		return 0;
+	}
+	cout << "FAILED!!!/n";
+	return -1;
+}
+
+int SettingsClass::write_commpas_callibration(const int index, const int16_t sh[]) {
+	cout << "write compass calibr is ";
+	ofstream f;
+	string fn= "/home/igor/hmc_calibration_";
+	fn += to_string(index);
+	fn += ".txt";
+	f.open(fn.c_str(), fstream::out | fstream::trunc);
+	if (f.is_open()) {
+		for (int i = 0; i < 6; i++) {
+			f << to_string(sh[i]) << endl;
+		}
+		int16_t dd[6];
+		read_commpas_callibration(index, dd);
+		cout << "OK/n";
+		return 0;
+	}
+	cout << "FAILED!!!/n";
+	return -1;
+
+}
+
+/////////////////////////////////////
+
+int SettingsClass::read() {
+
+	ifstream f;
+	f.open("/home/igor/eeprom2.set");
+	if (f.is_open()) {
+		f.read(EEPROM_MEM, EEPROM_SIZE);
+		f.close();
+
+		write_commpas_callibration(1, (int16_t*)(EEPROM_MEM + HMC_CALIBR));
+		//write_commpas_motors_correction((float*)(EEPROM_MEM + MOTOR_COMPAS));
+
+		return 0;
+	}
+	cout << "\n can't read settings \n";
+	return -1;
 }
 
 

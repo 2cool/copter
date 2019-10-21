@@ -382,6 +382,18 @@ void requestEvent() {
 
 
 //#define ESC_CALIBR
+float thr;
+float i[5] = { 0,0,0,0,0 };
+
+
+#define MI0 PIN_A2
+#define MI1 PIN_A0
+#define MI2 PIN_A6
+#define MI3 PIN_A4
+#define BAT PIN_A1
+int minar = 3000;
+
+bool S4 = true;
 
 void setup()
 {
@@ -425,6 +437,11 @@ void setup()
 	digitalWrite(SIM800_RESET, HIGH);
 	analogReference(INTERNAL2V56);
 
+	for (int i=0; i<100; i++)
+		fb[4] += ((float)(analogRead(BAT)) - fb[4]) * 0.03;  //volt
+	if (fb[4] < (1200.0 / 1.725))
+		S4 = false;
+
 	Wire.begin(9);
 	Wire.onRequest(requestEvent); // data request to slave
 	Wire.onReceive(receiveEvent); // data slave received
@@ -442,16 +459,7 @@ void setup()
 //thr1 = m0
 //thr2 =
 //thr3 =
-float thr;
-float i[5] = { 0,0,0,0,0 };
 
-
-#define MI0 PIN_A2
-#define MI1 PIN_A0
-#define MI2 PIN_A6
-#define MI3 PIN_A4
-#define BAT PIN_A1
-int minar = 3000;
 
 
 
@@ -518,8 +526,12 @@ void loop()
 		}
 		else 
 		{
-			bool alarm = (fb[4] > (1210.0 / 1.725) && fb[4] < (1320.0 / 1.725));
-			digitalWrite(BUZZER, alarm);
+			static bool old_alarm = false;
+			bool alarm = (S4 && fb[4] <= (1200.0 / 1.725));
+			if (alarm != old_alarm) {
+				digitalWrite(BUZZER, alarm);
+				old_alarm = alarm;
+			}
 
 		}
 	}

@@ -17,10 +17,12 @@ unsigned int PROM_read(int DA, char PROM_CMD)
 
 	if (write(DA, &PROM_CMD, 1) != 1){
 		cout << "read set reg Failed to write to the i2c bus." << "\t"<<millis_() << endl;
+		return 0;
 	}
 
 	if (read(DA, r8b, 2) != 2){
 		cout << "Failed to read from the i2c bus." << "\t"<<millis_() << endl;
+		return 0;
 	}
 
 	ret = r8b[0] * 256 + r8b[1];
@@ -333,12 +335,12 @@ double MS5611Class::get_pressure(double h) {
 }
 
 //-------------------------------------------init-------------------------
-int MS5611Class::init() {
+bool MS5611Class::init() {
 	oldAltt = 100000;
 	bar_task = 0;
 	bar_zero = 0x0;
 	ct = NORM_CT;
-	
+
 
 	wrong_altitude_cnt = 0;
 	altitude_ = ALT_NOT_SET;
@@ -360,22 +362,29 @@ int MS5611Class::init() {
 
 	if ((fd4S = open("/dev/i2c-0", O_RDWR)) < 0) {
 		cout << "Failed to open the bus.\n";
-		return -1;
+		return false;
 	}
 
 	if (ioctl(fd4S, I2C_SLAVE, MS5611_ADDRESS) < 0) {
 		cout << "Failed to acquire bus access and/or talk to slave.\n";
-		return -1;
+		return false;
 	}
 
-	writeReg(RESET);
+	if (writeReg(RESET) == -1) {
+		cout << "Failed to writeReg(RESET)\n";
+		return false;
+	}
 
 	usleep(100000);
 	for (i = 0; i < 6; i++) {
 		C[i] = PROM_read(fd4S, 0xA2 + (i * 2));
+		if (C[i] == 0) {
+			cout << "Failed PROM_read\n";
+			return false;
+		}
 	}
 
 #endif
-	return 0;
+	return true;
 }
 MS5611Class MS5611;

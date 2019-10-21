@@ -90,7 +90,7 @@ class HmcClass
 	 int16_t c_base[3];
 	 
 	float   dx, dy, dz;
-
+	int setings_i;
 	friend class StabilizationClass;
  public:
 	 string get_calibr_set();
@@ -101,17 +101,17 @@ class HmcClass
 	 int motor_index;
 	 bool do_compass_motors_calibr;
 	 float base[12];
-	 bool calibrated,motors_calibrated;
+	 bool calibrated_;
 	 string get_set();
 	 void set(const float buf[]);
 	// int16_t mx, my, mz;
 	 bool motors_power_on;
 	 
-	void init();
+	bool init();
 	bool loop();
 	bool ok;
 	bool calibration(const bool newc=false);
-
+	bool read_calibration(int16_t sh[]);
 
 //	float get_headingGrad(){ return heading*RAD2GRAD; }
 
@@ -120,7 +120,7 @@ class HmcClass
 	HmcClass();
 	HmcClass(uint8_t address);
 
-	void initialize();
+	int initialize();
 	bool testConnection();
 
 	// CONFIG_A register
@@ -133,11 +133,11 @@ class HmcClass
 
 	// CONFIG_B register
 	uint8_t getGain();
-	void setGain(uint8_t gain);
+	int setGain(uint8_t gain);
 
 	// MODE register
 	uint8_t getMode();
-	void setMode(uint8_t mode);
+	int setMode(uint8_t mode);
 
 	// DATA* registers
 	void getHeading(int16_t *x, int16_t *y, int16_t *z);

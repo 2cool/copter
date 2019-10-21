@@ -102,7 +102,7 @@ void MpuClass::log() {
 float newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.05, newR4xy = 1;
 
 //-----------------------------------------------------
-void MpuClass::init()
+bool MpuClass::init()
 {
 	yaw_correction_angle = 19 * GRAD2RAD;
 
@@ -161,14 +161,16 @@ void MpuClass::init()
 
 	accelgyro.initialize(MPU6050_GYRO_FS_2000, MPU6050_ACCEL_FS_16, MPU6050_DLPF_BW_20);
 	sleep(1);
-	accelgyro.initialize(MPU6050_GYRO_FS_2000, MPU6050_ACCEL_FS_16, MPU6050_DLPF_BW_20);
+	if (accelgyro.initialize(MPU6050_GYRO_FS_2000, MPU6050_ACCEL_FS_16, MPU6050_DLPF_BW_20) == -1)
+		return false;
 
-	writeWord(104, MPU6050_RA_XA_OFFS_H, -535);//-5525);
-	writeWord(104, MPU6050_RA_YA_OFFS_H, 219);// -1349);
-	writeWord(104, MPU6050_RA_ZA_OFFS_H, 1214);// 1291);
-	writeWord(104, MPU6050_RA_XG_OFFS_USRH, 165);// -43);
-	writeWord(104, MPU6050_RA_YG_OFFS_USRH, -39);// 36);
-	writeWord(104, MPU6050_RA_ZG_OFFS_USRH, 16);// -49);
+	bool ok;
+	ok = writeWord(104, MPU6050_RA_XA_OFFS_H, -535)!=-1;
+	ok &= writeWord(104, MPU6050_RA_YA_OFFS_H, 219)!=-1;
+	ok &= writeWord(104, MPU6050_RA_ZA_OFFS_H, 1214)!=-1;
+	ok &= writeWord(104, MPU6050_RA_XG_OFFS_USRH, 165)!=-1;
+	ok &= writeWord(104, MPU6050_RA_YG_OFFS_USRH, -39)!=-1;
+	ok &= writeWord(104, MPU6050_RA_ZG_OFFS_USRH, 16)!=-1;
 		
 #ifdef GYRO_CALIBR
 	gyro_calibratioan = false;
@@ -195,7 +197,7 @@ void MpuClass::init()
 	
 
 #endif
-
+	return ok;
 }
 //-----------------------------------------------------
 string MpuClass::get_set(){

@@ -24,7 +24,7 @@ class GPSClass
 	 
 	 float bearing;
 	
-	void init();
+	bool init();
 	bool loop();
 	LocationClass loc;
 

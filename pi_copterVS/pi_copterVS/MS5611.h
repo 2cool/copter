@@ -73,7 +73,7 @@ public:
 
 	double alt();
 	uint8_t ms5611_count;
-	int init();
+	bool init();
 	bool loop();
 	int32_t pressure;
 	double powerK;

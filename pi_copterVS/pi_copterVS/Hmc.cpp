@@ -22,8 +22,9 @@
 
 
 //enum{X,Y,Z};
-void HmcClass::init()
+bool HmcClass::init()
 {
+	setings_i = 0;
 	do_compass_motors_calibr = false;
 	motor_index = 0;
 	startTime = 10e3;
@@ -38,26 +39,30 @@ void HmcClass::init()
 	dx = dy = dz = 0;
 	//heading = 0;
 	ok = true;
-	calibrated = true;
+	calibrated_ = true;
 #ifndef FLY_EMULATOR
 
 
 	cout << "Initializing I2C devices...\n";
 	initialize();
 	delay(100);
-	initialize();
+	if (initialize() == -1)
+		return false;
+
 	cout << "Testing device connections...\n";
 	ok = testConnection();
 	if (ok)
 		cout << "HMC5883L connection successful\n";
-	else
+	else 
 		cout << "HMC5883L connection failed\n";
 
-	if (ok) {
-		calibration(false);
-	}
+//	if (ok) {
+//		calibration(false);
+//	}
 
 #endif	
+
+	return ok;
 }
 
 
@@ -67,7 +72,8 @@ string HmcClass::get_set(){
 	ostringstream convert;
 	convert << \
 		(motors_power_on ? "1" : "0") << "," << \
-		Mpu.yaw_correction_angle* RAD2GRAD;
+		Mpu.yaw_correction_angle * RAD2GRAD << "," << \
+		setings_i;
 	string ret = convert.str();
 	return string(ret);
 
@@ -81,6 +87,10 @@ void HmcClass::set(const float buf[]){
 	motors_power_on = (buf[0] > 0);
 	float yaw = constrain(buf[1],-45, 45);
 	Mpu.yaw_correction_angle = yaw * GRAD2RAD;
+
+	setings_i = buf[2];
+	calibration(false);
+
 	cout << "compas " << buf[0] << ","<<buf[1]<<endl;
 }
 //---------------------------------------------------------
@@ -271,7 +281,8 @@ bool HmcClass::loop(){
 			fmy -= ky;
 			fmz -= kz;
 	}
-	
+
+	//Debug.dump(fmx, fmy, fmz, 0);
 	// Tilt compensation
 	//float Xh = fmx * Mpu.cosPitch - fmz * Mpu.sinPitch;
 	//float Yh = fmx * Mpu.sinRoll * Mpu.sinPitch + fmy * Mpu.cosRoll - fmz * Mpu.sinRoll * Mpu.cosPitch;
@@ -377,7 +388,45 @@ void HmcClass::newCalibration(int16_t sh[]){
 	cout << "Stop Rottation\n";
 	
 }
+bool HmcClass::read_calibration(int16_t sh[]) {
+	bool calibr = Settings.read_commpas_callibration(setings_i, sh) == 0;
+	if (calibr == false) {
+		cout << "! ! ! ! Comppas not Calibrated ! ! ! !\n";
+		return false;
+	}
 
+	bool mot_cal = Settings.read_commpas_motors_correction(base) == 0;
+	if (!mot_cal)
+		cout << "! ! ! ! Comppas motors not Calibrated ! ! ! !\n";
+	calibr &= mot_cal;
+
+	if (calibr) {
+		if (sh[0] - sh[1] != 0 && sh[2] - sh[3] != 0 && sh[4] - sh[5] != 0) {
+			dx = (float)(sh[0] - sh[1]) * 0.5f;
+			c_base[X] = (int16_t)(dx + sh[1]);
+			cout << sh[0] << "\t" << sh[1] << endl;
+			dx = 1.0f / dx;
+
+			dy = (float)(sh[2] - sh[3]) * 0.5f;
+			c_base[Y] = (int16_t)(dy + sh[3]);
+			cout << sh[2] << "\t" << sh[3] << endl;
+			dy = 1.0f / dy;
+
+			dz = (float)(sh[4] - sh[5]) * 0.5f;
+			c_base[Z] = (int16_t)(dz + sh[5]);
+			cout << sh[4] << "\t" << sh[5] << endl;
+			dz = 1.0f / dz;
+
+			log_base();
+		}
+		else {
+			cout << "compass settings error!!!\n";
+			calibr = false;
+		}
+	}
+
+	return calibr;
+}
 bool HmcClass::calibration(const bool newc){
 
 	if (newc && Autopilot.motors_is_on())
@@ -387,38 +436,14 @@ bool HmcClass::calibration(const bool newc){
 
 	if (newc){
 		newCalibration(sh);
-		Settings.saveCompssSettings(sh);
-		//wdt_enable(WDTO_120MS);//reset
+		Settings.write_commpas_callibration(setings_i, sh);
+		calibrated_ = true;
 		cout << "RESET HMC\n";
 	}
-
-	calibrated = Settings.readCompassSettings(sh);
-	if (calibrated == false) 
-		cout<< "! ! ! ! Comppas not Calibrated ! ! ! !\n";
-	bool mot_cal = Settings.readCompasMotorSettings(base);
-	if (!mot_cal)
-		cout << "! ! ! ! Comppas motors not Calibrated ! ! ! !\n";
-	calibrated &= mot_cal;
-
 	
-	dx = (float)(sh[0] - sh[1])*0.5f;
-	c_base[X] = (int16_t)(dx + sh[1]);
-	cout << sh[0] << "\t" << sh[1] << endl;
-	dx = 1.0f / dx;
+	calibrated_ = read_calibration(sh);
 
-	dy = (float)(sh[2] - sh[3])*0.5f;
-	c_base[Y] = (int16_t)(dy + sh[3]);
-	cout << sh[2] << "\t" << sh[3] << endl;
-	dy = 1.0f / dy;
-
-	dz = (float)(sh[4] - sh[5])*0.5f;
-	c_base[Z] = (int16_t)(dz + sh[5]);
-	cout << sh[4] << "\t" << sh[5] << endl;
-	dz = 1.0f / dz;
-
-	log_base();
-
-	return true;
+	return calibrated_;
 }
 
 
@@ -447,18 +472,20 @@ HmcClass::HmcClass(uint8_t address) {
 * after initialization, especially the gain settings if you happen to be seeing
 * a lot of -4096 values (see the datasheet for mor information).
 */
-void HmcClass::initialize() {
+int HmcClass::initialize() {
 	// write CONFIG_A register
-	writeByte(devAddr, HMC5883L_RA_CONFIG_A,
+	
+	int ret = writeByte(devAddr, HMC5883L_RA_CONFIG_A,
 		(HMC5883L_AVERAGING_8 << (HMC5883L_CRA_AVERAGE_BIT - HMC5883L_CRA_AVERAGE_LENGTH + 1)) |
 		(HMC5883L_RATE_15 << (HMC5883L_CRA_RATE_BIT - HMC5883L_CRA_RATE_LENGTH + 1)) |
 		(HMC5883L_BIAS_NORMAL << (HMC5883L_CRA_BIAS_BIT - HMC5883L_CRA_BIAS_LENGTH + 1)));
 
 	// write CONFIG_B register
-	setGain(HMC5883L_GAIN_1090);
+	ret |= setGain(HMC5883L_GAIN_1090);
 
 	// write MODE register
-	setMode(HMC5883L_MODE_SINGLE);
+	ret |= setMode(HMC5883L_MODE_SINGLE);
+	return ret;
 }
 
 /** Verify the I2C connection.
@@ -590,11 +617,11 @@ uint8_t HmcClass::getGain() {
 * @see HMC5883L_CRB_GAIN_BIT
 * @see HMC5883L_CRB_GAIN_LENGTH
 */
-void HmcClass::setGain(uint8_t gain) {
+int HmcClass::setGain(uint8_t gain) {
 	// use this method to guarantee that bits 4-0 are set to zero, which is a
 	// requirement specified in the datasheet; it's actually more efficient than
 	// using the I2Cdev.writeBits method
-	writeByte(devAddr, (uint8_t)HMC5883L_RA_CONFIG_B, (uint8_t)(gain << (HMC5883L_CRB_GAIN_BIT - HMC5883L_CRB_GAIN_LENGTH + 1)));
+	return writeByte(devAddr, (uint8_t)HMC5883L_RA_CONFIG_B, (uint8_t)(gain << (HMC5883L_CRB_GAIN_BIT - HMC5883L_CRB_GAIN_LENGTH + 1)));
 }
 
 // MODE register
@@ -635,12 +662,13 @@ uint8_t HmcClass::getMode() {
 * @see HMC5883L_MODEREG_BIT
 * @see HMC5883L_MODEREG_LENGTH
 */
-void HmcClass::setMode(uint8_t newMode) {
+int HmcClass::setMode(uint8_t newMode) {
 	// use this method to guarantee that bits 7-2 are set to zero, which is a
 	// requirement specified in the datasheet; it's actually more efficient than
 	// using the I2Cdev.writeBits method
-	writeByte(devAddr, HMC5883L_RA_MODE, newMode << (HMC5883L_MODEREG_BIT - HMC5883L_MODEREG_LENGTH + 1));
+	int ret= writeByte(devAddr, HMC5883L_RA_MODE, newMode << (HMC5883L_MODEREG_BIT - HMC5883L_MODEREG_LENGTH + 1));
 	mode = newMode; // track to tell if we have to clear bit 7 after a read
+	return ret;
 }
 
 // DATA* registers

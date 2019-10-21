@@ -85,25 +85,28 @@ int init(int cnt) {////--------------------------------------------- INITIALIZAT
 #ifdef FLY_EMULATOR
 	Emu.init(WIND_X, WIND_Y, WIND_Z);
 #endif
-	Settings.read();
+	//Settings.read();
+	bool ok = true;
 	cout << "___setup___\n";
-	GPS.init();
-	Commander.init();
-	Mpu.init();
-	Hmc.init();
+	ok &= GPS.init();
+	ok &= Commander.init();
+	ok &= Mpu.init();
+	ok &= Hmc.init();
 	Balance.init();
-	MS5611.init();
+	ok &= MS5611.init();
 	Autopilot.init();
 	Telemetry.init_();
-	Telemetry.testBatteryVoltage();
+	ok &= Telemetry.testBatteryVoltage();
 
 	Settings.read_all();
+	ok &= Hmc.calibration(false);
 	for (int i = 0; i < 3; i++) {
 		MS5611.loop();
 		usleep(20000);
 	}
+
 	cout << "press "<<MS5611.pressure<<" alt " << MS5611.alt()<<" temp "<<(int)MS5611.i_readTemperature << endl;
-	return 0;
+	return ok?0:-1;
 
 }
 
@@ -436,6 +439,9 @@ int main(int argc, char* argv[]) {
 			if (flag)
 				shmPTR->run_main = false;
 		}
+	}
+	else {
+		cout << "INITIALIZATION ERROR!!!\n";
 	}
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 

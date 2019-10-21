@@ -45,7 +45,7 @@ class TelemetryClass
 	 float get_full_power() { return full_power; }
 	 void set_bat_capacity(float a_ch);
 	 uint8_t no_time_cnt = 0;
-	 void update_voltage();
+	 int update_voltage();
 	 float powerK;
 
 	 void clearMessage(){ message = ""; }
@@ -61,7 +61,7 @@ class TelemetryClass
 
 	 int check_time_left_if_go_to_home();
 	 int fly_time_left();
-	 void testBatteryVoltage();
+	 bool testBatteryVoltage();
 
 	 void init_();
 

@@ -9,7 +9,7 @@
 #include "Log.h"
 
 
-void GPSClass::init()
+bool GPSClass::init()
 {	
 
 #ifndef	FLY_EMULATOR
@@ -17,9 +17,10 @@ void GPSClass::init()
 #endif
 	if (loc.init() == -1) {
 		cout << "GPS ERROR\n";
-		return;
+		return false;
 	}
 	cout << "GPS INIT\n";
+	return true;
 }
 
 

@@ -241,14 +241,16 @@ int TelemetryClass::check_time_left_if_go_to_home(){
 #define FULL_FW
 #endif
 
-void TelemetryClass::update_voltage() {
+int TelemetryClass::update_voltage() {
 	
 #ifdef FULL_FW
 	Emu.battery(m_current,voltage);
 #else
 
-	if (mega_i2c.getiiiiv((char*)data)==-1)
-		return;
+	if (mega_i2c.getiiiiv((char*)data) == -1) {
+		cout << "Failed getiiiiv\n";
+		return -1;
+	}
 
 #define max_V 1022
 #define current_k 0.01953125
@@ -298,13 +300,16 @@ Max Continuous Power 220 Watts
 
 #endif
 
-
+	return 0;
 }
 
 
-void TelemetryClass::testBatteryVoltage() {
+bool TelemetryClass::testBatteryVoltage() {
 	static int32_t old_time = millis_();
-	update_voltage();
+	if (update_voltage() == -1) {
+
+		return false;
+	}
 	//const double time_nowd = Mpu.timed;
 	const int32_t _ct = millis_();
 
@@ -350,6 +355,7 @@ void TelemetryClass::testBatteryVoltage() {
 
 	float t_powerK = (MAX_VOLTAGE_AT_START * SN) / voltage;
 	powerK += (constrain(t_powerK, 1, 1.35f) - powerK)*0.001;
+	return true;
 }
 
 bool newGPSData = false;

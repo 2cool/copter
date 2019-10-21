@@ -624,7 +624,7 @@ bool AutopilotClass::is_all_OK(bool print){
 #endif
 	}
 
-	if (Hmc.do_compass_motors_calibr || (Mpu.gyro_calibratioan && Hmc.calibrated)) {
+	if (Hmc.do_compass_motors_calibr || (Mpu.gyro_calibratioan && Hmc.calibrated_)) {
 		if (Telemetry.low_voltage) {
 			if (print) {
 				Telemetry.addMessage(e_LOW_VOLTAGE);
@@ -651,7 +651,7 @@ bool AutopilotClass::is_all_OK(bool print){
 
 	}
 	else {
-		if (Hmc.calibrated == false) {
+		if (Hmc.calibrated_ == false) {
 			if (print) {
 				cout << "compas, ";
 				mega_i2c.beep_code(4);

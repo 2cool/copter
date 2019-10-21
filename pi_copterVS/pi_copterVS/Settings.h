@@ -57,6 +57,13 @@ public:
 	int write();
 	int read();
 
+
+
+	int read_commpas_callibration(const int index,  int16_t sh[]);
+	int read_commpas_motors_correction( float sh[]);
+
+	int write_commpas_callibration(const int index, const int16_t sh[]);
+	int write_commpas_motors_correction(const float sh[]);
 	int write_all();
 	int read_all();
 

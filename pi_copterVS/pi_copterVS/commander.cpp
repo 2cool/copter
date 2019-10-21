@@ -27,12 +27,13 @@
 void CommanderClass::controls2zero() {
 	yaw = yaw_offset = pitch = roll = throttle = 0;
 }
-void CommanderClass::init()
+bool CommanderClass::init()
 {
 
 	ppp_inet = true;
 	telegram_bot = false;
 	controls2zero();
+	return true;
 }
 
 //static private final int s_COUNTER = 0;
