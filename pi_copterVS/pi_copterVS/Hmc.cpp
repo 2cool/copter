@@ -212,7 +212,7 @@ static int32_t comTime = 0;
 #ifndef WORK_WITH_WIFI
 	headingGrad = 0;
 #endif
-	calibrated = true;
+	calibrated_ = true;
 	//log();
 	return true;
 }

@@ -55,6 +55,8 @@ public:
 	float get_accY();
 
 	float get_alt();
+	float get_speedX() { return (float)speed[X]; }
+	float get_speedY() { return (float)speed[Y]; }
 	float get_speedZ();
 	float get_x();
 	float get_y();

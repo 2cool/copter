@@ -194,7 +194,7 @@ bool MpuClass::init()
 
 
 #else
-	
+	bool ok = true;
 
 #endif
 	return ok;
@@ -284,17 +284,21 @@ void MpuClass::calc_corrected_ang(){
 */
 ///////////////////////////////////////////////////////////////////
 
-bool MpuClass::loop(){
+bool MpuClass::loop() {
 	static double oldmpuTime = 0;
 	time = micros_();
-	mpu_dt = (float)(time - oldmpuTime)*1e-6;
-	if (mpu_dt < 0.005)
-		return false;
+	mpu_dt = (float)(time - oldmpuTime) * 1e-6;
+	while (mpu_dt < 0.005) {
+		usleep(10000);
+		time = micros_();
+		mpu_dt = (float)(time - oldmpuTime) * 1e-6;
+		
+	}
 	
 	oldmpuTime = time;
-	Hmc.loop();
-	MS5611.loop();
-	GPS.loop();
+//	Hmc.loop();
+//	MS5611.loop();
+//	GPS.loop();
 	mpu_dt = 0.005;
 
 	pitch=Emu.get_pitch();
@@ -333,11 +337,19 @@ bool MpuClass::loop(){
 	accZ = Emu.get_accZ();
 
 	//faccZ += (accZ - faccZ)*ACC_Z_CF;
-	Debug.dump(WaccX, WaccY, accZ,0);
+	//Debug.dump(WaccX, WaccY, accZ,0);
 
 	accX = (cosYaw * WaccX + sinYaw * WaccY); //relative to copter xy
 	accY = (cosYaw * WaccY - sinYaw * WaccX);
 
+
+	//est_speedZ = Emu.get_speedZ();
+	//est_alt = Emu.get_alt();
+
+	//est_speedX = Emu.get_speedX();
+	//estX = Emu.get_x();
+	//est_speedX = Emu.get_speedY();
+	//estX = Emu.get_y();
 	test_Est_Alt();
 	test_Est_XY();
 
@@ -349,7 +361,7 @@ bool MpuClass::loop(){
 	//r_pitch = RAD2GRAD*pitch;
 	//r_roll = RAD2GRAD*roll;
 
-	delay(1);
+	
 	gyro_calibratioan = true;
 
 	log();

@@ -443,8 +443,11 @@ bool AutopilotClass::go2HomeProc(const float dt){
 				Stabilization.setNeedPos2Home();
 				break;
 			}	
-			//поднятся  на высоту  X м от стартовой высоты или опуститься
-			flyAtAltitude_R=flyAtAltitude_V = height_to_lift_to_fly_to_home;
+			//поднятся  на высоту  X если ниже, опустится если више 
+			if (Mpu.get_Est_Alt() > DOWN_IF_HIGHER_THEN_ON_FLY_TO_HOME)
+				flyAtAltitude_R = flyAtAltitude_V = DOWN_IF_HIGHER_THEN_ON_FLY_TO_HOME;
+			else if (Mpu.get_Est_Alt()< height_to_lift_to_fly_to_home)
+				flyAtAltitude_R=flyAtAltitude_V = height_to_lift_to_fly_to_home;
 			go2homeIndex = TEST_ALT1;
 			break;
 		}
