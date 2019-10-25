@@ -114,7 +114,7 @@ void HmcClass::log_sens() {
 
 int baseI = 0;
 bool motors_is_on_ = false;
-
+double _base[6],current;
 void HmcClass::start_motor_compas_calibr(){
 	if (do_compass_motors_calibr == false && Autopilot.motors_is_on()==false){
 		cout << "START MOTOR COMPAS CAL\n";
@@ -123,14 +123,16 @@ void HmcClass::start_motor_compas_calibr(){
 		c_base[X] = c_base[Y] = c_base[Z] = 0;
 		startTime = millis_() + 5e3;
 		motor_index = 0;
+		baseI = 0;
+		current = 0;
+		_base[0] = _base[1] = _base[2] = current = 0;
 
 	}
 }
 
 #define MAX_M_WORK_VOLTAGE 1250.0f
 
-float _base[3];
-float current = 0;
+
 void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 	if (millis_() > startTime){
 		if (baseI < 1000){
@@ -154,17 +156,14 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 				motors_is_on_ = false;
 				int index = motor_index * 3;
 
-				printf(" MOTOR ON\n");
-				printf("compas test: 4 m %i\n", motor_index);
-				printf("%f\t%f\t%f\n", base[0], base[1], base[2]);
-				printf("current 4 m %i %f\n", motor_index, Telemetry.get_current(motor_index)/1000);
+				printf("+++ ON  #%i %f %f %f current=%f\n",motor_index, _base[0]/1000, _base[1]/1000, _base[2]/1000,current/1000);
+		
 
+				base[index] =   (float)(((_base[0] - _base[3]) / current));
+				base[index+1] = (float)(((_base[1] - _base[4]) / current));
+				base[index+2] = (float)(((_base[2] - _base[5]) / current));
 
-				base[index] =   ((_base[0] - base[index])   / current);
-				base[index+1] = ((_base[1] - base[index+1]) / current);
-				base[index+2] = ((_base[2] - base[index+2]) / current);
-
-							
+				printf("bases  # %i %f %f %f\n", motor_index, base[index], base[index + 1], base[index + 2]);
 
 				if (motor_index < 3){
 					motor_index++;
@@ -173,17 +172,16 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 				else{
 					do_compass_motors_calibr = false;
 					Autopilot.reset_compas_motors_calibr_bit();
-					Settings.saveCompasMotorSettings(base);
+					Settings.write_commpas_motors_correction(base);
 				}
 			}
 			else{
-				int index = motor_index * 3;
-				base[index] =   _base[0];
-				base[index+1] = _base[1];
-				base[index+2] = _base[2];
-				printf(" MOTOR OFF\n");
-				printf("compas test: 4 m %i\n",motor_index);
-				printf("%f\t%f\t%f\n",base[0],base[1],base[2]);
+
+				_base[3] = _base[0];
+				_base[4] = _base[1];
+				_base[5] = _base[2];
+				
+				printf("\n\n--- OFF # %i %f %f %f current=%f\n", motor_index, _base[0] / 1000, _base[1] / 1000, _base[2] / 1000, current / 1000);
 				startTime = millis_() + 3e3;
 				Autopilot.motors_do_on(true, "CMT");
 				motors_is_on_ = true;

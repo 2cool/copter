@@ -65,8 +65,8 @@ public class Telemetry {
 
         if (ap_throttle < HOVER_THROTHLE)
             ap_throttle = HOVER_THROTHLE;
-        if (ap_throttle > 0.6)
-            ap_throttle = 0.6;
+        if (ap_throttle > 0.7)
+            ap_throttle = 0.7;
         return (float)ap_throttle;//*z;
 
 

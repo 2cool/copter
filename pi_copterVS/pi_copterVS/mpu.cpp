@@ -261,77 +261,29 @@ const float accifk = 0.00048828125f;//16
 
 #ifdef FLY_EMULATOR
 
-
-
-
-
 double real_pitch = 0, real_roll = 0;
-
-//-----------------------------------------------------
-
-/*
-void MpuClass::calc_corrected_ang(){
-
-	double raccX = cosYaw*GPS.loc.accX + sinYaw*GPS.loc.accY;
-	double raccY = cosYaw*GPS.loc.accY - sinYaw*GPS.loc.accX;
-
-
-
-
-
-
-}
-*/
 ///////////////////////////////////////////////////////////////////
 
 bool MpuClass::loop() {
 	static double oldmpuTime = 0;
 	time = micros_();
 	mpu_dt = (float)(time - oldmpuTime) * 1e-6;
-	while (mpu_dt < 0.005) {
-		usleep(10000);
-		time = micros_();
-		mpu_dt = (float)(time - oldmpuTime) * 1e-6;
-		
-	}
-	
 	oldmpuTime = time;
-//	Hmc.loop();
-//	MS5611.loop();
-//	GPS.loop();
 	mpu_dt = 0.005;
-
 	pitch=Emu.get_pitch();
 	roll = Emu.get_roll();
-
-
-
 	gyroPitch = Emu.get_gyroPitch();
 	gyroRoll = Emu.get_gyroRoll();
 	gyroYaw = Emu.get_gyroYaw();
-	
-
-
-	
-
 	double head = Emu.get_heading();
-
 	double g_yaw = Emu.get_yaw();
-
 	yaw_offset += (wrap_PI(g_yaw - head) - yaw_offset)*0.0031f;
-
 	yaw = wrap_PI(g_yaw - yaw_offset);// +yaw_correction_angle );
-
-
 	sin_cos(pitch, sinPitch, cosPitch);
 	sin_cos(roll, sinRoll, cosRoll);
-
-
 	tiltPower = cosPitch*cosRoll;
 	cosYaw = cos(yaw);
 	sinYaw = sin(yaw);
-
-
 	double WaccX = Emu.get_accX();
 	double WaccY = Emu.get_accY();
 	accZ = Emu.get_accZ();
@@ -594,7 +546,7 @@ void MpuClass::test_Est_Alt() {
 		kf[Z]->base(-MAX_LEN);
 	}
 	
-	//Debug.dump(est_alt_, est_speedZ, 0, 0);
+	//Debug.dump(est_alt, est_speedZ, alt, -1);
 
 #ifdef FLY_EMULATOR
 	if (alt <= -0.5) {
@@ -702,6 +654,7 @@ void MpuClass::test_Est_XY() {
 	//double t[] = { estX, est_speedX, estY, est_speedY };
 	//Debug.load(0, Mpu.w_accX, Mpu.w_accY);
 	//Debug.dump();
+//	Debug.dump(Emu.get_x(), Emu.get_x(), Emu.get_alt(), 0);
 	
 }
 

@@ -9,15 +9,11 @@
 #include "Stabilization.h"
 #include "commander.h"
 
-#define EEPROM_SIZE 256
-char EEPROM_MEM[EEPROM_SIZE];
-
 template <class T> int writeAnything(int ee, const T& value)
 {
 	const byte* p = (const byte*)(const void*)&value;
 	unsigned int i;
-	for (i = 0; i < sizeof(value); i++)
-		Settings.write(ee++, *p++);
+	
 	return i;
 }
 
@@ -25,8 +21,7 @@ template <class T> int readAnything(int ee, T& value)
 {
 	byte* p = (byte*)(void*)&value;
 	unsigned int i;
-	for (i = 0; i < sizeof(value); i++)
-		*p++ = Settings.read(ee++);
+	
 	return i;
 }
 
@@ -69,42 +64,6 @@ void SettingsClass::readBuf(uint8_t adr, int16_t buf[], uint8_t len) {
 		readAnything(i * 2 + adr, buf[i]);
 	}
 }
-
-bool  SettingsClass::saveCompasMotorSettings(float base[]) {
-
-	writeBuf(MOTOR_COMPAS, base, 12);
-	uint32_t hash = get_hash((char*)base, 12);
-	*(uint32_t*)(EEPROM_MEM + MOTOR_COMPAS_HASH) = hash;
-	return write()!=-1;
-	
-}
-
-bool  SettingsClass::saveCompssSettings(int16_t sh[]) {
-
-	writeBuf(HMC_CALIBR, sh, 6);
-	uint32_t hash = get_hash((char*)sh, 6);
-	*(uint32_t*)(EEPROM_MEM + HCM_HASH) = hash;
-	write();
-	return true;
-}
-
-bool  SettingsClass::readCompassSettings(int16_t sh[]) {
-	readBuf(HMC_CALIBR, sh, 6);
-	uint32_t hash=get_hash((char*)sh, 6);
-	bool ret = *(uint32_t*)(EEPROM_MEM + HCM_HASH) == hash;
-	return ret;
-}
-
-bool  SettingsClass::readCompasMotorSettings(float base[]) {
-	readBuf(MOTOR_COMPAS, base, 12);
-	uint32_t hash = get_hash((char*)base, 12);
-	bool ret = *(uint32_t*)(EEPROM_MEM + MOTOR_COMPAS_HASH) == hash;
-	return ret;
-
-}
-
-
-
 
 static float ar_t333[SETTINGS_ARRAY_SIZE + 1];
 float * load(const string  buf, const uint8_t  * filds, const bool deny_zero) {
@@ -332,7 +291,7 @@ int SettingsClass::read_commpas_motors_correction(float sh[]) {
 			source >> sh[i];
 			cout << sh[i] << ",";
 		}
-		cout << endl;
+		cout << "OK\n";
 		return 0;
 	}
 	cout << "FAILL!!!\n";
@@ -340,25 +299,28 @@ int SettingsClass::read_commpas_motors_correction(float sh[]) {
 }
 
 int  SettingsClass::write_commpas_motors_correction(const float sh[]) {
-	cout<< "write compass motors correction is ";
+#ifndef FLY_EMULATOR
+	cout<< "write compass motors correction ";
 	ofstream f;
 	f.open("/home/igor/hmc_motors_correction.txt", fstream::out | fstream::trunc);
 	if (f.is_open()) {
 		for (int i = 0; i < 12; i++) {
 			f << to_string(sh[i]) << endl;
 		}
-
-
-		float dd[12];
-		read_commpas_motors_correction(dd);
-		cout << "OK/n";
+	//	float dd[12];
+	//	read_commpas_motors_correction(dd);
+		cout << "OK\n";
 		return 0;
 	}
-	cout << "FAILED!!!/n";
+	cout << "FAILED!!!\n";
 	return -1;
+#else
+	return 0;
+#endif
 }
 
 int SettingsClass::write_commpas_callibration(const int index, const int16_t sh[]) {
+#ifndef FLY_EMULATOR
 	cout << "write compass calibr is ";
 	ofstream f;
 	string fn= "/home/igor/hmc_calibration_";
@@ -376,60 +338,14 @@ int SettingsClass::write_commpas_callibration(const int index, const int16_t sh[
 	}
 	cout << "FAILED!!!/n";
 	return -1;
+#else
+	return 0;
+#endif;
 
 }
 
 /////////////////////////////////////
 
-int SettingsClass::read() {
-
-	ifstream f;
-	f.open("/home/igor/eeprom2.set");
-	if (f.is_open()) {
-		f.read(EEPROM_MEM, EEPROM_SIZE);
-		f.close();
-
-		write_commpas_callibration(1, (int16_t*)(EEPROM_MEM + HMC_CALIBR));
-		//write_commpas_motors_correction((float*)(EEPROM_MEM + MOTOR_COMPAS));
-
-		return 0;
-	}
-	cout << "\n can't read settings \n";
-	return -1;
-}
-
-
-int SettingsClass::write() {
-#ifndef FLY_EMULATOR
-	ofstream f;
-	f.open("/home/igor/eeprom.set", fstream::in | fstream::out | fstream::trunc);
-	if (f.is_open()) {
-		f.write(EEPROM_MEM, EEPROM_SIZE);
-		f.close();
-		return 0;
-	}
-	cout << "\n cant write settings \n";
-#endif
-	return -1;
-}
-
-
-
-
-void SettingsClass::write(int i, char c) {
-	if (EEPROM_SIZE > i) {
-		EEPROM_MEM[i] = c;
-	}
-};
-
-char SettingsClass::read(int i) {
-	if (EEPROM_SIZE > i) {
-		return EEPROM_MEM[i];
-	}
-	else
-		return 0;
-
-}
 
 
 SettingsClass Settings;

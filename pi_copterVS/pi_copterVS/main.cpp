@@ -1,6 +1,6 @@
 
  
-#define PROG_VERSION "ver 3.190919\n"
+#define PROG_VERSION "ver 3.191025\n"
 #define SIM800_F
 
 
@@ -85,7 +85,6 @@ int init(int cnt) {////--------------------------------------------- INITIALIZAT
 #ifdef FLY_EMULATOR
 	Emu.init(WIND_X, WIND_Y, WIND_Z);
 #endif
-	//Settings.read();
 	bool ok = true;
 	cout << "___setup___\n";
 	ok &= GPS.init();
@@ -99,7 +98,7 @@ int init(int cnt) {////--------------------------------------------- INITIALIZAT
 	ok &= Telemetry.testBatteryVoltage();
 
 	Settings.read_all();
-	ok &= Hmc.calibration(false);
+	ok &= Hmc.calibrated_;
 	for (int i = 0; i < 3; i++) {
 		MS5611.loop();
 		usleep(20000);
@@ -448,8 +447,6 @@ int main(int argc, char* argv[]) {
 	if (flag!=0)
 		cout<< "\n main Signal caught!" << "\t"<<millis_() << endl;
 	//WiFi.stopServer();
-	Settings.write();
-	
 	Log.close();
 
 	shmPTR->internet_run = false;

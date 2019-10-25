@@ -76,6 +76,8 @@ public class DrawView extends View {
 
     private static long message_time=0;
     float v_speed =0;
+
+    boolean old_hold_on=false;
     private  void updateControls(){
 
         motors_on[0].enabled(Commander.link);
@@ -137,6 +139,35 @@ public class DrawView extends View {
 
           //  if ((MainActivity.command_bits_& MainActivity.Z_STAB) == 0)
           //      j_left.set_return_back_Y(MainActivity.altHoldF());
+
+
+
+            if (old_hold_on != hold_alt.is_pressed()) {
+                old_hold_on=hold_alt.is_pressed();
+              //  if (MainActivity.toHomeF()==false && MainActivity.progF()==false) {
+                //    MainActivity.altHold();
+                    j_left.set_return_back_Y(hold_alt.is_pressed());
+                    desc_off.set(false);
+                    j_left.set_block_Y(false);
+                    if (hold_alt.is_pressed() == false)
+                        j_left.setJosticY( (max_manual_thr_index * (THROTTLE_K - Telemetry.corectThrottle())));
+                    else
+                        j_left.setJosticY(0);
+              //  }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
             do_prog.set(MainActivity.progF());
         }
     }
@@ -537,6 +568,7 @@ public class DrawView extends View {
                 j_left.set_return_back_Y(hold_alt.is_pressed());
                 desc_off.set(false);
                 j_left.set_block_Y(false);
+                old_hold_on=hold_alt.is_pressed();
                 if (hold_alt.is_pressed() == false)
                     j_left.setJosticY( (max_manual_thr_index * (THROTTLE_K - Telemetry.corectThrottle())));
                 else

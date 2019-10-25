@@ -138,8 +138,8 @@ void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 	float speedP=0, speedM=0;
 	if (speed != 0) {
 		set_alt = true;
-	//	if (speed < -0.2 && (flyAtAltitude_R < lowest_height || flyAtAltitude_V < lowest_height))
-		//	speed = fmax(-0.2, speed);
+		if (speed < -0.2 && (flyAtAltitude_R < lowest_height || flyAtAltitude_V < lowest_height))
+			speed = fmax(-0.2, speed);
 
 		if (speed > 0) 
 			speedP = speed;
@@ -150,6 +150,7 @@ void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 		flyAtAltitude_V = Stabilization.getDist_Z(speedP+speedM);
 		flyAtAltitude_R += speed * dt;
 		flyAtAltitude_V += flyAtAltitude_R;
+
 	}
 	else {
 		if (set_alt) {
@@ -219,70 +220,74 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 	}
 #endif
 
-	//-----------------------------------------
-	static int uspd_cnt = 0;
-	if (motors_is_on() && fabs(Mpu.get_roll()) > 110 && Mpu.get_Est_Alt() < 5) {
-		if (uspd_cnt++ > 10)
-			off_throttle(true, "USD");
-	}else
-		uspd_cnt = 0;
-	//-----------------------------------------
-
-	if (MS5611.fault() && motors_is_on() && go2homeState() == 0) {
-		//sim.send_sos(e_BARROMETR_FAULT);
-		going2HomeON(true);
-	}
+	
 
 
+	if (control_bits & MOTORS_ON) {
 
-	if (control_bits&CONTROL_FALLING){
-		aYaw_ = Mpu.get_yaw();
-		off_throttle(false,"cntr_fall");
-	}
-	else{
-		if (control_bits & PROGRAM){
-			
-			Prog.loop();
+		//-----------------------------------------
+		static int uspd_cnt = 0;
+		if (fabs(Mpu.get_roll()) > 110 && Mpu.get_Est_Alt() < 5) {
+			if (uspd_cnt++ > 10)
+				off_throttle(true, "USD");
+		}else
+			uspd_cnt = 0;
+		//-----------------------------------------
+
+		if (MS5611.fault() && go2homeState() == 0) {
+			//sim.send_sos(e_BARROMETR_FAULT);
+			going2HomeON(true);
 		}
-		else{
-			if (control_bits & GO2HOME){
-				go2HomeProc(dt);
+
+		if (control_bits & CONTROL_FALLING) {
+			aYaw_ = Mpu.get_yaw();
+			off_throttle(false, "cntr_fall");
+		}
+		else {
+			if (control_bits & PROGRAM) {
+
+				Prog.loop();
 			}
-			else{
-				int32_t timelag = _ct - last_time_data__recived;
-				if (last_time_data__recived && motors_is_on() && timelag > CONNECTION_LOST__TIMEOUT) {
-					connectionLost_();
-					return;
+			else {
+				if (control_bits & GO2HOME) {
+					go2HomeProc(dt);
 				}
+				else {
+					int32_t timelag = _ct - last_time_data__recived;
+					if (last_time_data__recived && timelag > CONNECTION_LOST__TIMEOUT) {
+						connectionLost_();
+						return;
+					}
 #ifndef OFF_TIMELAG
-				if (timelag > TIMEOUT__LAG) {
-					int32_t _timeout__LAG = TIMEOUT__LAG;
-					if (Mpu.get_Est_Alt() > 15 || Mpu.get_Est_Alt() / (-Mpu.get_Est_SpeedZ()) > 5)
-						_timeout__LAG = 2e3;
-					if (timelag > _timeout__LAG)
-						Commander.data_reset();
-				}
+					if (timelag > TIMEOUT__LAG) {
+						int32_t _timeout__LAG = TIMEOUT__LAG;
+						if (Mpu.get_Est_Alt() > 15 || Mpu.get_Est_Alt() / (-Mpu.get_Est_SpeedZ()) > 5)
+							_timeout__LAG = 2e3;
+						if (timelag > _timeout__LAG)
+							Commander.data_reset();
+					}
 #endif
-				
-				aYaw_ = Commander.get_yaw_minus_offset();
-				if (control_bits & Z_STAB){
-					const float thr = Commander.getThrottle();
-					const float speed = (thr - MIDDLE_POSITION) * sens_z;
-					add_2_need_altitude(speed, dt);
-				}
-				else{
-					throttle = Commander.getThrottle();
-				}
-				if (control_bits & XY_STAB){
-					smart_commander(dt);
-				}
-				else{
-					aPitch = Commander.getPitch();
-					aRoll = Commander.getRoll();
+
+					aYaw_ = Commander.get_yaw_minus_offset();
+					if (control_bits & Z_STAB) {
+						const float thr = Commander.getThrottle();
+						const float speed = (thr - MIDDLE_POSITION) * sens_z;
+						add_2_need_altitude(speed, dt);
+					}
+					else {
+						throttle = Commander.getThrottle();
+					}
+					if (control_bits & XY_STAB) {
+						smart_commander(dt);
+					}
+					else {
+						aPitch = Commander.getPitch();
+						aRoll = Commander.getRoll();
+					}
 				}
 			}
+
 		}
-			
 	}
 
 	if (_ct < CALIBRATION__TIMEOUT || Mpu.acc_callibr_time > micros_()) {
@@ -634,7 +639,9 @@ bool AutopilotClass::is_all_OK(bool print){
 				cout << " LOW VOLTAGE" << "\t" << _ct << endl;
 				mega_i2c.beep_code(B_LOW_VOLTAGE);
 			}
+#ifndef DEBUG
 			return false;
+#endif
 		}
 
 		if (Hmc.do_compass_motors_calibr == false && GPS.loc.accuracy_hor_pos_ > min_hor_accuracy_2_start) {
@@ -680,7 +687,7 @@ beep codes
 
 bool AutopilotClass::motors_do_on(const bool start, const string msg){////////////////////////  M O T O R S  D O  ON  /////////////////////////////////////////////////////////////////////////
 	const int32_t _ct = millis_();
-	if (_ct - old_time_at__start < 3000)
+	if (_ct - old_time_at__start < 1500)
 		return false;
 	cout << msg << "-";
 	
@@ -689,7 +696,7 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 
 		cout << "ON\n";
 
-		if (is_all_OK(true) == false)
+		if (is_all_OK(!Hmc.do_compass_motors_calibr) == false)
 			return false;
 
 		time_at__start = _ct;
@@ -707,6 +714,8 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 		Stabilization.resset_xy_integrator();
 		aYaw_ = -Mpu.get_yaw();
 		Log.run_counter++;
+
+		cout <<"Lat,lon,alt: "<< GPS.loc.lon_ << ", " << GPS.loc.lat_ << ", " << GPS.loc.altitude << endl;
 		
 	}//------------------------------OFF----------------
 	else {
@@ -714,8 +723,8 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 			Telemetry.on_power_time += _ct - time_at__start;
 		old_time_at__start = _ct;
 		time_at__start = 0;
-
-		cout << "off ";
+		cout << "OFF\n";
+		cout << "Lat,lon,alt: " << GPS.loc.lon_ << ", " << GPS.loc.lat_ << ", " << GPS.loc.altitude << endl;
 		Telemetry.addMessage(i_OFF_MOTORS);
 		off_throttle(true, msg);
 

@@ -187,7 +187,31 @@ uint16_t Megai2c::correct(const float n) {    //0-это
 
 }
 
-void Megai2c::throttle(const float n[]) {
+void Megai2c::throttle(const float _n[]) {
+	static bool fn[4] = { false,false,false,false };
+	float n[4] = { _n[0],_n[1],_n[2],_n[3] };
+	static float down[4];
+
+	for (int i = 0; i < 4; i++) {
+		if (fn[i] == false) {
+			if (n[i] >= 0.05) {
+				fn[i] = true;
+				down[i] = 0;
+			}
+		}else 
+			if (n[i] == 0) {
+				down[i] -= 0.006;
+				if (down[i] < 0) {
+					down[i] = 0;
+					fn[i] = false;
+				}
+				n[i] = down[i];
+			}else
+				down[i] = n[i];
+	}
+
+
+
 #ifdef FLY_EMULATOR
 	Emu.update(n, Mpu.get_dt());
 #else

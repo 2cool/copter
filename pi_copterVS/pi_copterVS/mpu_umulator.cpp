@@ -373,6 +373,8 @@ void EmuClass::update(const float fm_[4], double dt) {
 	acc[Y] += 1.0 - 2.0*((float)(rand()) / (float)RAND_MAX);
 #endif
 
+
+	
 	speed[X] += acc[X] * dt;
 	speed[Y] += acc[Y] * dt;
 	speed[Z] += acc[Z] * dt;
@@ -397,6 +399,9 @@ void EmuClass::update(const float fm_[4], double dt) {
 		//if (Autopilot.motors_is_on())
 	// 		Autopilot.motors_do_on(false, "S_S");
 	}
+
+
+	//Debug.dump(pos[X], pos[Y], pos[Z], 0);
 
 	if (Log.writeTelemetry) {
 		Log.block_start(LOG::EMU);

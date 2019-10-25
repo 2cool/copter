@@ -918,11 +918,14 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 
 	//(mpu._max[mEX]-mpu._min[mEX])
 	//distX_start
-
-	draw(g, rect, mpu._max[mEX]+6, mpu._min[mEX]+2.93, SX);
-	draw(g, rect, mpu._max[mEY]+6.59, mpu._min[mEY]-10.59, SY);
-	draw(g, rect, mpu._max[mEX] + 6, mpu._min[mEX] + 2.93, GSX);
-	draw(g, rect, mpu._max[mEY] + 6.59, mpu._min[mEY] - 10.59, GSY);
+	mpu._max[mEX] = 10;
+	mpu._min[mEX] = -10;
+	mpu._max[mEY] = 10;
+	mpu._min[mEY] = -10;
+	draw(g, rect, mpu._max[mEX], mpu._min[mEX], SX);
+	draw(g, rect, mpu._max[mEY], mpu._min[mEY], SY);
+	draw(g, rect, mpu._max[mEX] , mpu._min[mEX] , GSX);
+	draw(g, rect, mpu._max[mEY] , mpu._min[mEY] , GSY);
 
 	draw(g, rect, 15, -15, SPEED_X);
 	draw(g, rect, 15, -15, SPEED_Y);

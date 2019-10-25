@@ -184,7 +184,7 @@ bool BalanceClass::set_min_max_throttle(const float max, const float min) {
 
 
 bool BalanceClass::speed_up_control(float n[]) {
-#define START_THROTTHLE 0.05
+#define START_THROTTHLE 0.01
 #define SPEEDUP_CNT 1000
 	bool speed_up = false;
 	static uint32_t start_cnt[4];
@@ -337,7 +337,12 @@ bool BalanceClass::loop()
 				f_[0] = f_[1] = f_[2] = f_[3] = throttle = true_throttle;
 				Autopilot.hall_test();//put only there
 			}
-			//f_[0] = f_[1] = f_[2] = f_[3] = throttle;//!!!!!!!!!!!!!!!!!
+
+			/*
+			if (throttle > 0.05)
+				throttle = 0.05;
+			f_[0] = f_[1] = f_[2] = f_[3] = throttle;//!!!!!!!!!!!!!!!!!
+			*/
 		}
 	}
 	else
@@ -350,10 +355,7 @@ bool BalanceClass::loop()
 	f_[0] = f_[1] = f_[2] = f_[3] = 0;
 #endif
 #endif
-/*	f_[0] = 0;
-	f_[1] = 0;
-	f_[2] = 0;
-	f_[3] = 0;*/
+
 		
 	if (speed_up && (speed_up_control(f_) || true_throttle <= MIN_THROTTLE))
 		PID_reset();

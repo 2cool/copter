@@ -41,23 +41,11 @@ class SettingsClass
 
  public: 
 	 bool load_(string msg, bool any_change);//settings
-	 bool readCompasMotorSettings(float base[]);
-	 bool saveCompasMotorSettings(float base[]);
-	
-	 bool saveCompssSettings(int16_t sh[]);
 
-
-	 bool readCompassSettings(int16_t sh[]);
 
 	 bool any_change = false;
 	 void set(const float  val, float &set);
 public:
-	void write(int i, char c);
-	char read(int i);
-	int write();
-	int read();
-
-
 
 	int read_commpas_callibration(const int index,  int16_t sh[]);
 	int read_commpas_motors_correction( float sh[]);
