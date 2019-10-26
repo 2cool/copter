@@ -170,7 +170,7 @@ void TelemetryClass::init_()
 	full_power = 0;
 
 
-	float bat_chargedK = (voltage/SN - 322)*0.01;
+	bat_chargedK = (voltage/SN - 322)*0.01;
 	if (bat_chargedK > 1)
 		bat_chargedK = 1;
 	full_battery_charge=battery_charge = BAT_Ampere_hour * bat_chargedK;

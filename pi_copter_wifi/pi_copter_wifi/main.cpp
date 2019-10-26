@@ -251,6 +251,19 @@ void watch_d() {
 std::ofstream out;
 std::streambuf *coutbuf;// старый буфер
 
+void set_wifi_30() {
+	exec("nice -n -20 ifconfig wlan0 down");
+	delay(3000);
+	exec("nice -n -20 iw reg set BO");
+	delay(3000);
+	exec("nice -n -20 iwconfig wlan0 txpower 40");
+	delay(3000);
+	exec("nice -n -20 ifconfig wlan0 up");
+	delay(2000);
+	exec("nice -n -20 iwconfig");
+	delay(5000);
+}
+
 int main(int argc, char *argv[])
 {
 	init_shmPTR();
@@ -261,7 +274,11 @@ int main(int argc, char *argv[])
 		cout << "wifi_clone\n";
 		return -1;
 	}
-	
+
+
+
+
+
 	thread tl(watch_d);
 	tl.detach();
 	delay(100);
@@ -283,7 +300,6 @@ int main(int argc, char *argv[])
 		std::cout.rdbuf(out.rdbuf()); //и теперь все будет в файл!
 		std::cerr.rdbuf(out.rdbuf());
 	}
-
 
 	shmPTR->connected = 0;
 	shmPTR->client_addr = 0;

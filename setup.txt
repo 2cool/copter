@@ -18,13 +18,21 @@ Alter min_speed or max_speed variable.
 service cpufrequtils restart
 
 /////////////////////////////////////////////////////////////////////////////////////
-
+https://forums.kali.org/showthread.php?4129-Increase-Wi-Fi-TX-Power-Signal-Strength
 
 # /etc/init.d/pi_copter
 #
 #! /bin/sh
 # Some things that run always
 touch /var/lock/pi_copter
+
+echo " taking down wlan0"
+ifconfig wlan0 down
+sleep 3
+iwconfig wlan0 txpower 80
+sleep 2
+ifconfig wlan0 up 
+sleep 5
 
 # Carry out specific functions when asked to by the system
 case "$1" in
@@ -48,7 +56,7 @@ exit 0
 
 Once you've saved your file into the correct location make sure that it's executable by running "chmod 755 /etc/init.d/blah".
 
-update-rc.d blah defaults
+update-rc.d pi_copter defaults
 
 
 If you wish to remove the script from the startup sequence in the future run:
@@ -57,3 +65,44 @@ root@skx:/etc/rc2.d# update-rc.d -f  blah remove
 Igor Toocool, [27.06.17 00:15]
 root@skx:~# update-rc.d pi_copter defaults
 */
+
+
+
+
+
+
+
+
+
+
+
+
+#!/bin/bash
+
+
+echo " taking down wlan0"
+ifconfig wlan0 down
+sleep 3
+
+echo "setting Region to Bolivia"
+iw reg set BO
+sleep 3
+
+echo "setting TxPower to 30"
+iwconfig wlan0 txpower 30
+sleep 2
+
+echo "starting wlan0"
+ifconfig wlan0 up 
+echo "pulling wlan0 interface up"
+iwconfig
+
+
+
+
+
+
+
+
+
+

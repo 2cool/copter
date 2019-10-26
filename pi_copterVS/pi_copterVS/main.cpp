@@ -72,7 +72,18 @@ int zzz = 1;
 
 
 
-
+void set_wifi_30() {
+	exec("sudo ifconfig wlan0 down");
+	delay(3000);
+	exec("sudo iw reg set BO");
+	delay(3000);
+	exec("sudo iwconfig wlan0 txpower 30");
+	delay(3000);
+	exec("sudo ifconfig wlan0 up");
+	delay(2000);
+//	exec("iwconfig");
+	//delay(5000);
+}
 
 
 
@@ -358,7 +369,6 @@ int main(int argc, char* argv[]) {
 	shmPTR->connected = 0;
 	shmPTR->fly_at_start = 3;
 	shmPTR->lowest_altitude_to_fly = 1.6f;
-
 
 	thread tl(watch_dog);
 	tl.detach();
