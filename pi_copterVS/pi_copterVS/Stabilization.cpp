@@ -24,7 +24,7 @@ void StabilizationClass::setMaxAng() {
 	set_acc_xy_speed_imax(Balance.get_max_angle());
 }
 void StabilizationClass::setMinMaxI_Thr() {
-	pids[SPEED_Z_PID].imax(Balance.get_min_throttle()-HOVER_THROTHLE, Balance.get_max_throttle() - HOVER_THROTHLE);
+	pids[SPEED_Z_PID].imax(Balance.get_min_throttle()*cos(Balance.get_max_angle()*GRAD2RAD)-HOVER_THROTHLE, Balance.get_max_throttle() - HOVER_THROTHLE);
 }
 //"dist to speed","speed to acc","SPEED_KP","SPEED_I","SPEED_imax","max_speed","FILTR"
 void StabilizationClass::init(){

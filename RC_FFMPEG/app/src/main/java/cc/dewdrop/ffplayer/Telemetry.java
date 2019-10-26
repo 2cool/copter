@@ -5,10 +5,9 @@ import android.util.Log;
 public class Telemetry {
 
 
-    static public double MIDDLE_POSITION =0.5;
+
     static public double HOVER_THROTHLE = 0.5;
-    static public double MIN_THROTTLE = 0.4;
-    static public double FALLING_THROTTLE = 0.45;
+
 
     private static int  telemetry_couter=0;
     public static int get_counter(){return telemetry_couter;}

@@ -242,27 +242,23 @@ bool BalanceClass::loop()
 		const float c_max_throttle = (max_throttle * pK > OVER_THROTTLE) ? OVER_THROTTLE : max_throttle * pK;
 
 		if (Autopilot.z_stabState()) {
-			true_throttle = pK * Stabilization.Z();
+			throttle = pK * Stabilization.Z();
 		}
 		else {
-			true_throttle = Autopilot.get_throttle();
-
+			throttle = Autopilot.get_throttle();
 		}
 
-		true_throttle = constrain(true_throttle, c_min_throttle, c_max_throttle);
-		throttle = true_throttle;
-		const float thr = throttle / Mpu.tiltPower;
-
+		throttle /= Mpu.tiltPower;
+		throttle = constrain(throttle, c_min_throttle, c_max_throttle);
 
 		//зробити приоритет оставатися на місті перед оставатися на висоті
 		//пріорітет швидкості меньший за висоту. -це зробленно
-		if (thr > OVER_THROTTLE) {
+		if (throttle > OVER_THROTTLE) {
 			t_max_angle = RAD2GRAD * acos(throttle / OVER_THROTTLE);
 			t_max_angle = constrain(t_max_angle, MIN_ANGLE, max_angle);
-			throttle = max_throttle;
+			throttle = OVER_THROTTLE;
 		}
 		else {
-			throttle = thr;
 			t_max_angle = max_angle;
 		}
 
@@ -333,8 +329,7 @@ bool BalanceClass::loop()
 			const int32_t speedup_time = 5e3; 
 			const int32_t _ct32 = _ct / 1e3;
 			if ((_ct32 - Autopilot.time_at__start) < speedup_time || (Autopilot.time_at__start - Autopilot.old_time_at__start) > 8e3) {
-				true_throttle = MIN_THROTTLE;
-				f_[0] = f_[1] = f_[2] = f_[3] = throttle = true_throttle;
+				f_[0] = f_[1] = f_[2] = f_[3] = throttle = MIN_THROTTLE;
 				Autopilot.hall_test();//put only there
 			}
 
@@ -357,7 +352,7 @@ bool BalanceClass::loop()
 #endif
 
 		
-	if (speed_up && (speed_up_control(f_) || true_throttle <= MIN_THROTTLE))
+	if (speed_up && (speed_up_control(f_) || throttle <= MIN_THROTTLE))
 		PID_reset();
 	else
 		speed_up = false;
@@ -368,8 +363,7 @@ bool BalanceClass::loop()
 }
 
 void BalanceClass::set_off_th_() { 
-	f_[0] = f_[1] = f_[2] = f_[3] = 0; 
-	throttle = true_throttle = 0;
+	f_[0] = f_[1] = f_[2] = f_[3] = throttle = 0; 
 	mega_i2c.throttle(f_);
 }
 

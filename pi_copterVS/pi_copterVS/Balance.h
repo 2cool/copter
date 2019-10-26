@@ -37,7 +37,7 @@ class BalanceClass
 	 void log();
 	 int64_t old_time;
 	 void set_pitch_roll_pids(const float kp, const float ki, const float imax);
-	float throttle,true_throttle;
+	float throttle;
 	//float pitch_roll_stabKP, pitch_roll_rateKP, yaw_rateKP,yaw_stabKP,pitch_roll_rateKI,pitch_roll_rateIMAX,yaw_rateKI,yaw_rateIMAX;
 	//float getThrottle();
 	float yaw_stabKP, pitch_roll_stabKP;
@@ -57,7 +57,6 @@ class BalanceClass
 	 float powerK();
 	 float c_pitch, c_roll;
 	 float get_throttle(){ return throttle; }
-	 float get_true_throttle() { return true_throttle; }
 	 float gf(const uint8_t n){ return f_[n]; }
 	 float gf0(){ return f_[0]; }
 	 float gf1(){ return f_[1]; }
