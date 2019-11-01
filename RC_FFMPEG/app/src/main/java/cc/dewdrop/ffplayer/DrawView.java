@@ -384,6 +384,7 @@ public class DrawView extends View {
 
     }
 
+
     static public void fpv_stop(){
         if (Commander.fpv_addr!=0){
             Log.d("FPV", "STOP");
@@ -394,7 +395,6 @@ public class DrawView extends View {
             Commander.fpv = true;
         }
     }
-
 
 
     static public void fpv_start_stop(){

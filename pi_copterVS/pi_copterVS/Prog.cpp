@@ -341,7 +341,8 @@ bool ProgClass::getIntersection(double &x, double &y){
 
 			if (dist2line > r){
 				if (dist2line > MAX_DIST_ERROR_TO_FALL){
-					Autopilot.off_throttle(false, e_TOO_STRONG_WIND);
+					Telemetry.addMessage(e_TOO_STRONG_WIND);
+					Autopilot.going2HomeStartStop(false);
 					return true;
 				}
 				//ks = r / dist2line;

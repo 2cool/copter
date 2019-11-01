@@ -136,6 +136,8 @@ int32_t millis() {
 	auto end = chrono::steady_clock::now();
 	return (int32_t)chrono::duration_cast<chrono::milliseconds>(end - start).count();
 }
+
+
 void delay(unsigned long t) {
 	usleep(t * 1000);
 }
@@ -200,6 +202,7 @@ char buffer[1024] = { 0 };
 // 514 video stop
 
 void send_msg(uint16_t msg) {
+	
 	const string tosend= "{\"msg_id\":"+to_string(msg)+",\"token\":" + stoken + "}";
 
 	send(sock, tosend.c_str(), strlen(tosend.c_str()), 0);
@@ -272,6 +275,20 @@ void start_ffmpeg_stream() {
 	string s = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + " > /dev/null 2>&1  &";
 	cout << "stream started" << endl;
 	system(s.c_str());
+
+
+	std::time_t result = std::time(nullptr);
+	//std::cout << std::asctime(std::localtime(&result))
+//		<< result << " seconds since the Epoch\n";
+
+
+	string file_name = "/home/igor/stream_"+std::to_string(result);
+	file_name += +".mp4";
+	s = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -r 60 -y " + file_name + " > /dev/null 2>&1  &";
+	cout << "stream to "+ file_name + " started" << endl;
+	system(s.c_str());
+
+	
 }
 
 //  https://github.com/lwfinger/rtl8188eu

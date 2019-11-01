@@ -11,11 +11,12 @@ import android.util.Log;
 
 import cc.dewdrop.ffplayer.DrawView;
 import cc.dewdrop.ffplayer.MainActivity;
+import cc.dewdrop.ffplayer.Telemetry;
 
 import static java.lang.Math.cos;
 
 public class Monitor {
-    Paint white,green;
+    Paint white,green,red;
     private float compsL;
     private float hight_t=0,hight,speed_t=0,speed;
     private double pitch, roll, yaw;
@@ -73,6 +74,12 @@ public class Monitor {
         green=new Paint();
         green.setColor(Color.GREEN);
         green.setStrokeWidth(3);
+
+        red=new Paint();
+        red.setColor(Color.RED);
+        red.setStrokeWidth(3);
+
+
         compsL= (float)cmps.getWidth()*9.0f/25.0f;
     }
 
@@ -83,82 +90,96 @@ public class Monitor {
     public void paint(Canvas c) {
 
         //draw monitoring of pitch and yaw;
-        c.drawRect(xpos-size*0.7f,ypos-size,xpos+size*0.7f,ypos+size,gray);
+        c.drawRect(xpos - size * 0.7f, ypos - size, xpos + size * 0.7f, ypos + size, gray);
         matrix.reset();
-        matrix.postRotate((float)roll);
-        float k=(float)bm.getWidth()/185.0f;
+        matrix.postRotate((float) roll);
+        float k = (float) bm.getWidth() / 185.0f;
         Bitmap cropped = Bitmap.createBitmap(
                 bm,
                 0,
-                (int)(307*k+2.4*k*pitch),
+                (int) (307 * k + 2.4 * k * pitch),
                 bm.getWidth(),
                 bm.getWidth(),
                 matrix,
                 true);
         matrix.reset();
-        matrix.postScale(scale,scale);
-        Bitmap cropped2=Bitmap.createBitmap(
+        matrix.postScale(scale, scale);
+        Bitmap cropped2 = Bitmap.createBitmap(
                 cropped,
-                (cropped.getHeight()-bm.getWidth())/2,
-                (cropped.getWidth()-bm.getWidth())/2,bm.getWidth(),
+                (cropped.getHeight() - bm.getWidth()) / 2,
+                (cropped.getWidth() - bm.getWidth()) / 2, bm.getWidth(),
                 bm.getWidth(),
                 matrix,
                 true);
-        c.drawBitmap(cropped2,xpos-cropped2.getWidth()/2,ypos-cropped2.getHeight()/2,white);
+        c.drawBitmap(cropped2, xpos - cropped2.getWidth() / 2, ypos - cropped2.getHeight() / 2, white);
 
 
         //draw central horizontal line of pitch
-        c.drawLine(xpos-50,ypos,xpos+50,ypos,white);
-        c.drawLine(xpos,ypos-15,xpos,ypos+15,white);
+        c.drawLine(xpos - 50, ypos, xpos + 50, ypos, white);
+        c.drawLine(xpos, ypos - 15, xpos, ypos + 15, white);
 
 
         //draw division of roll
-        for (float a= -60; a<=60; a+=20){
-            float ang=(float)(a/180*Math.PI);
-            float size1=size*0.65f;
-            float x0=(float)Math.sin(ang)*size1;
-            float y0=-(float)Math.cos(ang)*size1;
-            c.drawLine(xpos+x0,ypos+y0,xpos+x0*1.1f,ypos+y0*1.1f,white);
+        for (float a = -60; a <= 60; a += 20) {
+            float ang = (float) (a / 180 * Math.PI);
+            float size1 = size * 0.65f;
+            float x0 = (float) Math.sin(ang) * size1;
+            float y0 = -(float) Math.cos(ang) * size1;
+            c.drawLine(xpos + x0, ypos + y0, xpos + x0 * 1.1f, ypos + y0 * 1.1f, white);
         }
         //draw pointer of roll
-        float size1 = size*0.6f;
-        float x0=(float)Math.sin(roll/180*Math.PI)*size1;
-        float y0=-(float)Math.cos(roll/180*Math.PI)*size1;
-        c.drawLine(xpos+x0,ypos+y0,xpos+x0*1.2f,ypos+y0*1.2f,white);
+        float size1 = size * 0.6f;
+        float x0 = (float) Math.sin(roll / 180 * Math.PI) * size1;
+        float y0 = -(float) Math.cos(roll / 180 * Math.PI) * size1;
+        c.drawLine(xpos + x0, ypos + y0, xpos + x0 * 1.2f, ypos + y0 * 1.2f, white);
         //draw height
-        String text=Float.toString(hight)+ " m";
-        Rect r=new Rect();
-        white.getTextBounds(text,0,text.length(),r);
+        String text = Float.toString(hight) + " m";
+        Rect r = new Rect();
+        white.getTextBounds(text, 0, text.length(), r);
         //draw speed
-        c.drawText(text,xpos-bm.getWidth()/2.7f-(r.right-r.left),ypos+(r.bottom-r.top)/2,white);
-        text=Float.toString(speed)+" m/c";
-        c.drawText(text,xpos+bm.getWidth()/3,ypos+(r.bottom-r.top)/2,white);
+        c.drawText(text, xpos - bm.getWidth() / 2.7f - (r.right - r.left), ypos + (r.bottom - r.top) / 2, white);
+        text = Float.toString(speed) + " m/c";
+        c.drawText(text, xpos + bm.getWidth() / 3, ypos + (r.bottom - r.top) / 2, white);
         //draw pointer of yaw
-        c.drawLine(xpos, ypos-size1,xpos,ypos-size1*1.25f,white);
+        c.drawLine(xpos, ypos - size1, xpos, ypos - size1 * 1.25f, white);
 
 
         //draw yaw
         matrix.reset();
-        matrix.postScale(scale,scale);
-        Bitmap compsN=Bitmap.createBitmap(
+        matrix.postScale(scale, scale);
+        Bitmap compsN = Bitmap.createBitmap(
                 cmps,
-                (int)(16.0/360/25*yaw*cmps.getWidth()),
+                (int) (16.0 / 360 / 25 * yaw * cmps.getWidth()),
                 0,
-                (int)(compsL),
+                (int) (compsL),
                 cmps.getHeight(),
                 matrix,
                 true);
-        c.drawBitmap(compsN,xpos-compsL*scale*0.5f,ypos-size1*1.5f,white);
+        c.drawBitmap(compsN, xpos - compsL * scale * 0.5f, ypos - size1 * 1.5f, white);
         //phone direction
-        green.setAlpha((DrawView.head_less_.is_pressed())?255:100);
-        final float dy=(float) Math.max(-90,Math.min(90,DrawView.wrap_180(MainActivity.yaw-DrawView.wrap_180(yaw))));
+        green.setAlpha((DrawView.head_less_.is_pressed()) ? 255 : 100);
+        //----------------------------------------------------------------------------
+
+        float dy = (float) Math.max(-90, Math.min(90, DrawView.wrap_180(MainActivity.yaw - DrawView.wrap_180(yaw))));
         //Log.d("MONIT",Float.toString(dy)+" "+Double.toString(MainActivity.yaw)+ " "+Double.toString(yaw));
-        final float w=-(scale*compsL);
-        float d_yaw=w*dy/180;
-        d_yaw+=w*0.5;
-        final float x=xpos-compsL*scale*0.5f-d_yaw;
-        final float y=ypos-size1*1.5f+cmps.getHeight()*0.5f;
-        c.drawLine(x,y,x,y+cmps.getHeight()*0.5f,green);
+        final float w = -(scale * compsL);
+        float d_yaw = w * dy / 180;
+        d_yaw += w * 0.5;
+        float x = xpos - compsL * scale * 0.5f - d_yaw;
+        float y = ypos - size1 * 1.5f + cmps.getHeight() * 0.5f;
+        c.drawLine(x, y, x, y + cmps.getHeight() * 0.5f, green);
+
+        //----------------------------------------------------------------------------
+        dy = (float) Math.max(-90, Math.min(90, DrawView.wrap_180(Telemetry.direction + MainActivity.yaw)));
+     //   Log.d("MONIT","dir "+Double.toString(Telemetry.direction)+" telefon_yaw "+Double.toString(MainActivity.yaw));
+        //final float w=-(scale*compsL);
+        d_yaw = w * dy / 180;
+        d_yaw += w * 0.5;
+        x = xpos - compsL * scale * 0.5f - d_yaw;
+        y = ypos - size1 * 1.5f + cmps.getHeight() * 0.5f;
+        c.drawLine(x, y, x, y + cmps.getHeight() * 0.5f, red);
+
+
     }
 
 

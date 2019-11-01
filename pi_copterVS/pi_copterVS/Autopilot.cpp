@@ -464,6 +464,7 @@ bool AutopilotClass::go2HomeProc(const float dt){
 		}
 		case GO2HOME_LOC:{//перелететь на место старта
 			// led_prog = 4;
+			dist2home_at_begin = GPS.loc.dist2home;
 			Stabilization.setNeedPos2Home();
 			go2homeIndex = TEST4HOME_LOC;
 			aYaw_ = -RAD2GRAD * atan2(Mpu.get_Est_Y(),Mpu.get_Est_X());// GPS.loc.dir_angle_GRAD;
@@ -518,7 +519,7 @@ bool AutopilotClass::go2HomeProc(const float dt){
 		}
 	 }
 
-	if (GPS.loc.dist2home - dist2home_at_begin > MAX_DIST_ERROR_TO_FALL){
+	if (Mpu.get_Est_Alt() < (DOWN_IF_HIGHER_THEN_ON_FLY_TO_HOME+20) && GPS.loc.dist2home - dist2home_at_begin > MAX_DIST_ERROR_TO_FALL){
 		cout << GPS.loc.dist2home - dist2home_at_begin<<" STRONG_WIND\n";
 		Autopilot.off_throttle(false, e_TOO_STRONG_WIND);
 	}
@@ -758,7 +759,7 @@ bool AutopilotClass::off_throttle(const bool force, const string msg){//////////
 		cout << "force motors_off " << msg << ", alt: " << (int)Mpu.get_Est_Alt() << ", time " << (int)millis_() << endl;
 		Balance.set_off_th_();
 		Telemetry.addMessage(msg);
-		control_bits &= -1 ^ (MOTORS_ON | GO2HOME | CONTROL_FALLING | PROGRAM);
+		control_bits = 0;
 		return true;
 	}
 	else{

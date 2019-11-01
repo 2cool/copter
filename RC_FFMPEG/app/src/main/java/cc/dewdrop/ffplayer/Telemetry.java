@@ -21,7 +21,7 @@ public class Telemetry {
     static public double roll=0,pitch=0,yaw=0;
     static private double _start_lat=0,_start_lon=0;
     static private boolean start_data_is_loaded=false;
-    static public double dist=0,speed=0,v_speed=0,alt_time=0 ,speed_time=0,alt_speed;
+    static public double dist=0,speed=0,v_speed=0,alt_time=0 ,speed_time=0,direction;
     static public String messages=null;
     static public float heading=0,	battery_consumption=0,vibration=0;
     static public int status=0;
@@ -153,6 +153,14 @@ public class Telemetry {
 
 
 
+    static double bearing(double lat, double lon, double lat2, double lon2){
+        double rll = (lon2 - lon);
+        double rlat = (lat);
+        double rlat2 = (lat2);
+        double y = (Math.sin(rll)*Math.cos(rlat2));
+        double x = (Math.cos(rlat)*Math.sin(rlat2) - Math.sin(rlat)*Math.cos(rlat2)*Math.cos(rll));
+        return Math.atan2(y, x);  //minus и как у гугла
+    }
 
 
 
@@ -368,8 +376,6 @@ public class Telemetry {
         //   Log.d("BUFREAD","bufRead");
         int i=0;
 
-        //if (buf_len<=4)
-        //	return;
         telemetry_couter++;
         MainActivity.control_bits=load_int32(buf,i);
 
@@ -535,7 +541,15 @@ public class Telemetry {
             speed_time=System.currentTimeMillis();
         }
         if (cur_time-speed_time>500 && old_Lat!=lat || old_Lon!=lon) {
-            //вічисляем растояние до старта
+            //вічисляем растояние до старта и угол
+            if (_start_lat==0 || _start_lon==0){
+                dist=0;
+                direction=0;
+            }
+            else{
+                dist=dist(_start_lat,_start_lon,lat,lon);
+                direction=RAD2GRAD*bearing(_start_lat,_start_lon,lat,lon);
+            }
             dist=(_start_lat==0 || _start_lon==0)?0:dist(_start_lat,_start_lon,lat,lon);
             final double dDist = dist(old_Lat, old_Lon, lat, lon);
             if (dDist>3) {

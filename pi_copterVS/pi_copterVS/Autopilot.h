@@ -75,6 +75,7 @@ class AutopilotClass
 	 int exit();
 	 int32_t  time_at__start,old_time_at__start;
 	 void gimBalRollCorrection();
+	 void fpv_command_recived() { control_bits ^= FPV_RECIVED; }
 	 bool busy() { return (control_bits & (MPU_ACC_CALIBR | MPU_GYRO_CALIBR | COMPASS_CALIBR)); }
 	 volatile int32_t last_time_data__recived;
 	 void setYaw(const float yaw){aYaw_ = yaw;}

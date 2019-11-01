@@ -249,6 +249,7 @@ bool CommanderClass::input(){
 				}
 				else if (msg.find(m_FPV) == 0) {
 					//cout << "FPV\n";
+					Autopilot.fpv_command_recived();
 					shmPTR->fpv_adr = *(buf+i++);
 					shmPTR->fpv_port = *(int16_t*)(buf + i);
 					i += 2;

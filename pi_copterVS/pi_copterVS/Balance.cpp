@@ -34,7 +34,7 @@ void BalanceClass::init()
 	cout << "BALANCE INIT\n";
 	c_pitch = c_roll = 0;
 	Stabilization.init();
-	true_throttle = throttle = 0;
+	throttle = 0;
 	pitch_roll_stabKP = 2;
 	propeller_lost[0]= propeller_lost[1] = propeller_lost[2] = propeller_lost[3] = false;
 	//set_pitch_roll_pids(0.0017,  0.0001, 0.2);  //very old
@@ -238,18 +238,23 @@ bool BalanceClass::loop()
 	if (Autopilot.motors_is_on()) { 
 	
 		const float pK = powerK();
-		const float c_min_throttle = min_throttle * pK;
+		
 		const float c_max_throttle = (max_throttle * pK > OVER_THROTTLE) ? OVER_THROTTLE : max_throttle * pK;
 
 		if (Autopilot.z_stabState()) {
 			throttle = pK * Stabilization.Z();
+			throttle /= Mpu.tiltPower;
+			const float c_min_throttle = min_throttle * pK;
+			throttle = constrain(throttle, c_min_throttle, c_max_throttle);
 		}
 		else {
 			throttle = Autopilot.get_throttle();
+			throttle /= Mpu.tiltPower;
+			const float c_min_throttle = 0.35 * pK;
+			throttle = constrain(throttle, c_min_throttle, c_max_throttle);
 		}
 
-		throttle /= Mpu.tiltPower;
-		throttle = constrain(throttle, c_min_throttle, c_max_throttle);
+
 
 		//зробити приоритет оставатися на місті перед оставатися на висоті
 		//пріорітет швидкості меньший за висоту. -це зробленно
