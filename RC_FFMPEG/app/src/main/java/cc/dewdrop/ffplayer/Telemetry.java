@@ -2,6 +2,8 @@ package cc.dewdrop.ffplayer;
 
 import android.util.Log;
 
+import cc.dewdrop.ffplayer.myTools.BeepHelper;
+
 public class Telemetry {
 
 
@@ -371,14 +373,17 @@ public class Telemetry {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    static int old_cb=0;
     static public void bufferReader_(byte buf[],int buf_len){
         //   Log.d("BUFREAD","bufRead");
         int i=0;
 
         telemetry_couter++;
         MainActivity.control_bits=load_int32(buf,i);
-
+        if (MainActivity.control_bits != old_cb) {
+            BeepHelper.beep();
+            old_cb=MainActivity.control_bits;
+        }
         i+=4;
 
 

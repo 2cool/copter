@@ -245,7 +245,7 @@ bool CommanderClass::input(){
 				}
 				else if (msg.find(m_UPLOAD_SETTINGS) == 0) {
 					Telemetry.getSettings(buf[i++]);
-					mega_i2c.beep_code(B_COMMAND_RECEIVED);
+					//mega_i2c.beep_code(B_COMMAND_RECEIVED);
 				}
 				else if (msg.find(m_FPV) == 0) {
 					//cout << "FPV\n";
@@ -256,7 +256,7 @@ bool CommanderClass::input(){
 					shmPTR->fpv_zoom = *(buf + i++);
 					shmPTR->fpv_code = *(int16_t*)(buf + i);
 					i += 2;
-					mega_i2c.beep_code(B_COMMAND_RECEIVED);
+					//mega_i2c.beep_code(B_COMMAND_RECEIVED);
 				}
 			}
 		}

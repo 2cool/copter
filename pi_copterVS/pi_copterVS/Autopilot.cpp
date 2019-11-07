@@ -885,11 +885,7 @@ bool AutopilotClass::start_stop_program(const bool stopHere){
 bool AutopilotClass::set_control_bits(uint32_t bits) {
 	if (bits==0)
 		return true;
-	//	uint8_t mask = control_bits_^bits;
-	//printf("comm=%i\n", bits);
 
-	//cout << bits << endl;
-	mega_i2c.beep_code(B_COMMAND_RECEIVED);
 
 	if (MOTORS_ON&bits)  {
 		Hmc.do_compass_motors_calibr = false;

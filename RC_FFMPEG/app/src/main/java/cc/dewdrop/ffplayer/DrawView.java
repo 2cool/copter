@@ -11,6 +11,7 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import cc.dewdrop.ffplayer.myTools.BatteryMonitor;
+import cc.dewdrop.ffplayer.myTools.BeepHelper;
 import cc.dewdrop.ffplayer.myTools.Camera_pitch_cntr;
 import cc.dewdrop.ffplayer.myTools.FlightTextInfo;
 import cc.dewdrop.ffplayer.myTools.Img_button;
@@ -406,7 +407,6 @@ public class DrawView extends View {
             Commander.fpv=true;
             Log.d("FPV","START");
             MainActivity.startFPV_Video();
-
 
         }else {
             fpv_stop();
