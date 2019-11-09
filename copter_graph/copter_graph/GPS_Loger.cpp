@@ -4,9 +4,22 @@
 
 double z_cor = 101010;
 FILE *klm;
-void GPS_Loger::init() {
-	startZ = 122222220;
-	klm = fopen("d:/klm.txt", "w");
+int GPS_Loger::init() {
+	//startZ = 122222220;
+	//klm = fopen("d:/logs/klm.txt", "w");
+
+
+	
+	
+
+
+
+
+
+
+
+
+	return 0;// klm == 0 ? -1 : 0;
 }
 
 
@@ -58,7 +71,12 @@ int GPS_Loger::decode(/*SEND_I2C*p, */byte buf[], int i, int len, bool rotate ) 
 //	old_gspeeZ = gspeedZ;
 
 
+	//33.4720041, 47.97157490000001, 96.20999999999999
 
+	r_lat = p->lat * 0.0000001;
+	r_lon = p->lon * 0.0000001;
+	acurH = p->hAcc;
+	acurV = p->vAcc;
 	double n_lat = p->lat*0.0000001*GRAD2RAD;
 	double n_lon = p->lon*0.0000001*GRAD2RAD;
 
@@ -100,8 +118,7 @@ int GPS_Loger::decode(/*SEND_I2C*p, */byte buf[], int i, int len, bool rotate ) 
 	//	lat = n_lat;
 	//	lon = n_lon;
 
-
-
+	
 	
 
 	/*

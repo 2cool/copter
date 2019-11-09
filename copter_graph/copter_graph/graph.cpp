@@ -190,7 +190,42 @@ int16_t load_int16_(byte buf[], int i) {
 }
 
 
+FILE* klm_;
+int make_end() {
+
+
+
+	FILE* end = fopen("d:/logs/end.txt", "r");
+	char buf[2000];
+	size_t  letn = fread(buf, 1, 1000, end);
+
+	fwrite(buf, 1, letn, klm_);
+
+	fclose(klm_);
+
+	return klm_ == 0 ? -1 : 0;
+}
+int make_head(std::string name) {
+
+	klm_ = fopen(name.c_str(),"w");
+
+	FILE* head = fopen("d:/logs/head.txt", "r");
+	char buf[2000];
+	size_t  letn=fread(buf, 1,1000, head);
+
+	fwrite(buf,1, letn, klm_);
+
+
+//	make_end();
+	
+	return klm_ == 0 ? -1 : 0;
+}
+
+
 int Graph::parser(byte buf[]) {
+
+	
+
 	int i = 0;
 	int f_len = load_int16_(buf, i);
 	i += 2;
@@ -222,6 +257,18 @@ int Graph::parser(byte buf[]) {
 		case GPS_SENS: {
 			
 			gps_log.decode(buf,i,len);
+
+			static double dalt = 0;
+			static int cnt = 0;
+			if (cnt == 0 && gps_log.acurH < 6 &&  gps_log.z<400 && mpu.est_alt < 300 && mpu.est_alt>-3) {
+				cnt++;
+				dalt = gps_log.z - mpu.est_alt;
+			}
+			if (cnt && floor(gps_log.r_lon) == 33 && floor(gps_log.r_lat) == 47 && mpu.est_alt<300 && mpu.est_alt>-3) {
+				std::string str = " " + std::to_string(gps_log.r_lon) + "," + std::to_string(gps_log.r_lat) + "," + std::to_string(mpu.est_alt+dalt/*gps_log.z*/) + " ";
+				fwrite(str.c_str(), str.length(), 1, klm_);
+			}
+
 			
 			break;
 		}
@@ -246,6 +293,9 @@ int Graph::parser(byte buf[]) {
 			bal.parser(buf, i, control_bits);
 			break;
 		}
+		default:
+
+			break;
 		}
 		i += len;
 	}
@@ -316,6 +366,7 @@ int Graph::decode_Log() {
 	bal.init();
 	press.init();
 	mpu.init();
+	gps_log.init();
 
 
 	int t1 = load_int16_((byte*)buffer, 0);
@@ -372,6 +423,10 @@ int Graph::decode_Log() {
 
 	j = log_from_telephone;
 	n = 0;
+
+	make_head((std::string(fname)+".kml").c_str());
+
+
 	while (j < lSize) {
 
 
@@ -482,7 +537,7 @@ int Graph::decode_Log() {
 		n++;
 
 	}
-
+	make_end();
 
 	lSize = n;
 
@@ -953,13 +1008,13 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 	draw(g, rect, 1, 0, F3);
 	draw(g, rect, 1, 0, THROTTLE);
 
-#define MAX_ALT press.max_alt
-#define MIN_ALT press.min_alt
+#define MAX_ALT press.max_alt+5
+#define MIN_ALT press.min_alt-5
 //#define MAX_ALT 130
 //#define MIN_ALT 117
 	draw(g, rect, MAX_ALT, MIN_ALT, SZ);
 	draw(g, rect, MAX_ALT, MIN_ALT, BAR_ALT);
-	draw(g, rect, MAX_ALT+50, MIN_ALT+50, GPS_ALT);
+	draw(g, rect, MAX_ALT+27, MIN_ALT+27, GPS_ALT);
 	
 
 
