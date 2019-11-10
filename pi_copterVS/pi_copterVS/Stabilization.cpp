@@ -131,7 +131,7 @@ void StabilizationClass::set_max_sped_ver(float &maxP, float &maxM, bool only_te
 		max_speedZ_M = maxM;
 	}
 }
-void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
+void StabilizationClass::set_max_speedXY(const float speedX, const float speedY) {
 	if (speedX == 0) {
 		max_speed_x_P = min_stab_XY_speed;
 		max_speed_x_M = -min_stab_XY_speed;
@@ -144,9 +144,6 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 		max_speed_x_M = (speedX <= -min_stab_XY_speed) ? speedX : -min_stab_XY_speed;
 		max_speed_x_P = min_stab_XY_speed;
 	}
-
-
-
 	if (speedY == 0) {
 		max_speed_y_P = min_stab_XY_speed;
 		max_speed_y_M = -min_stab_XY_speed;
@@ -160,29 +157,44 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 		max_speed_y_P = min_stab_XY_speed;
 	}
 
-	static bool flagzx = false;
-	static bool flagzy = false;
+}
+
+
+void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
+	
+	set_max_speedXY(speedX, speedY);
+
+	static bool f_stop_x = false;
+	static bool f_stop_y = false;
 	if (speedX == 0) {
-		if (flagzx == false) {
-			flagzx = true;
+		if (f_stop_x == false ) {
+			f_stop_x = true;
 			needXR = needXV = Mpu.get_Est_X();
 		}
 	}
 	else {
-		flagzx = false;
+		if (f_stop_x) {
+			needXR = needXV = Mpu.get_Est_X();
+			f_stop_x = false;
+		}
 		float distX = speedX, distY = speedY;
 		speed2dist(distX, distY);
 		needXR += speedX * dt;
 		needXV = needXR + distX;
+		cout << Mpu.get_Est_SpeedX() << endl;
 	}
 	if (speedY == 0) {
-		if (flagzy == false) {
-			flagzy = true;
+		if (f_stop_y == false) {
+			f_stop_y = true;
 			needYV = needYR = Mpu.get_Est_Y();
+			cout << "Y STOP\n";
 		}
 	}
 	else {
-		flagzy = false;
+		if (f_stop_y) {
+			f_stop_y = false;
+			needYV = needYR = Mpu.get_Est_Y();
+		}
 		float distX = speedX, distY = speedY;
 		speed2dist(distX, distY);
 		needYR += speedY * dt;

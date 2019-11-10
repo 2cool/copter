@@ -557,13 +557,15 @@ public class Telemetry {
             }
             dist=(_start_lat==0 || _start_lon==0)?0:dist(_start_lat,_start_lon,lat,lon);
             final double dDist = dist(old_Lat, old_Lon, lat, lon);
-            if (dDist>3) {
+           // if (dDist>3) {
                 old_Lat = lat;
                 old_Lon = lon;
                 final double dt = 0.001 * (cur_time - speed_time);
                 speed_time = cur_time;
                 speed += (dDist / dt - speed) * ((dt<1)?dt:1);
-            }
+                if (speed>30)
+                    speed=30;
+           // }
         }
 
         if (old_alt1==-100000)
@@ -572,9 +574,18 @@ public class Telemetry {
         old_alt1=_alt;
         long t=System.currentTimeMillis();
         double dt=0.001*(t-alt_time);
-        alt_time=t;
-        if (dt>0)
-            v_speed+=(dalt/dt-v_speed)*0.05;
+        if (dt>=0.1) {
+            if (dt > 1)
+                dt = 1;
+            alt_time = t;
+            if (dt > 0)
+                v_speed += (dalt / dt - v_speed) * dt;
+            if (v_speed > 20)
+                v_speed = 20;
+            else if (v_speed < -20)
+                v_speed = -20;
+        }
+
         if ((MainActivity.control_bits&MainActivity.MOTORS_ON)==MainActivity.MOTORS_ON){
             relAlt=_alt;
         }

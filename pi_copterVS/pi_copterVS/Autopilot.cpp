@@ -137,7 +137,10 @@ void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 	
 	float speedP=0, speedM=0;
 	if (speed != 0) {
-		set_alt = true;
+		if (set_alt == false) {
+			flyAtAltitude_V = flyAtAltitude_R = Mpu.get_Est_Alt();
+			set_alt = true;
+		}
 		if (speed < -0.2 && (flyAtAltitude_R < lowest_height || flyAtAltitude_V < lowest_height))
 			speed = fmax(-0.2, speed);
 
@@ -163,16 +166,16 @@ void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 }
 //-------------------------------------------------------------------------
 void AutopilotClass::smart_commander(const float dt){
-	////if (Commander.getPitch() != 0 || Commander.getRoll() != 0){
-		const float addX = sens_xy*(Commander.getPitch());
-		const float addY = -sens_xy*(Commander.getRoll());
-		const float cyaw = Commander.getYaw()*GRAD2RAD;
-		const float cosL = (float)cos(cyaw);
-		const float sinL = (float)sin(cyaw);
-		float speedX = addX * cosL + addY *sinL;
-		float speedY = -(addX * sinL - addY *cosL);
+	
+	const float addX = sens_xy*(Commander.getPitch());
+	const float addY = -sens_xy*(Commander.getRoll());
+	const float cyaw = Commander.getYaw()*GRAD2RAD;
+	const float cosL = (float)cos(cyaw);
+	const float sinL = (float)sin(cyaw);
+	float speedX = addX * cosL + addY *sinL;
+	float speedY = -(addX * sinL - addY *cosL);
 
-		Stabilization.add2NeedPos(speedX, speedY, dt);
+	Stabilization.add2NeedPos(speedX, speedY, dt);
 
 	
 
@@ -759,7 +762,7 @@ bool AutopilotClass::off_throttle(const bool force, const string msg){//////////
 		cout << "force motors_off " << msg << ", alt: " << (int)Mpu.get_Est_Alt() << ", time " << (int)millis_() << endl;
 		Balance.set_off_th_();
 		Telemetry.addMessage(msg);
-		control_bits = 0;
+		control_bits &= (XY_STAB | Z_STAB);
 		return true;
 	}
 	else{

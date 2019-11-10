@@ -55,6 +55,7 @@ public:
 	void setMaxAng();
 	void setMinMaxI_Thr();
 	void setNeedPos2Home();
+	void set_max_speedXY(const float speedX, const float speedY);
 	void add2NeedPos(float speedX, float speedY, float dt);
 	void setNeedPos(float x, float y);
 	void setNeedLoc(long lat, long lon, double &x, double&y);

@@ -263,6 +263,8 @@ int Graph::parser(byte buf[]) {
 			if (cnt == 0 && gps_log.acurH < 6 &&  gps_log.z<400 && mpu.est_alt < 300 && mpu.est_alt>-3) {
 				cnt++;
 				dalt = gps_log.z - mpu.est_alt;
+				if (gps_log.z < 40)
+					dalt += 100;
 			}
 			if (cnt && floor(gps_log.r_lon) == 33 && floor(gps_log.r_lat) == 47 && mpu.est_alt<300 && mpu.est_alt>-3) {
 				std::string str = " " + std::to_string(gps_log.r_lon) + "," + std::to_string(gps_log.r_lat) + "," + std::to_string(mpu.est_alt+dalt/*gps_log.z*/) + " ";
