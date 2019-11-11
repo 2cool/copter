@@ -168,7 +168,7 @@ void ProgClass::loop(){
 					distFlag = true;
 				}
 				else {
-					const double advance_dist = Stabilization.getDist_XY(max_speed_xy);
+					const double advance_dist = Stabilization.getDist_XY(max_speed_XY);
 					const double acur = fmax(fmax(ACCURACY_XY, GPS.loc.accuracy_hor_pos_), advance_dist);
 					distFlag = Stabilization.get_dist2goal() <= acur;
 				}
@@ -210,9 +210,9 @@ bool ProgClass::program_is_OK(){
 			if (next_y != old_y && next_x != old_x){
 				const double dx = next_x - old_x;
 				const double dy = next_y - old_y;
-				double time = (double)(sqrt(dx*dx + dy*dy) / max_speed_xy);
+				double time = (double)(sqrt(dx*dx + dy*dy) / max_speed_XY);
 				const double dAlt = alt - old_alt;
-				time += dAlt / ((dAlt >= 0) ? max_speedZ_P : max_speedZ_M);
+				time += dAlt / ((dAlt >= 0) ? max_speed_Z : -max_speed_Z);
 				time *= 1.25f;
 				time += timer;
 				
@@ -282,7 +282,7 @@ bool ProgClass::getIntersection(double &x, double &y){
 
 	const double dist_ = Stabilization.get_dist2goal();
 
-	double r = Stabilization.getDist_XY(max_speed_xy);
+	double r = Stabilization.getDist_XY(max_speed_XY);
 	if (r > dist_){
 		//ErrorLog.println("r>dist");
 		return false;
@@ -405,15 +405,12 @@ bool ProgClass::load_next(bool loadf) {
 	
 
 	if (prog[prog_data_index] & SPEED_XY) {
-		max_speed_xy = fabs(prog[wi++]);
-		Stabilization.set_max_speed_hor(max_speed_xy,!loadf);
+		max_speed_XY = fabs(prog[wi++]);
 	}
 	
 	if (prog[prog_data_index] & SPEED_Z) {
 		float speedZ = fabs(prog[wi++]);
-		max_speedZ_P = speedZ;
-		max_speedZ_M = -speedZ;
-		Stabilization.set_max_sped_ver(max_speedZ_P, max_speedZ_M, !loadf);	
+		max_speed_Z = speedZ;	
 	}
 
 	if (prog[prog_data_index] & LAT_LON){
@@ -424,6 +421,9 @@ bool ProgClass::load_next(bool loadf) {
 			Stabilization.setNeedLoc(lat, lon, next_x, next_y);
 		else
 			Stabilization.fromLoc2Pos(lat, lon, next_x, next_y);
+	}
+	else {
+		max_speed_XY = 0;
 	}
 
 
@@ -439,8 +439,24 @@ bool ProgClass::load_next(bool loadf) {
 		lb[0] = prog[wi++];
 		lb[1] = prog[wi++];
 		alt = ialt;
-		if (loadf)
+		if (loadf) {
 			Autopilot.set_new_altitude(alt);
+
+			float max_speedZ_P, max_speedZ_M;
+			if (Mpu.get_Est_Alt() <= alt) {
+				max_speedZ_P = max_speed_Z;
+				max_speedZ_M = 0;
+			}
+			else {
+				max_speedZ_P = 0;
+				max_speedZ_M = -max_speed_Z;
+			}
+			Stabilization.set_max_sped_ver(max_speedZ_P, max_speedZ_M, !loadf);
+		}
+	}
+	else {
+		float sP = 0, sM = 0;
+		Stabilization.set_max_sped_ver(sP, sM, !loadf);
 	}
 
 

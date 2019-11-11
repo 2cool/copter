@@ -181,13 +181,11 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 		speed2dist(distX, distY);
 		needXR += speedX * dt;
 		needXV = needXR + distX;
-		cout << Mpu.get_Est_SpeedX() << endl;
 	}
 	if (speedY == 0) {
 		if (f_stop_y == false) {
 			f_stop_y = true;
 			needYV = needYR = Mpu.get_Est_Y();
-			cout << "Y STOP\n";
 		}
 	}
 	else {
@@ -213,6 +211,24 @@ float StabilizationClass::get_dist2goal(){
 void StabilizationClass::XY(float &pitch, float&roll){//dont work 
 		float need_speedX, need_speedY;
 		float tx, ty;
+		if (Autopilot.progState()) {
+			if (need_speedX >= 0) {
+				max_speed_x_P = Prog.get_max_speed_XY();
+				max_speed_x_M = -min_stab_XY_speed;
+			}
+			else {
+				max_speed_x_M = -Prog.get_max_speed_XY();
+				max_speed_x_P = min_stab_XY_speed;
+			}
+			if (need_speedY >= 0) {
+				max_speed_y_P = Prog.get_max_speed_XY();;
+				max_speed_y_M = -min_stab_XY_speed;
+			}
+			else {
+				max_speed_y_M = -Prog.get_max_speed_XY();;
+				max_speed_y_P = min_stab_XY_speed;
+			}
+		}
 		if (Autopilot.progState() && Prog.intersactionFlag) {
 			need_speedX = Prog.need_speedX;
 			need_speedY = Prog.need_speedY;
@@ -242,24 +258,15 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		//----------------------------------------------------------------преобр. в относительную систему координат
 		pitch = (float)(Mpu.cosYaw*w_pitch - Mpu.sinYaw*w_roll);
 		roll = (float)(Mpu.cosYaw*w_roll + Mpu.sinYaw*w_pitch);
-
 		//Debug.load(0, pitch, roll);
 		//Debug.dump();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 float StabilizationClass::Z(){
-
-
 	//-------------stab
-
 	const float need_speedZ = getSpeed_Z(Autopilot.fly_at_altitude() - Mpu.get_Est_Alt());
-
 	mc_z += (need_speedZ - Mpu.get_Est_SpeedZ() - mc_z)*Z_FILTER;
-	//const float accZ_C = ((mc_z * speed_2_acc_Z) - Mpu.faccZ)*acc_2_power;
-
-
-
 	float fZ = HOVER_THROTHLE +  pids[SPEED_Z_PID].get_pid(mc_z, Mpu.get_dt())*Balance.powerK();
 	return fZ;
 }

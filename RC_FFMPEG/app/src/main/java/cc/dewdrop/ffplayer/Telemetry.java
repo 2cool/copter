@@ -570,16 +570,15 @@ public class Telemetry {
 
         if (old_alt1==-100000)
             old_alt1=_alt;
-        double dalt=_alt-old_alt1;
-        old_alt1=_alt;
         long t=System.currentTimeMillis();
         double dt=0.001*(t-alt_time);
-        if (dt>=0.1) {
-            if (dt > 1)
-                dt = 1;
+        if (dt>=0.01) {
+            double dalt=_alt-old_alt1;
+            old_alt1=_alt;
+            if (dt > 0.5)
+                dt = 0.5;
             alt_time = t;
-            if (dt > 0)
-                v_speed += (dalt / dt - v_speed) * dt;
+            v_speed += (dalt / dt - v_speed) * 0.1;
             if (v_speed > 20)
                 v_speed = 20;
             else if (v_speed < -20)
