@@ -34,7 +34,7 @@ class ProgClass
 
 	 int32_t begin_time;
 	 double timer;
-
+	 float max_speedZ_P, max_speedZ_M,max_speed_xy;
 	 void takePhoto360();
 	 bool takePhoto();
 	 bool startVideo();
@@ -42,10 +42,7 @@ class ProgClass
 	 void cameraZoom();
 	 bool do_cam_action(const uint16_t code);
 	 void Do_Action();
-	 float max_speed_XY, max_speed_Z;
  public:
-	 float get_max_speed_XY() { return max_speed_XY; }
-	 float get_max_speed_Z() { return max_speed_Z; }
 	 bool intersactionFlag;
 	 double need_speedX, need_speedY;
 	bool getIntersection(double &distX, double &distY);

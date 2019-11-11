@@ -77,7 +77,7 @@ using namespace std;
 //#define DEFAULT_STATE (Z_STAB|XY_STAB)
 //#define DEFAULT_STATE 0 
 
-bool set_alt = true;
+
 
 void AutopilotClass::init(){/////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -132,7 +132,7 @@ void AutopilotClass::hall_test() {
 		hall_ok |= ((Telemetry.get_current(i) > 0.55))<<i;
 }
 
-
+bool set_alt = true; //need here
 void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 	
 	float speedP=0, speedM=0;
@@ -166,16 +166,16 @@ void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 }
 //-------------------------------------------------------------------------
 void AutopilotClass::smart_commander(const float dt){
-	
-	const float addX = sens_xy*(Commander.getPitch());
-	const float addY = -sens_xy*(Commander.getRoll());
-	const float cyaw = Commander.getYaw()*GRAD2RAD;
-	const float cosL = (float)cos(cyaw);
-	const float sinL = (float)sin(cyaw);
-	float speedX = addX * cosL + addY *sinL;
-	float speedY = -(addX * sinL - addY *cosL);
 
-	Stabilization.add2NeedPos(speedX, speedY, dt);
+		const float addX = sens_xy*(Commander.getPitch());
+		const float addY = -sens_xy*(Commander.getRoll());
+		const float cyaw = Commander.getYaw()*GRAD2RAD;
+		const float cosL = (float)cos(cyaw);
+		const float sinL = (float)sin(cyaw);
+		float speedX = addX * cosL + addY *sinL;
+		float speedY = -(addX * sinL - addY *cosL);
+
+		Stabilization.add2NeedPos(speedX, speedY, dt);
 
 	
 
