@@ -8,5 +8,6 @@
         <item>mpu</item>
         <item>compas</item>
         <item>rest</item>
+        <item>debug</item>
     </string-array>
 </resources>

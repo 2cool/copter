@@ -14,6 +14,13 @@
 static const float f_constrain(const float v, const float min, const float max){
 	return constrain(v, min, max);
 }
+
+float BalanceClass::set_max_throthle_without_limit(const float angl) { 
+	max_angle = angl; 
+	Stabilization.setMaxAng(); 
+}
+
+
 void BalanceClass::set_pitch_roll_pids(const float kp, const float ki, const float imax) {
 	pids[PID_PITCH_RATE].kP(kp);
 	pids[PID_PITCH_RATE].kI(ki);
@@ -27,6 +34,7 @@ void BalanceClass::set_pitch_roll_pids(const float kp, const float ki, const flo
 
 void BalanceClass::init()
 {
+	alt_over_place = true;
 	max_angle = MAX_ANGLE;
 	max_throttle = MAX_THROTTLE;
 	min_throttle = MIN_THROTTLE;
@@ -227,9 +235,6 @@ bool BalanceClass::speed_up_control(float n[]) {
 //#define MAX_POWER_K_IF_MAX_ANGLE_30 1.12
 
 
-
-
-
 bool speed_up = true;
 bool BalanceClass::loop()
 {
@@ -238,36 +243,39 @@ bool BalanceClass::loop()
 	if (Autopilot.motors_is_on()) { 
 	
 		const float pK = powerK();
-		
-		const float c_max_throttle = (max_throttle * pK > OVER_THROTTLE) ? OVER_THROTTLE : max_throttle * pK;
-
+		float _thr;
 		if (Autopilot.z_stabState()) {
-			throttle = pK * Stabilization.Z();
+			_thr = throttle = pK * Stabilization.Z();
 			throttle /= Mpu.tiltPower;
 			const float c_min_throttle = min_throttle * pK;
-			throttle = constrain(throttle, c_min_throttle, c_max_throttle);
+			if (throttle < c_min_throttle)
+				throttle = c_min_throttle;
+
+			if (throttle > OVER_THROTTLE) {
+				if (_thr >= OVER_THROTTLE) {
+					if (alt_over_place && Mpu.get_Est_SpeedZ() < 0 && Mpu.get_Est_Alt() + 5 < Autopilot.fly_at_altitude()) { //drone is falling
+						throttle = OVER_THROTTLE;
+						t_max_angle = MIN_ANGLE;
+					}
+					else {
+						throttle = OVER_THROTTLE;
+						t_max_angle = max_angle;
+					}
+				}
+				else {
+					throttle = OVER_THROTTLE;
+					t_max_angle = RAD2GRAD * acos(_thr / OVER_THROTTLE);
+				}
+			}else
+				t_max_angle = max_angle;
 		}
 		else {
-			throttle = Autopilot.get_throttle();
+			_thr = throttle = Autopilot.get_throttle();
 			throttle /= Mpu.tiltPower;
 			const float c_min_throttle = 0.35 * pK;
-			throttle = constrain(throttle, c_min_throttle, c_max_throttle);
-		}
-
-
-
-		//зробити приоритет оставатися на місті перед оставатися на висоті
-		//пріорітет швидкості меньший за висоту. -це зробленно
-		if (throttle > OVER_THROTTLE) {
-			t_max_angle = RAD2GRAD * acos(throttle / OVER_THROTTLE);
-			t_max_angle = constrain(t_max_angle, MIN_ANGLE, max_angle);
-			throttle = OVER_THROTTLE;
-		}
-		else {
+			throttle = f_constrain(throttle, c_min_throttle, OVER_THROTTLE);
 			t_max_angle = max_angle;
 		}
-
-
 
 		//Debug.load(0, true_throttle, throttle);
 		//Debug.dump();
@@ -296,8 +304,7 @@ bool BalanceClass::loop()
 
 		const float pitch_stab_output = f_constrain(pitch_roll_stabKP*(wrap_180(Mpu.get_pitch() - c_pitch)), -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED);
 		const float roll_stab_output = f_constrain(pitch_roll_stabKP*(wrap_180(Mpu.get_roll() - c_roll)), -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED);
-		const float yaw_stab_output = f_constrain(yaw_stabKP*wrap_180(-Autopilot.get_yaw() - Mpu.get_yaw()), -MAX_D_YAW_SPEED, MAX_D_YAW_SPEED);
-
+		const float yaw_stab_output = (Autopilot.if_strong_wind() && Autopilot.go2homeState())?0:f_constrain(yaw_stabKP*wrap_180(-Autopilot.get_yaw() - Mpu.get_yaw()), -MAX_D_YAW_SPEED, MAX_D_YAW_SPEED);
 
 		const int64_t _ct = micros_();
 		double dt = (_ct - old_time) * 1e-6;
@@ -331,13 +338,14 @@ bool BalanceClass::loop()
 			throttle = HOVER_THROTHLE;
 		}
 		else {
+#ifndef FLY_EMULATOR
 			const int32_t speedup_time = 5e3; 
 			const int32_t _ct32 = _ct / 1e3;
 			if ((_ct32 - Autopilot.time_at__start) < speedup_time || (Autopilot.time_at__start - Autopilot.old_time_at__start) > 8e3) {
 				f_[0] = f_[1] = f_[2] = f_[3] = throttle = MIN_THROTTLE;
 				Autopilot.hall_test();//put only there
 			}
-
+#endif
 			/*
 			if (throttle > 0.05)
 				throttle = 0.05;

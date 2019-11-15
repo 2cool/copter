@@ -47,7 +47,12 @@ class BalanceClass
 	float t_max_angle;
 	float max_throttle,min_throttle, max_angle;
 	bool speed_up_control(float n[]);
+	bool alt_over_place;
  public:
+	 void set_alt_over_place() { alt_over_place = true; }
+	 void set_place_over_alt() { alt_over_place = false; }
+	 bool get_alt_over_place() { return alt_over_place; }
+	 float set_max_throthle_without_limit(const float angl);
 	 float get_max_throttle() { return max_throttle; }
 	 float get_min_throttle() { return min_throttle; }
 	 float get_max_angle() { return max_angle; }

@@ -41,7 +41,7 @@ class AutopilotClass
 	 uint8_t go2homeIndex;
 	 float f_go2homeTimer;
  
-	 
+	 void strong_wind_fight_control();
 	 float flyAtAltitude_V,flyAtAltitude_R;
 
 	// bool motors_on, smart_ctrl;
@@ -63,10 +63,10 @@ class AutopilotClass
 	 float lowest_height;
 	 float fall_thr;
 	 uint8_t hall_ok;
-
+	bool strong_wind;
 	 
  public:
-	 
+	 bool if_strong_wind() { return strong_wind; }
 	 float min_hor_accuracy_2_start;
 	 int32_t powerOnTime();
 	 bool is_all_OK(bool print=false);

@@ -15,6 +15,8 @@
 //#define TEST_4_FULL_VOLTAGE
 
 
+float frand() { return (float)(rand()) / (float)RAND_MAX; }
+
 //#define BAT_ZERO 370 //80 процентов разряд
 #define BAT_100P 422
 
@@ -80,7 +82,7 @@ void getWindForces(float wf[4][3]) {
 
 
 double wind_f[3][4];
-const double f_speed_k[3] = { 0.021,0.021,0.232 };  //12.5  grad pri 10/m/s
+const double f_speed_k[3] = { 0.005,0.005,0.0232 };  //12.5  grad pri 10/m/s
 
 const double f_gyro_k[3] = { 0.05,0.05,3.8 };
 
@@ -93,15 +95,19 @@ float maxWind[3];
 float rand_L[3], rand_M[3][4], rand_H[3][4];
 float low[3], mid[3][4], high[3][4];
 
-void init_wind(float x, float y, float z) {
+float EmuClass::get_windX() { return maxWind[X]; }
+float EmuClass::get_windY() { return maxWind[Y]; }
+float EmuClass::get_windZ() { return maxWind[Z]; }
+void EmuClass::init_wind(float x, float y, float z) {
+	cout << "max wind " << x <<" "<<y<<" " << z << endl;
 	maxWind[X] = x;
 	maxWind[Y] = y;
 	maxWind[Z] = z;
 	for (int i = 0; i < 3; i++) {
-		rand_L[i] = (maxWind[i] * (float)(rand()) / (float)RAND_MAX);
+		rand_L[i] = (maxWind[i] * frand());
 		for (int j = 0; j < 4; j++) {
-			rand_M[i][j] = (maxWind[i] * 0.25) - 0.5*(maxWind[i] * (float)(rand()) / (float)RAND_MAX);
-			rand_H[i][j] = (maxWind[i] * 0.125) - 0.25*(maxWind[i] * (float)(rand()) / (float)RAND_MAX);
+			rand_M[i][j] = (maxWind[i] * 0.25) - 0.5*(maxWind[i] * frand());
+			rand_H[i][j] = (maxWind[i] * 0.125) - 0.25*(maxWind[i] * frand());
 		}
 	}
 }
@@ -114,19 +120,19 @@ void get_wind(float w[][4]) {
 	if (rand_w_cnt&MMASK == MMASK) {
 		for (int i=0; i<3;i++)
 			for (int j = 0; j < 4; j++) {
-				rand_M[i][j]=(maxWind[i]*0.25) - 0.5*(maxWind[i] * (float)(rand()) / (float)RAND_MAX);
+				rand_M[i][j]=(maxWind[i]*0.25) - 0.5*(maxWind[i] * frand());
 			}
 	}
 	if (rand_w_cnt&HMASK == HMASK) {
 		for (int i = 0; i<3; i++)
 			for (int j = 0; j < 4; j++) {
-				rand_H[i][j] = (maxWind[i] * 0.125) - 0.25*(maxWind[i] * (float)(rand()) / (float)RAND_MAX);
+				rand_H[i][j] = (maxWind[i] * 0.125) - 0.25*(maxWind[i] * frand());
 			}
 	}
 
 	if (rand_w_cnt&LMASK == LMASK) {
 		for (int i = 0; i<3; i++)
-			rand_L[i] = (maxWind[i] *(float)(rand()) / (float)RAND_MAX);
+			rand_L[i] = (maxWind[i] *frand());
 	}
 
 
@@ -141,7 +147,7 @@ void get_wind(float w[][4]) {
 #else
 	for (int i = 0; i < 3; i++)
 		for (int j=0; j<4; j++)
-			w[i][j] = 0;
+			w[i][j] = maxWind[i];
 #endif
 }
 
@@ -156,7 +162,7 @@ float  EmuClass::get_heading() {
 	double head = ang[YAW];
 
 #ifdef NOISE_ON
-	head+=(0.4*rand() / (double)RAND_MAX)-0.2;
+	head+=(0.4*frand())-0.2;
 #endif
 	head=wrap_PI(head);
 	head = wrap_PI(head);
@@ -194,16 +200,16 @@ float  EmuClass::get_alt() {
 
 #ifdef NOISE_ON
 	cnt++;
-	const float dt = 0.2;
+	//const float dt = 0.2;
 
 
-	float high_noise = 0.2 - 0.4*(float)(rand()) / (float)RAND_MAX;
+	float high_noise = 0.2 - 0.4*frand();
 	if (cnt&mid_f_noise_cnt == mid_f_noise_cnt) {
-		mid_rand_noise = 0.5 - 1 * (float)(rand()) / (float)RAND_MAX;;
+		mid_rand_noise = 0.5 - 1 * frand();;
 	}
 	mid_noise += (mid_rand_noise - mid_noise)*0.3;
 	if (cnt&low_f_noise_cnt == low_f_noise_cnt) {
-		low_rand_noise = 0.5 - 1 * (float)(rand()) / (float)RAND_MAX;;
+		low_rand_noise = 0.5 - 1 * frand();;
 	}
 	low_noise += (low_rand_noise - low_noise)*0.03;
 	return (float)pos[Z] + low_noise + mid_noise + high_noise;
@@ -268,6 +274,26 @@ void EmuClass::update(const float fm_[4], double dt) {
 	{
 		float w[3][4];
 		get_wind(w);
+		float awindX=(w[X][0] + w[X][1] + w[X][2] + w[X][3]) / 4;
+		float awindY = (w[Y][0] + w[Y][1] + w[Y][2] + w[Y][3]) / 4;
+
+		float windZ = -speed[Z] +  sin(ang[PITCH])* (speed[X]-awindX) - sin(ang[ROLL]) * (speed[Y]-awindY);
+		float windX = -speed[X];
+		float windY = -speed[Y];
+		float wk = 1+(abs(pos[Z])) / 100;
+		for (int i = 0; i < 4; i++) {
+			w[Z][i] = w[Z][i] + windZ;
+			w[X][i] = w[X][i]*wk + windX;
+			w[Y][i] = w[Y][i]*wk + windY;
+
+		}
+
+		
+
+
+
+		
+		//w[2][0] += 3;
 
 		float w03[3], w12[3];
 		float rot03[3], rot12[3];
@@ -295,7 +321,7 @@ void EmuClass::update(const float fm_[4], double dt) {
 				w12[i] = 0;
 
 			wacc[i] = w12[i] + w03[i];
-			wacc[i] = wacc[i] * wacc[i] * f_speed_k[i];
+			wacc[i] = wacc[i] * abs(wacc[i]) * f_speed_k[i];
 
 
 		}
@@ -364,13 +390,13 @@ void EmuClass::update(const float fm_[4], double dt) {
 	acc[Z] = m[2][0] * vec[0] + m[2][1] * vec[1] + m[2][2] * vec[2];
 
 
-	acc[X] = (acc[X] * force) - resistenceF[X] + wacc[X];
-	acc[Y] = (acc[Y] * force) - resistenceF[Y] + wacc[Y];
-	acc[Z] = (acc[Z] * force) - resistenceF[Z] - GRAVITY_G + wacc[Z];
+	acc[X] = (acc[X] * force)   + wacc[X];
+	acc[Y] = (acc[Y] * force)   + wacc[Y];
+	acc[Z] = (acc[Z] * force)  - GRAVITY_G + wacc[Z];
 #ifdef NOISE_ON
-	acc[Z] += 2.5 - 5.0*((float)(rand()) / (float)RAND_MAX);
-	acc[X] += 1.0 - 2.0*((float)(rand()) / (float)RAND_MAX);
-	acc[Y] += 1.0 - 2.0*((float)(rand()) / (float)RAND_MAX);
+	acc[Z] += 2.5 - 5.0*(frand());
+	acc[X] += 1.0 - 2.0*(frand());
+	acc[Y] += 1.0 - 2.0*(frand());
 #endif
 
 
@@ -379,9 +405,9 @@ void EmuClass::update(const float fm_[4], double dt) {
 	speed[Y] += acc[Y] * dt;
 	speed[Z] += acc[Z] * dt;
 
-	resistenceF[X] = speed[X] * fabs(speed[X]) * f_speed_k[X];
-	resistenceF[Y] = speed[Y] * fabs(speed[Y]) * f_speed_k[Y];
-	resistenceF[Z] = speed[Z] * fabs(speed[Z]) * f_speed_k[Z];
+	//resistenceF[X] = speed[X] * fabs(speed[X]) * f_speed_k[X];
+	//resistenceF[Y] = speed[Y] * fabs(speed[Y]) * f_speed_k[Y];
+	//resistenceF[Z] = speed[Z] * fabs(speed[Z]) * f_speed_k[Z];
 
 	pos[X] += speed[X] * dt;
 	pos[Y] += speed[Y] * dt;

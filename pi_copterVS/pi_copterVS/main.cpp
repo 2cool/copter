@@ -87,9 +87,9 @@ void set_wifi_30() {
 
 
 
-#define WIND_X 3
-#define WIND_Y 3
-#define WIND_Z 0.5
+#define WIND_X 0
+#define WIND_Y 0
+#define WIND_Z 0
 
 int init(int cnt) {////--------------------------------------------- INITIALIZATION ------------------------------
 	Log.init(cnt);

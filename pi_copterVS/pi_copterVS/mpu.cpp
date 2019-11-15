@@ -281,7 +281,10 @@ bool MpuClass::loop() {
 	yaw = wrap_PI(g_yaw - yaw_offset);// +yaw_correction_angle );
 	sin_cos(pitch, sinPitch, cosPitch);
 	sin_cos(roll, sinRoll, cosRoll);
-	tiltPower = cosPitch*cosRoll;
+
+
+	tiltPower += (constrain(cosPitch * cosRoll, 0.5f, 1) - tiltPower) * tiltPower_CF;
+
 	cosYaw = cos(yaw);
 	sinYaw = sin(yaw);
 	double WaccX = Emu.get_accX();
@@ -650,7 +653,7 @@ void MpuClass::test_Est_XY() {
 		estY += MAX_LEN;
 		kf[Y]->base(-MAX_LEN);
 	}
-
+	
 	//double t[] = { estX, est_speedX, estY, est_speedY };
 	//Debug.load(0, Mpu.w_accX, Mpu.w_accY);
 	//Debug.dump();

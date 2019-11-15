@@ -1,8 +1,9 @@
 // 
 // 
 // 
-
+#include "Settings.h"
 #include "debug.h"
+
 	 int64_t d_old_t = 0;
 	 int d_delay = 50;
 	 double d_dt = (double)d_delay *0.001;
@@ -40,7 +41,66 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 	 }
 
 
+	 string DebugClass::get_set(bool for_save) {
+		 ostringstream convert;
 
+#ifdef FLY_EMULATOR
+		 convert << \
+			 Emu.get_windX() << "," << \
+			 Emu.get_windY() << "," << \
+			 Emu.get_windZ() << "," << \
+			 4 << "," << \
+			 5 << "," << \
+			 6 << "," << \
+			 7 << "," << \
+			 8 << "," << \
+			 9 << "," << \
+			 10 ;
+#else
+		 convert << \
+			 1 << "," << \
+			 2 << "," << \
+			 3 << "," << \
+			 4 << "," << \
+			 5 << "," << \
+			 6 << "," << \
+			 7 << "," << \
+			 8 << "," << \
+			 9 << "," << \
+			 10;
+#endif
+			
+		 string ret = convert.str();
+		 return string(ret);
+	 }
+	 
+	 void DebugClass::set(const float ar[]) {
+		 int i = 0, j = 0;
+
+		 
+
+		 if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK) {
+#ifdef FLY_EMU
+float wind[3] = { Emu.get_windX(),Emu.get_windY(),Emu.get_windZ() };
+			 wind[j++] = ar[i++];
+			 wind[j++] = ar[i++];
+			 wind[j++] = ar[i++];
+			 Emu.init_wind(wind[0], wind[1], wind[2]);
+#else
+		 Settings.set(ar[i++], sett[j++]);
+		 Settings.set(ar[i++], sett[j++]);
+		 Settings.set(ar[i++], sett[j++]);
+#endif
+			 Settings.set(ar[i++], sett[j++]);
+			 Settings.set(ar[i++], sett[j++]);
+			 Settings.set(ar[i++], sett[j++]);
+			 Settings.set(ar[i++], sett[j++]);
+			 Settings.set(ar[i++], sett[j++]);
+			 Settings.set(ar[i++], sett[j++]);
+			 Settings.set(ar[i++], sett[j++]);
+
+		 }
+	 }
 
 
 	 void DebugClass::load(const uint8_t i, const float x, const float y) {

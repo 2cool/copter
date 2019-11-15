@@ -70,7 +70,7 @@ private:
 
  public:
 	 inline float get_dt() { return mpu_dt; }
-
+	 inline float est_speed() { return sqrt(estX * estX + estY * estY); }
 	 void getXYRelative2Zero(double&x, double&y) { x -= x_at_zero; y -= y_at_zero; }
 	// void set_cos_sin_dir();
 	// double dir_angle_GRAD, cosDirection, sinDirection;

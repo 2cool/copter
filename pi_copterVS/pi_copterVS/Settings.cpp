@@ -133,7 +133,9 @@ bool SettingsClass::load_(string buf, bool any_ch) {
 		break;
 	case 6:
 		//Commander.set(load(buf, filds));
-
+		break;
+	case 7:
+		Debug.set(load(buf, filds, false));
 		break;
 	default:
 		return false;

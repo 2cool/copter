@@ -80,7 +80,7 @@ using namespace std;
 
 
 void AutopilotClass::init(){/////////////////////////////////////////////////////////////////////////////////////////////////
-
+	strong_wind = false;
 	hall_ok = 255;
 	shmPTR->sim800_reset = false;
 	time_at__start = old_time_at__start = 0;
@@ -189,16 +189,16 @@ void AutopilotClass::smart_commander(const float dt){
 static int32_t last_beep__time = 0;
 
 
-
+#define AUTOPILOT_TIMEOUT 0.033
 void AutopilotClass::loop(){/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	
 	
 	const int32_t _ct = millis_();
 	float dt = (float)((_ct - control_DeltaTime)*1e-3); 
-	if (dt < 0.033)
+	if (dt < AUTOPILOT_TIMEOUT)
 		return;
-	dt= constrain(dt, 0.033, 0.1);
+	dt= constrain(dt, AUTOPILOT_TIMEOUT, 0.1);
 	control_DeltaTime = _ct;
 
 	if (shmPTR->control_bits_4_do)
@@ -488,7 +488,8 @@ bool AutopilotClass::go2HomeProc(const float dt){
 			f_go2homeTimer += dt;
 			if (f_go2homeTimer > 5){
 				go2homeIndex = TEST_ALT2;
-				flyAtAltitude_R = flyAtAltitude_V = (FAST_DESENDING_TO_HIGH);
+				if (flyAtAltitude_R> FAST_DESENDING_TO_HIGH)
+					flyAtAltitude_R = flyAtAltitude_V = (FAST_DESENDING_TO_HIGH);
 			}
 			break;
 
@@ -522,13 +523,57 @@ bool AutopilotClass::go2HomeProc(const float dt){
 		}
 	 }
 
-	if (Mpu.get_Est_Alt() < (DOWN_IF_HIGHER_THEN_ON_FLY_TO_HOME+20) && GPS.loc.dist2home - dist2home_at_begin > MAX_DIST_ERROR_TO_FALL){
-		cout << GPS.loc.dist2home - dist2home_at_begin<<" STRONG_WIND\n";
-		Autopilot.off_throttle(false, e_TOO_STRONG_WIND);
-	}
+	 strong_wind_fight_control();
+	
 
 	return true;
 }
+//---------------------------------------------------------------
+
+void AutopilotClass::strong_wind_fight_control() {
+	static float old_dist;
+	 static float speed_to_home;
+
+	 if (Balance.get_max_angle() < 45) {
+		 old_dist = GPS.loc.dist2home;
+		 speed_to_home = -Mpu.est_speed();
+		 if (Mpu.get_Est_Alt() < (DOWN_IF_HIGHER_THEN_ON_FLY_TO_HOME + 20) && GPS.loc.dist2home - dist2home_at_begin > MAX_DIST_ERROR_TO_ACT) {
+			 Balance.set_max_throthle_without_limit(45);
+			 strong_wind = true;
+			 cout << "STRONG_WIND" << endl;
+			 Telemetry.addMessage(e_TOO_STRONG_WIND);
+			 cout << "STRONG_WIND" << "\t" << millis_() << endl;
+		 }
+	 } else {
+
+		 if (Balance.get_alt_over_place() && flyAtAltitude_R <= height_to_lift_to_fly_to_home && GPS.loc.dist2home - dist2home_at_begin > MAX_DIST_ERROR_4_PLACE_OVER_ALT) {
+			 Balance.set_place_over_alt();
+			 cout << "PlACE OVER ALT" << "\t" << millis_() << endl;
+		 }
+
+		 speed_to_home += ((old_dist - GPS.loc.dist2home) / AUTOPILOT_TIMEOUT - speed_to_home) * 0.1;
+		 //cout << "speed to home " << speed_to_home << endl;
+		 old_dist = GPS.loc.dist2home;
+		 if (flyAtAltitude_R > height_to_lift_to_fly_to_home)
+			flyAtAltitude_R = flyAtAltitude_V -= AUTOPILOT_TIMEOUT * 3;
+		 else {
+			// angle += (sqrt(Mpu.get_pitch() * Mpu.get_pitch() + Mpu.get_roll() * Mpu.get_roll()) - angle) * 0.01;
+			 if (speed_to_home < 5 && GPS.loc.dist2home >= 20 ) {
+				 float a = Balance.get_max_angle();
+				 if (a < 60) {
+					 a += 0.01;
+					 Balance.set_max_throthle_without_limit(a);
+					// cout << "set max_angle " << a << endl;
+				 }
+			 }
+		 }
+		 if (go2homeIndex == START_FAST_DESENDING) {
+			 float p = 1, n = -1;
+			 Stabilization.set_max_sped_ver(p, n);
+		 }
+	 }
+}
+//---------------------------------------------------------------
 bool AutopilotClass::going2HomeON(const bool hower){
 	
 	Stabilization.setDefaultMaxSpeeds();
@@ -705,7 +750,11 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 
 		time_at__start = _ct;
 		Telemetry.update_voltage();
+#ifdef FLY_EMULATOR
+		control_bits = MOTORS_ON;
+#else
 		control_bits |= MOTORS_ON;
+#endif
 		GPS.loc.setHomeLoc();
 		Mpu.set_XYZ_to_Zero();  // все берем из мпу. при  старте x y z = 0;
 		//tflyAtAltitude = flyAtAltitude = 0;// Mpu.get_Est_Alt();
@@ -762,7 +811,11 @@ bool AutopilotClass::off_throttle(const bool force, const string msg){//////////
 		cout << "force motors_off " << msg << ", alt: " << (int)Mpu.get_Est_Alt() << ", time " << (int)millis_() << endl;
 		Balance.set_off_th_();
 		Telemetry.addMessage(msg);
+#ifdef FLY_EMULATOR
+		control_bits = 0;
+#else
 		control_bits &= (XY_STAB | Z_STAB);
+#endif
 		return true;
 	}
 	else{

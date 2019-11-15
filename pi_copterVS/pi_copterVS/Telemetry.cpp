@@ -86,6 +86,9 @@ void TelemetryClass::getSettings(int n){
 	case 6:
 		message += Commander.get_set();
 		break;
+	case 7:
+		message += Debug.get_set();
+		break;
 	}
 	
 /*	uint8_t o = (message.length()+1) % 3;  //чтобы длина сообщения была кратная трем.

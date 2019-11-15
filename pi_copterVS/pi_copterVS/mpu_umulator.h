@@ -41,6 +41,7 @@ private:
 	float wind[3];
 	float f[4][3];
 public:
+	void init_wind(float x, float y, float z);
 	void battery(float [], float &voltage);
 	void init(float wx, float wy, float wz, float yaw=0,float pitch=0,float roll=0);
 	float get_pitch();
@@ -53,7 +54,9 @@ public:
 	float get_accX();
 	float get_accZ();
 	float get_accY();
-
+	float get_windX();
+	float get_windY();
+	float get_windZ();
 	float get_alt();
 	float get_speedX() { return (float)speed[X]; }
 	float get_speedY() { return (float)speed[Y]; }

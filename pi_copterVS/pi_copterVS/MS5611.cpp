@@ -149,10 +149,12 @@ bool MS5611Class::loop(){
 	
 	log_sens();
 
-	powerK = PRESSURE_AT_0 / pressure;
+	powerK = 101325.0 / (double)pressure;
 
 	if (powerK>1.4)
 		powerK = 1.4;
+	if (powerK < 1)
+		powerK = 1;
 	return true;
 }
 

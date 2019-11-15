@@ -340,7 +340,7 @@ bool ProgClass::getIntersection(double &x, double &y){
 				dist2line = (1.0 + sqrt(xx * xx + yy * yy));
 
 			if (dist2line > r){
-				if (dist2line > MAX_DIST_ERROR_TO_FALL){
+				if (dist2line > MAX_DIST_ERROR_TO_ACT){
 					Telemetry.addMessage(e_TOO_STRONG_WIND);
 					Autopilot.going2HomeStartStop(false);
 					return true;

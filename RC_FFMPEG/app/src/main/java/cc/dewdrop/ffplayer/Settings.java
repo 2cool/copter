@@ -34,7 +34,8 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             {0.2,0.2,0.2,0.2,0.2,0.2,1,1,1,2},
             {0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
             {0.2,10,3,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
-            {0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2}
+            {0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
+            {20,20,10,1,0.2,0.2,0.2,0.2,0.2,0.2}
 
     };
 
@@ -53,7 +54,9 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             //compas
             {"m power on,1,0,100","yaw_correction","calibr_index",_null,_null,_null,_null,_null,_null,_null},
             //rest
-            {"vedeoAdr","ppp_inet","telegram",_null,_null,_null,_null,_null,_null,_null}
+            {"vedeoAdr","ppp_inet","telegram",_null,_null,_null,_null,_null,_null,_null},
+            //DEBUG
+            {"debug 1","debug 2","debug 3","debug 4","debug 5","debug 6","debug 7","debug 8","debug 9","debug 0"}
 
     };
 

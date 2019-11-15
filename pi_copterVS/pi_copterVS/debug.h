@@ -22,6 +22,9 @@ class DebugClass
 	 void graphic(const int n, const float x, const float y);
 	 void graphic(const int n, const float x, const float y,const float z);
  public:
+	 float sett[10];
+	 string get_set(bool for_save = false);
+	 void set(const float buf[]);
 	 uint32_t escCalibr;
 	 
 	 float  lowest_altitude_to_fly;
