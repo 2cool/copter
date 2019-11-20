@@ -150,7 +150,7 @@ public class Net {
     final int PORT = 1;
 
     static int threads_=0;
-
+    private long  old_t=0;
     public boolean runTCPClient(String ip_port) {
         if (threads_>0)
             return false;
@@ -173,7 +173,7 @@ public class Net {
                 int offline_cnt=0;
                 while (net_runing && run) {
                     try {
-                        int len = Commander.get(buffer);
+                        int len = Commander.get_b(buffer);
                         DatagramPacket packet = new DatagramPacket(buffer, len, serverAddr, SERVER_PORT);
                        // Log.d("UDP","send data. threads="+threads_);
                         udpSocket.send(packet);
@@ -187,9 +187,15 @@ public class Net {
                         Telemetry.bufferReader_(buffer, len);
                         offline_cnt=0;
                             //  Log.d("Receivedtext", text);
-
-                        // try {Thread.sleep(10);} catch (InterruptedException e) {e.printStackTrace(); }
-
+                        long t=System.currentTimeMillis();
+                        if (t-old_t < 50) {
+                            try {
+                                Thread.sleep(old_t+50-t);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        old_t=t;
                     } catch (IOException e) {
                         if (offline_cnt++>3) {
                             run=false;

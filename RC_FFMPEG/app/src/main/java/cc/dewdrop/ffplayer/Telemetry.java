@@ -377,12 +377,14 @@ public class Telemetry {
     static public void bufferReader_(byte buf[],int buf_len){
         //   Log.d("BUFREAD","bufRead");
         int i=0;
-
+      //  Log.d("COMMANDER", " tel "+telemetry_couter);
         telemetry_couter++;
         MainActivity.control_bits=load_int32(buf,i);
         if (MainActivity.control_bits != old_cb) {
             BeepHelper.beep();
             old_cb=MainActivity.control_bits;
+
+           // Log.d("COMMANDER", " tel " +MainActivity.control_bits + " time="+System.currentTimeMillis() + " cnt "+telemetry_couter);
         }
         i+=4;
 

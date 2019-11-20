@@ -365,7 +365,7 @@ bool BalanceClass::loop()
 #endif
 
 		
-	if (speed_up && (speed_up_control(f_) || throttle <= MIN_THROTTLE))
+	if (speed_up && (speed_up_control(f_) || throttle <= MIN_THROTTLE_2_DONT_RESET_STAB_PIDS))
 		PID_reset();
 	else
 		speed_up = false;

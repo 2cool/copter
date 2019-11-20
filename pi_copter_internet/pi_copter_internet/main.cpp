@@ -230,7 +230,7 @@ string down_case(string &str) {
 	}
 	return str;
 }
-const static int  com_bit[] = { MOTORS_ON ,GO2HOME,CONTROL_FALLING,REBOOT,SHUTDOWN,GIMBAL_PLUS,GIMBAL_MINUS,PROGRAM,Z_STAB,XY_STAB,GIMBAL_AXIS,NOT_USED2,MPU_GYRO_CALIBR,COMPASS_CALIBR };
+const static int  com_bit[] = { MOTORS_ON ,GO2HOME,CONTROL_FALLING,REBOOT,SHUTDOWN,GIMBAL_PLUS,GIMBAL_MINUS,PROGRAM,Z_STAB,XY_STAB,GIMBAL_AXIS,FPV_RECIVED,MPU_GYRO_CALIBR,COMPASS_CALIBR };
 const static string str_com[] = { "motorson","go2home","cntrf","reboot","shutdown","gimbp","gimbm","prog","zstab","xystab","compason","horizonton","mpugyrocalibr","compasscalibr","stat", "help","image" };
 const static int arr_size = sizeof(com_bit) / 4;
 //-----------------------------------------------------------------------------
@@ -682,14 +682,14 @@ void loger_loop() {
 	static double old_lat = 0, old_lon = 0;
 	int sockfd_loger=0;
 	shmPTR->loger_run = true;
-
+	cout << "started loger loop\n";
 	while (true) {
 		delay(1000);
 		double lat = 1.74532925199433e-9 * (double)shmPTR->lat_;  //radians
 		double lon = 1.74532925199433e-9 * (double)shmPTR->lon_;
 		//bearing = bearing_(lat, lon, lat + DELTA_A_RAD, lon + DELTA_A_RAD);
 		const double distance = distance_(lat, lon, old_lat, old_lon);
-		if (distance>10) {
+		if (shmPTR->accuracy_hor_pos_ <= 20 && distance > 10) {
 			//cout << "sended" << endl;
 			old_lat = lat;
 			old_lon = lon;

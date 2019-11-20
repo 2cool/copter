@@ -155,8 +155,9 @@ public class Commander {
 
         return mask;
     }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    static public int get(byte buf[]){
+    static public int get_b(byte buf[]){
 
 
 
@@ -171,10 +172,11 @@ public class Commander {
 
 
         int mask=get32to8bMask(MainActivity.command_bits_);
-
         load_32int2buf(buf,i,MainActivity.command_bits_);
+
+       // Log.d("COMMANDER", " com "+counter);
         if (MainActivity.command_bits_!=old_commande) {
-            // Log.i("COMMANDER", " " + MainActivity.command_bits_);
+            // Log.d("COMMANDER", " com " + MainActivity.command_bits_ + " time="+System.currentTimeMillis() + " cnt "+counter);
            // Log.i("COMMANDER", " " + MainActivity.command_bits_);
             old_commande=MainActivity.command_bits_;
         }
