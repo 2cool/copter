@@ -248,6 +248,14 @@ void EmuClass::init(float wx, float wy, float wz,float y , float p , float r ) {
 }
 
 
+double cosA = 1;
+double sinA = 0;
+double cosB = 1;
+double sinB = 0;
+double cosY = 1;
+double sinY = 0;
+
+
 
 float motors_pow[4] = { 0,0,0,0 };
 void EmuClass::update(const float fm_[4], double dt) {
@@ -277,8 +285,11 @@ void EmuClass::update(const float fm_[4], double dt) {
 		float awindX=(w[X][0] + w[X][1] + w[X][2] + w[X][3]) / 4;
 		float awindY = (w[Y][0] + w[Y][1] + w[Y][2] + w[Y][3]) / 4;
 
-		float windZ = -speed[Z] +  sin(ang[PITCH])* (speed[X]-awindX) - sin(ang[ROLL]) * (speed[Y]-awindY);
-	//	cout << windZ << endl;
+		float pitch = (float)(cosA * ang[PITCH] + sinA * ang[ROLL]);
+		float roll = (float)(cosA * ang[ROLL] - sinA * ang[PITCH]);
+
+		float windZ = -speed[Z] +  sin(pitch)* (speed[X]-awindX) - sin(roll) * (speed[Y]-awindY);
+		//cout << windZ << endl; 
 		float windX = -speed[X];
 		float windY = -speed[Y];
 		float wk = 1+(abs(pos[Z])) / 100;
@@ -372,12 +383,12 @@ void EmuClass::update(const float fm_[4], double dt) {
 
 	double m[3][3];
 
-	const double cosA = cos(ang[YAW]);
-	const double sinA = sin(ang[YAW]);
-	const double cosB = cos(ang[PITCH]);
-	const double sinB = sin(ang[PITCH]);
-	const double cosY = cos(ang[ROLL]);
-	const double sinY = sin(ang[ROLL]);
+	cosA = cos(ang[YAW]);
+	sinA = sin(ang[YAW]);
+	cosB = cos(ang[PITCH]);
+	sinB = sin(ang[PITCH]);
+	cosY = cos(ang[ROLL]);
+	sinY = sin(ang[ROLL]);
 
 	m[0][0] = cosA * cosB; m[0][1] = cosA * sinB*sinY - sinA * cosY; m[0][2] = cosA * sinB*cosY + sinA * sinY;
 	m[1][0] = sinA * cosB; m[1][1] = sinA * sinB*sinY + cosA * cosY; m[1][2] = sinA * sinB*cosY - cosA * sinY;

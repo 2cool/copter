@@ -80,6 +80,7 @@ private:
 	 float get_Est_SpeedX() { return est_speedX; }
 	 float get_Est_SpeedY() { return est_speedY; }
 	 float get_Est_SpeedZ() { return est_speedZ; }
+	 float get_Est_SpeedXY() { return sqrt(est_speedX * est_speedX + est_speedY * est_speedY); }
 	 double get_Est_Alt() { return (double)(est_alt-alt_at_zero)+base_z; }
 	 void set_XYZ_to_Zero();
 

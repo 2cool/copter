@@ -89,8 +89,9 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	min_hor_accuracy_2_start = MIN_ACUR_HOR_POS_2_START_;
 	ignore_the_lack_of_internet_at_startup = false;
 	fall_thr = FALLING_THROTTLE;
-	sens_z = 6;
-	sens_xy = 0.285f;
+	sens_z_p = 5;
+	sens_z_m = 5;
+	sens_xy = 10.0/45.0;
 
 	newData = false;
 
@@ -141,8 +142,17 @@ void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 			flyAtAltitude_V = flyAtAltitude_R = Mpu.get_Est_Alt();
 			set_alt = true;
 		}
-		if (speed < -0.2 && (flyAtAltitude_R < lowest_height || flyAtAltitude_V < lowest_height))
-			speed = fmax(-0.2, speed);
+
+		if (speed < -0.02) {
+			float max_sp = Stabilization.getSpeed_XY(5 - Mpu.get_Est_Alt());
+			const float k = -1.0f/Stabilization.get_def_max_speedZ_M();
+			if (max_sp > speed * k)
+				max_sp = speed * k;
+			speed = max_sp;
+		}
+
+		//if (speed < -0.2 && (flyAtAltitude_R < lowest_height || flyAtAltitude_V < lowest_height))
+		//	speed = fmax(-0.2, speed);
 
 		if (speed > 0) 
 			speedP = speed;
@@ -274,7 +284,8 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 					aYaw_ = Commander.get_yaw_minus_offset();
 					if (control_bits & Z_STAB) {
 						const float thr = Commander.getThrottle();
-						const float speed = (thr - MIDDLE_POSITION) * sens_z;
+						const float pos = (thr - MIDDLE_POSITION);
+						const float speed = 2* pos * ((pos>=0) ? sens_z_p:sens_z_m);
 						add_2_need_altitude(speed, dt);
 					}
 					else {
@@ -336,6 +347,17 @@ void AutopilotClass::log() {
 		Log.block_end();
 	}
 }
+
+
+void AutopilotClass::set_sensXY(const float max_speed) {
+	sens_xy=max_speed / 45;
+}
+
+void AutopilotClass::set_sensZ(const float speed_P, const float speed_M) {
+	sens_z_p = speed_P;
+	sens_z_m = -speed_M;
+}
+
 string AutopilotClass::get_set(bool for_save){
 	
 	ostringstream convert;
@@ -343,8 +365,6 @@ string AutopilotClass::get_set(bool for_save){
 		height_to_lift_to_fly_to_home << "," << \
 		Balance.get_max_throttle() << "," << \
 		Balance.get_min_throttle() << "," << \
-		sens_xy << "," << \
-		sens_z << "," << \
 		lowest_height << "," << \
 		shmPTR->fly_at_start << "," << \
 		Telemetry.get_bat_capacity() << ",";
@@ -364,8 +384,6 @@ void AutopilotClass::set(const float ar[]){
 		Settings.set(ar[i++], height_to_lift_to_fly_to_home);
 		Balance.set_min_max_throttle(ar[i++], ar[i++]);
 		//i += 2;
-		Settings.set(ar[i++], sens_xy);
-		Settings.set(ar[i++], sens_z);
 		Settings.set(ar[i++], lowest_height);
 		Settings.set(ar[i++], shmPTR->fly_at_start);
 		if (shmPTR->fly_at_start + 1 < lowest_height)
@@ -576,7 +594,7 @@ void AutopilotClass::strong_wind_fight_control() {
 //---------------------------------------------------------------
 bool AutopilotClass::going2HomeON(const bool hower){
 	
-	Stabilization.setDefaultMaxSpeeds();
+	Stabilization.setDefaultMaxSpeeds4Return2HOME();
 
 	howeAt2HOME = hower;//зависнуть на месте или нет
 
@@ -598,9 +616,10 @@ bool AutopilotClass::going2HomeStartStop(const bool hower){
 		return false;
 	bool f = (control_bits & GO2HOME);
 	if (f){
-		flyAtAltitude_R = flyAtAltitude_V;
+		flyAtAltitude_R = flyAtAltitude_V = Mpu.get_Est_Alt();
 		control_bits ^=GO2HOME;
 		holdLocation(GPS.loc.lat_, GPS.loc.lon_);
+		Stabilization.setDefaultMaxSpeeds();
 		return true;
 	}
 	else{

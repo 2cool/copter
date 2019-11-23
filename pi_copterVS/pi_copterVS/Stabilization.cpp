@@ -18,6 +18,7 @@
 #include "Log.h"
 #include "Settings.h"
 
+
 float Z_FILTER = 1;
 float XY_FILTER = 1;
 void StabilizationClass::setMaxAng() {
@@ -32,11 +33,12 @@ void StabilizationClass::init(){
 	set_acc_xy_speed_kp(6);
 	set_acc_xy_speed_kI(2.5);
 	set_acc_xy_speed_imax(Balance.get_max_angle());
-	def_max_speedXY=max_speed_xy = MAX_HOR_SPEED;
-	min_stab_hor_speed = 1;
+
+	def_max_speedXY=max_speed_xy = 10;
+	min_stab_hor_speed = 0.5;
 	min_stab_ver_speed = 1;
-	def_max_speedZ_P = max_speedZ_P =  MAX_VER_SPEED_PLUS;
-	def_max_speedZ_M = max_speedZ_M = MAX_VER_SPEED_MINUS;
+	def_max_speedZ_P = max_speedZ_P =  3;
+	def_max_speedZ_M = max_speedZ_M = -3;
 	//--------------------------------------------------------------------------
 
 	alt2speedZ = 0.2;
@@ -48,6 +50,19 @@ void StabilizationClass::init(){
 	//----------------------------------------------------------------------------
 	d_speedX=d_speedY=mc_z=0;
 }
+void StabilizationClass::setDefaultMaxSpeeds4Return2HOME() {
+	max_speed_xy = def_max_speedXY;
+	if (max_speed_xy < MIN_SPEED_TO_GO_TO_HOME_XY)
+		max_speed_xy = MIN_SPEED_TO_GO_TO_HOME_XY;
+	max_speedZ_P = def_max_speedZ_P;
+	if (max_speedZ_P < MIN_SPEED_TO_GO_TO_HOME_Z)
+		max_speedZ_P = MIN_SPEED_TO_GO_TO_HOME_Z;
+	max_speedZ_M = def_max_speedZ_M;
+	if (max_speedZ_M > -MIN_SPEED_TO_GO_TO_HOME_Z)
+		max_speedZ_M = -MIN_SPEED_TO_GO_TO_HOME_Z;
+}
+
+
 
 void StabilizationClass::setDefaultMaxSpeeds(){//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	max_speed_xy = def_max_speedXY;
@@ -57,13 +72,19 @@ void StabilizationClass::setDefaultMaxSpeeds(){//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 void StabilizationClass::max_speed_limiter(float &x, float &y) {
-	const double speed2 = (x*x + y * y);
-	const double maxSpeed2 = max_speed_xy * max_speed_xy;
-	if (speed2 > maxSpeed2) {
-		const float k = (float)sqrt(maxSpeed2 / speed2);
-		x *= k;
-		y *= k;
+	const float max_ = max(abs(x), abs(y));
+	if (max_ > 0) {
+		x = x / max_ * max_speed_xy;
+		y = y / max_ * max_speed_xy;
+		const float speed2 = (x * x + y * y);
+		const float maxSpeed2 = max_speed_xy * max_speed_xy;
+		if (speed2 > maxSpeed2) {
+			const float k = (float)sqrt(maxSpeed2 / speed2);
+			x *= k;
+			y *= k;
+		}
 	}
+
 }
 void StabilizationClass::setNeedPos2Home() {
 	needXR = needXV = needYR = needYV = 0;
@@ -277,7 +298,12 @@ void StabilizationClass::setZ(const float  *ar) {
 		Settings.set(ar[i++], t);
 		pids[SPEED_Z_PID].kI(t);
 		Settings.set(ar[i++], def_max_speedZ_P);
+		def_max_speedZ_P = constrain(def_max_speedZ_P, 1, 20);
 		Settings.set(ar[i++], def_max_speedZ_M);
+		def_max_speedZ_M = constrain(def_max_speedZ_M, -10, -1);
+		Autopilot.set_sensZ(def_max_speedZ_P, def_max_speedZ_M);
+
+
 		Settings.set(ar[i++], min_stab_ver_speed);
 		Settings.set(ar[i++], Z_FILTER);
 		if (Z_FILTER > 1)
@@ -316,11 +342,13 @@ void StabilizationClass::setXY(const float  *ar){
 		Settings.set(ar[i++], dist2speed_XY);
 		t = pids[SPEED_X_SPEED].kP();
 		Settings.set(ar[i++], t);
-			set_acc_xy_speed_kp(t);
+		set_acc_xy_speed_kp(t);
 		t = pids[SPEED_X_SPEED].kI();
 		Settings.set(ar[i++], t);
-			set_acc_xy_speed_kI(t);
+		set_acc_xy_speed_kI(t);
 		Settings.set(ar[i++], def_max_speedXY);
+		def_max_speedXY = constrain(def_max_speedXY, 1, 20);
+		Autopilot.set_sensXY(def_max_speedXY);
 		Settings.set(ar[i++], min_stab_hor_speed);
 		Settings.set(ar[i++], XY_FILTER);
 		if (XY_FILTER > 1)

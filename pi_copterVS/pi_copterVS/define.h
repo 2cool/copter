@@ -8,7 +8,7 @@
 //#define OFF_MOTOR_IF_LOST_CONNECTION  
 //#define OFF_TIMELAG
 //-----------------------------------------------------------------
-//#define FLY_EMULATOR
+#define FLY_EMULATOR
 //----------------------------------------------------------------
 //#define YAW_OFF
 //#define XY_SAFE_AREA 200
@@ -18,6 +18,9 @@
 //#define DEBUG_MODE
 #define GPS_ALT_MAX_ERROR 30
 #define MAX_BAROMETR_ERRORS 40
+
+#define MIN_SPEED_TO_GO_TO_HOME_XY 10.0f
+#define MIN_SPEED_TO_GO_TO_HOME_Z 5.0f
 
 
 #define WORK_WITH_WIFI
@@ -57,12 +60,7 @@
 
 #define DOWN_IF_HIGHER_THEN_ON_FLY_TO_HOME 200
 #define HIGHT_TO_LIFT_ON_TO_FLY_TO_HOME 80
-#define FAST_DESENDING_TO_HIGH 15
-
-#define MIN_STAB_HOR_SPEED 0.2
-#define MAX_HOR_SPEED 10
-#define MAX_VER_SPEED_PLUS 5
-#define MAX_VER_SPEED_MINUS -5
+#define FAST_DESENDING_TO_HIGH 30
 
 #define ACCURACY_XY 5
 #define ACCURACY_Z 3

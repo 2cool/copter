@@ -42,7 +42,7 @@ public class DrawView extends View {
     static public Img_button[]motors_on=new Img_button[2];
 
     static public Img_button control_type_acc_, head_less_;
-    static public float maxAngle=35;
+    static public final float maxAngle=45; //only 45
     Monitor monitor;
     static private int screen=viewMain;
     FlightTextInfo ftx;

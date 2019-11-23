@@ -34,7 +34,7 @@ class AutopilotClass
 #endif
 
 	 bool howeAt2HOME;
-	 float sens_z, sens_xy;
+	 float sens_z_p, sens_z_m, sens_xy;
 
 	 bool newData;
 	 int32_t control_DeltaTime;
@@ -66,6 +66,8 @@ class AutopilotClass
 	bool strong_wind;
 	 
  public:
+	 void set_sensXY(const float max_speed);
+	 void set_sensZ(const float speed_P, const float speed_M);
 	 bool if_strong_wind() { return strong_wind; }
 	 float min_hor_accuracy_2_start;
 	 int32_t powerOnTime();

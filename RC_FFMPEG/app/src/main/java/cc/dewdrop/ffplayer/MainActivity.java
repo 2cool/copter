@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.GradientDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -462,6 +463,13 @@ double angK=0.3;
             double f=gyroscopeWork?Math.max(0.003,Math.min(0.03,dt*0.5)):0.03;
             pitch += (aPitch - pitch) * f;
             roll += (aRoll - roll) * f;
+
+            final double angle=Math.sqrt(pitch*pitch+roll*roll);
+            if ( angle > DrawView.maxAngle*RAD2GRAD){
+                final double k=DrawView.maxAngle/angle;
+                pitch*=k;
+                roll*=k;
+            }
             //update=DrawView.control_type_acc.is_pressed();
            // Log.d("ACC", pitch+" "+roll);
 

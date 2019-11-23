@@ -134,7 +134,7 @@ void BalanceClass::set(const float *ar, int n){
 			
 			t = max_angle;
 			Settings.set(ar[i++], t);
-			max_angle = constrain(t, 15, 35);
+			max_angle = constrain(t, 15, 45);
 			Stabilization.setMaxAng();
 		}
 	}

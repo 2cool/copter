@@ -272,20 +272,21 @@ void stop_ffmpeg_stream() {
 }
 void start_ffmpeg_stream() {
 	uint32_t ip = (shmPTR->client_addr & 0x00ffffff) | shmPTR->fpv_adr << 24;
-	string s = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + " > /dev/null 2>&1  &";
-	cout << "stream started" << endl;
-	system(s.c_str());
 
-
-	std::time_t result = std::time(nullptr);
+std::time_t result = std::time(nullptr);
 	//std::cout << std::asctime(std::localtime(&result))
 //		<< result << " seconds since the Epoch\n";
 
 
 	string file_name = "/home/igor/stream_"+std::to_string(result);
 	file_name += +".mp4";
-	s = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -r 60 -y " + file_name + " > /dev/null 2>&1  &";
-	cout << "stream to "+ file_name + " started" << endl;
+
+
+
+
+	string s = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + \
+		"-r 60 -y " + file_name + " > /dev/null 2>&1  &";
+	cout << "stream started" << endl;
 	system(s.c_str());
 
 	

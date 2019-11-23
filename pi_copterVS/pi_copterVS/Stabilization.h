@@ -50,8 +50,12 @@ private:
 public:
 	void set_max_speed_hor(float& s, bool only_test = false);
 	void set_max_sped_ver(float &ps, float &ns, bool only_test = false);
-	float get_max_speedXY() { return def_max_speedXY; }
+	float get_def_max_speedXY() { return def_max_speedXY; }
 	float get_min_stagXY() { return min_stab_hor_speed; }
+	float get_def_max_speedZ_M() { return def_max_speedZ_M; }
+	float get_max_speedXY_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_XY, min_stab_hor_speed); }
+	float get_max_speedZ_M_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_Z, -def_max_speedZ_M); }
+	float get_max_speedZ_P_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_Z, def_max_speedZ_P); }
 	void setMaxAng();
 	void setMinMaxI_Thr();
 	void setNeedPos2Home();
@@ -81,7 +85,7 @@ public:
 
 
 
-
+	void setDefaultMaxSpeeds4Return2HOME();
 	void setDefaultMaxSpeeds();
 	
 

@@ -229,14 +229,14 @@ int TelemetryClass::fly_time_left() {
 	return fly_time_lef;
 }
 int TelemetryClass::check_time_left_if_go_to_home(){
-	float time_left=0;
-
+	float need_time=0;
 	if (Autopilot.motors_is_on()) {
-		const double time2home = GPS.loc.dist2home * (1.0 / Stabilization.get_max_speedXY());
-		const double time2down = fabs((Mpu.get_Est_Alt()) * (1.0 / MAX_VER_SPEED_MINUS));
-		time_left = (time2home + time2down);
+		need_time = 5.0f+GPS.loc.dist2home / Stabilization.get_max_speedXY_4_go_to_home();
+		if (Mpu.get_Est_Alt() < HIGHT_TO_LIFT_ON_TO_FLY_TO_HOME) 
+			need_time += 5.0f+(HIGHT_TO_LIFT_ON_TO_FLY_TO_HOME- Mpu.get_Est_Alt()) / Stabilization.get_max_speedZ_P_4_go_to_home();
+		need_time += 5.0f+fabs(Mpu.get_Est_Alt() / Stabilization.get_max_speedZ_M_4_go_to_home());
 	}
-	return fly_time_lef-time_left;
+	return fly_time_lef-need_time;
 }
 
 
@@ -435,6 +435,11 @@ bool TelemetryClass::update_buf() {
 	loadBUF8(i, Mpu.get_roll());
 	loadBUF8(i, Balance.c_pitch);
 	loadBUF8(i, Balance.c_roll);
+
+	loadBUF8(i, fmin((Mpu.get_Est_SpeedXY() * 3), 127));
+	loadBUF8(i, fmin((Mpu.get_Est_SpeedZ() * 5), 127));
+	int16_t d2h = GPS.loc.dist2home;
+	loadBUF16(i, (d2h <= 0x7fff) ? d2h : 0x7fff - d2h);
 	loadBUF16(i, (int)(voltage*10*4/SN));
 
 

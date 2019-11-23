@@ -23,7 +23,7 @@ public class Telemetry {
     static public double roll=0,pitch=0,yaw=0;
     static private double _start_lat=0,_start_lon=0;
     static private boolean start_data_is_loaded=false;
-    static public double dist=0,speed=0,v_speed=0,alt_time=0 ,speed_time=0,direction;
+    static public double dist=0,speed=0,v_speed=0,speed_time=0,direction;
     static public String messages=null;
     static public float heading=0,	battery_consumption=0,vibration=0;
     static public int status=0;
@@ -31,14 +31,13 @@ public class Telemetry {
     static double ap_pitch,ap_roll,realThrottle;  //autopilot
     static private  double ap_throttle=0;
     static int gimbalPitch;
-    static float _alt=0,old_alt1=-100000;
+    static float _alt=0;
     static float  relAlt=0;
     static String batery="";
     static final int MIN_VOLT =1280;
     static final int VOLT_50  =1520;
     static boolean F_MIN_VOLT=false;
     static boolean F_VOLT50 =false;
-    static private double old_Lat=0,old_Lon=0;
     static final double GRAD2RAD = 0.01745329251994329576923690768489;
 
     static public float settings[]=new float[10];
@@ -416,6 +415,16 @@ public class Telemetry {
         ap_pitch=buf[i++];
         ap_roll=buf[i++];
 
+        speed=buf[i++];
+        speed/=3;
+        v_speed=buf[i++];
+        v_speed/=5;
+
+        dist=load_int16(buf,i);
+        i+=2;
+        if (dist<0)
+            dist=0x7fff-dist;
+
         //i+=4;
 
         batVolt=load_int16(buf,i);
@@ -524,68 +533,38 @@ public class Telemetry {
         if (MainActivity.motorsOnF()) {
             if (start_data_is_loaded==false){//start_lat==0 && start_lon==0){
                 start_data_is_loaded=true;
-                _start_lat =  lat;
+               _start_lat =  lat;
                 _start_lon =  lon;
-
+                speed_time=cur_time;
                 Disk.save_location_(
                         "/sdcard/RC/start_location.save",
                         lat,
                         lon,
                         _alt);
             }
+
+            if (cur_time-speed_time>200) {
+                //вічисляем растояние до старта и угол
+                dist=dist(_start_lat,_start_lon,lat,lon);
+                direction=RAD2GRAD*bearing(_start_lat,_start_lon,lat,lon);
+              //  dist=(_start_lat==0 || _start_lon==0)?0:dist(_start_lat,_start_lon,lat,lon);
+              //  final double dDist = dist(old_Lat, old_Lon, lat, lon);
+                speed_time = cur_time;
+            }
+
+
+
         }else {
             start_data_is_loaded=false;
             _start_lat = _start_lon = 0;
+            dist=0;
+            direction=0;
 
         }
 //fly time
 
 
 //dist speed
-        if (old_Lat==0 && old_Lon==0) {
-            old_Lat = lat;
-            old_Lon = lon;
-            speed_time=System.currentTimeMillis();
-        }
-        if (cur_time-speed_time>500 && old_Lat!=lat || old_Lon!=lon) {
-            //вічисляем растояние до старта и угол
-            if (_start_lat==0 || _start_lon==0){
-                dist=0;
-                direction=0;
-            }
-            else{
-                dist=dist(_start_lat,_start_lon,lat,lon);
-                direction=RAD2GRAD*bearing(_start_lat,_start_lon,lat,lon);
-            }
-            dist=(_start_lat==0 || _start_lon==0)?0:dist(_start_lat,_start_lon,lat,lon);
-            final double dDist = dist(old_Lat, old_Lon, lat, lon);
-           // if (dDist>3) {
-                old_Lat = lat;
-                old_Lon = lon;
-                final double dt = 0.001 * (cur_time - speed_time);
-                speed_time = cur_time;
-                speed += (dDist / dt - speed) * ((dt<1)?dt:1);
-                if (speed>30)
-                    speed=30;
-           // }
-        }
-
-        if (old_alt1==-100000)
-            old_alt1=_alt;
-        long t=System.currentTimeMillis();
-        double dt=0.001*(t-alt_time);
-        if (dt>=0.01) {
-            double dalt=_alt-old_alt1;
-            old_alt1=_alt;
-            if (dt > 0.5)
-                dt = 0.5;
-            alt_time = t;
-            v_speed += (dalt / dt - v_speed) * 0.1;
-            if (v_speed > 20)
-                v_speed = 20;
-            else if (v_speed < -20)
-                v_speed = -20;
-        }
 
         if ((MainActivity.control_bits&MainActivity.MOTORS_ON)==MainActivity.MOTORS_ON){
             relAlt=_alt;

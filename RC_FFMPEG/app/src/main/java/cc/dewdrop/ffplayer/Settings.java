@@ -48,7 +48,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             // XY stab
             {"dist to speed","SPEED_KP","SPEED_I","max_speed","min_stab_speed","FILTR", _null,_null,_null,_null},
             // secure
-            {"high_to_lift_2_home","max_throttle","min_throttle","sens_xy","sens_z","min_hight","lift at start","battery cap","min_hor_acur","ignor_inet"},//,"gimbP_Z","gimbR_Z"},
+            {"high_to_lift_2_home","max_throttle","min_throttle","min_hight","lift at start","battery cap","min_hor_acur","ignor_inet",_null, _null},//,"gimbP_Z","gimbR_Z"},
             // mpu
             {"Q_XY","R_XY","Q_Z","R_Z",_null,_null,_null,_null,_null,_null},
             //compas
