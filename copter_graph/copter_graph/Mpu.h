@@ -6,8 +6,8 @@ enum { mPITCH, mROLL, mrPITCH, mrROLL, mYAW, mGYRO_PITCH, mGYRO_ROLL, mGYRO_YAW,
 class Mpu
 {
 public:
-	double newR=0.1;
-	double newQ = 0.001;
+	double newR = 1;// 0.1;
+	double newQ = 0.05;// 0.001;
 
 
 
@@ -15,7 +15,7 @@ public:
 
 	void init();
 
-	void parser(byte buf[], int j, int len, int cont_bits, bool filter);
+	void parser(byte buf[], int j, int len, int cont_bits, bool filter,bool rotate);
 	void toEulerianAngle();
 
 
@@ -24,7 +24,7 @@ public:
 	float _max[mALL_E], _min[mALL_E];
 
 	float start_pos[mALL_E];
-	float dt, time, rdt;
+	double dt, time, rdt;
 
 	uint8_t devStatus;      // return status after each device operation
 							//(0 = success, !0 = error)

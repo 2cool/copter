@@ -247,7 +247,7 @@ int Graph::parser(byte buf[]) {
 			if (len == 5)
 				press.parser(buf,i, flags[FILTER]);
 			else
-				mpu.parser(buf, i, len, control_bits, flags[FILTER]);
+				mpu.parser(buf, i, len, control_bits, flags[FILTER],flags[ROTATE]);
 			break;
 		}
 		case MS5611_SENS: {

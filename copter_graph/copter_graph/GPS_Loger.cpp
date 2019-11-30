@@ -14,7 +14,7 @@ int GPS_Loger::init() {
 
 
 
-
+	acurH = acurV = 99;
 
 
 

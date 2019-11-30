@@ -180,33 +180,41 @@ using namespace std;
 
 
 
-void Mpu::parser(byte buf[], int j, int len,int cont_bits, bool filter) {
+void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool rotate) {
 
 
 	len += j;
 
-	static double old_time = 0;
-	
+	static uint64_t old_itime = 0;
+
 	uint64_t itime = loaduint64t(buf, j);
 	j += 8;
-	time = (double)itime *0.001;
-	//if (time > 302)
-	//	time--;
-	dt = time - old_time;
-	old_time = time;
+	time = (double)itime * 0.001;
+	dt = 0.001 * (itime - old_itime);
+	old_itime = itime;
 
-	
+
 	int g[3];
 	int a[3];
 	int q[4];
 
-	if (dt > 0.01)
-		dt = 0.01;
+	if (dt > 0.03)
+		dt = 0.03;
 
 	kf[Z]->A <<
 		1, dt, 0,
 		0, 1, dt,
 		0, 0, 1;
+
+
+
+	kf[X]->A(3) = kf[X]->A(7) = dt;
+
+	kf[Y]->A(3) = kf[Y]->A(7) = dt;
+
+
+
+
 	memcpy(g, &(buf[j]), 6);
 	j += 6;
 	memcpy(a, &(buf[j]), 6);
@@ -214,13 +222,13 @@ void Mpu::parser(byte buf[], int j, int len,int cont_bits, bool filter) {
 	//memcpy(q, &(buf[j]), 16);
 	//j += 16;
 
-	pitch= *(float*)&buf[j]; j += 4;
-	roll= *(float*)&buf[j]; j += 4;
+	pitch = *(float*)&buf[j]; j += 4;
+	roll = *(float*)&buf[j]; j += 4;
 	yaw = *(float*)&buf[j]; j += 4;;
 	if (yaw < 0)
 		yaw += 360;
 
-	cosYaw = cos(yaw*GRAD2RAD);
+	cosYaw = cos(yaw * GRAD2RAD);
 	sinYaw = sin(yaw * GRAD2RAD);
 
 
@@ -229,63 +237,80 @@ void Mpu::parser(byte buf[], int j, int len,int cont_bits, bool filter) {
 	gyroYaw = *(float*)&buf[j]; j += 4;
 
 #define ACC_CF 0.007
-
+	static double ACCX = 0, ACCY = 0, ACCZ = 0;
 	const float f = 1;// (filter ? ACC_CF : 1);
-	if (j <= len) { 
-		const float tacc =  *(float*)& buf[j];
+	if (j <= len) {
+		const float tacc = *(float*)&buf[j];
 		j += 4;
-		accX += (tacc - accX)*f; 
+		ACCX += (tacc - ACCX) * f;
 	}
 	if (j <= len) {
-		const float tacc = *(float*)& buf[j];
+		const float tacc = *(float*)&buf[j];
 		j += 4;
-		accY += (tacc - accY)*f; 
+		ACCY += (tacc - ACCY) * f;
 	}
 	if (j <= len) {
-		accZnF = *(float*)& buf[j];	
+		accZnF = *(float*)&buf[j];
 		j += 4;
 
-		accZ += (accZnF - accZ)*f;
+		ACCZ += (accZnF - ACCZ) * f;
 		//accZ = *(float*)&buf[j];
 	}
-	
-
-	if (j <= len) { 
-		est_alt = *(float*)&buf[j]; j += 4; }
-	if (j <= len) { 
-		est_speedZ = *(float*)&buf[j]; j += 4; }
+	accX = ACCX;
+	accY = ACCY;
+	accZ = ACCZ;
 
 	if (j <= len) {
-		estX = *(float*)& buf[j]; j += 4;
+		est_alt = *(float*)&buf[j]; j += 4;
 	}
 	if (j <= len) {
-		est_speedX = *(float*)& buf[j]; j += 4;
+		est_speedZ = *(float*)&buf[j]; j += 4;
+	}
+
+	if (j <= len) {
+		estX = *(float*)&buf[j]; j += 4;
 	}
 	if (j <= len) {
-		estY = *(float*)& buf[j]; j += 4;
+		est_speedX = *(float*)&buf[j]; j += 4;
 	}
 	if (j <= len) {
-		est_speedY = *(float*)& buf[j]; j += 4;
+		estY = *(float*)&buf[j]; j += 4;
+	}
+	if (j <= len) {
+		est_speedY = *(float*)&buf[j]; j += 4;
 	}
 
 
-	static float old_accZ = 0,old_accX=0,old_accY=0;
-	static double old_bar_alt = 0,oldSX=0,oldSY=0;
-	if (filter) {
+	static float old_accZ = 0, old_accX = 0, old_accY = 0;
+	static double old_bar_alt = 0, oldSX = 0, oldSY = 0;
+	static bool start_f = false;
 
-		
+
+
+
+
+	w_accX = (-cosYaw * accX + sinYaw * accY); //relative to world
+	w_accY = (-cosYaw * accY - sinYaw * accX);
+
+	if (start_f == false && gps_log.gx != 0 && gps_log.gy != 0)
+		start_f = true;
+
+
+	if (start_f && filter) {
+
+
 		//ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
 		static float f_accZ = 0;
 		f_accZ += (accZ - f_accZ) * 1;
-		accZ =  f_accZ;
-		kf[Z]->B[2] =  accZ - old_accZ;
+		accZ = f_accZ;
+		kf[Z]->B[2] = accZ - old_accZ;
 		old_accZ = accZ;
-		if (press.altitude != old_bar_alt) { 
+		if (press.altitude != old_bar_alt) {
 			old_bar_alt = press.altitude;
-			Eigen::VectorXd y(m);
-			y << old_bar_alt;
-			kf[Z]->update(y);
+			Eigen::VectorXd z(m);
+			z << old_bar_alt;
+			kf[Z]->update(z);
 		}
 		else {
 			kf[Z]->update();
@@ -295,26 +320,26 @@ void Mpu::parser(byte buf[], int j, int len,int cont_bits, bool filter) {
 		accZ = kf[Z]->state()(2);
 		//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-		kf[0]->B[2] =  accX - old_accX;
-		old_accX = accX;
+		kf[0]->B[2] = w_accX - old_accX;
+		old_accX = w_accX;
 		if (gps_log.gx != oldSX) {
 			oldSX = gps_log.gx;
-			Eigen::VectorXd y(m);
-			y << oldSX;
-			kf[0]->update(y);
+			Eigen::VectorXd x(m);
+			x << oldSX;
+			kf[0]->update(x);
 		}
 		else {
 			kf[0]->update();
 		}
 		est_speedX = kf[0]->state()(1);
 		estX = kf[0]->state()(0);
-		accX = kf[0]->state()(2);
+		w_accX = kf[0]->state()(2);
 
 
 		//YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
 
-		kf[1]->B[2] = accY - old_accY;
-		old_accY = accY;
+		kf[1]->B[2] = w_accY - old_accY;
+		old_accY = w_accY;
 		if (gps_log.gy != oldSY) {
 			oldSY = gps_log.gy;
 			Eigen::VectorXd y(m);
@@ -326,9 +351,21 @@ void Mpu::parser(byte buf[], int j, int len,int cont_bits, bool filter) {
 		}
 		est_speedY = kf[1]->state()(1);
 		estY = kf[1]->state()(0);
-		accY = kf[1]->state()(2);
+		w_accY = kf[1]->state()(2);
+
+
 	}
 
+	if (rotate == false) {
+		accX = (-cosYaw * w_accX - sinYaw * w_accY); //relative to world
+		accY = (-cosYaw * w_accY + sinYaw * w_accX);
+	}
+	else {
+		accX = w_accX;
+		accY = w_accY;
+
+	}
+	
 
 
 
