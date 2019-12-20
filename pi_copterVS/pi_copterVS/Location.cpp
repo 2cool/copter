@@ -146,14 +146,15 @@ void LocationClass::proceed(SEND_I2C *d) {
 
 #define REAL_GPS
 #ifdef REAL_GPS
-	shmPTR->accuracy_hor_pos_ = accuracy_hor_pos_ = (accuracy_hor_pos_ > 99) ? 99 : d->hAcc;
-	shmPTR->accuracy_ver_pos_ = accuracy_ver_pos_ = (accuracy_ver_pos_ > 99) ? 99 : d->vAcc;
+	shmPTR->accuracy_hor_pos_ = accuracy_hor_pos_ = (d->hAcc > 99) ? 99 : d->hAcc;
+	shmPTR->accuracy_ver_pos_ = accuracy_ver_pos_ = (d->vAcc > 99) ? 99 : d->vAcc;
 	if (accuracy_hor_pos_ < MIN_ACUR_HOR_POS_4_JAMM)
 		last_gps_accuracy_ok = last_gps_data__time;
 	shmPTR->gps_altitude_ = d->height;
 	altitude = 0.001*(double)d->height;
 	shmPTR->lat_ = lat_ = d->lat;
 	shmPTR->lon_ = lon_ = d->lon;
+	//cout << lat_ << " " << lon_ <<" "<< (uint)accuracy_hor_pos_<< endl;
 #else
 	shmPTR->accuracy_hor_pos_ = accuracy_hor_pos_ = 1;
 	shmPTR->accuracy_ver_pos_ = accuracy_ver_pos_ = 1;
