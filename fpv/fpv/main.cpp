@@ -282,10 +282,9 @@ std::time_t result = std::time(nullptr);
 	file_name += +".mp4";
 
 
-
-
 	string s = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + \
-		"-r 60 -y " + file_name + " > /dev/null 2>&1  &";
+		" -b 900k -vcodec copy -r 60 -y " + file_name + " > /dev/null 2>&1  &";
+	cout << s << endl;
 	cout << "stream started" << endl;
 	system(s.c_str());
 
