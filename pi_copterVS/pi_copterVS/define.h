@@ -26,8 +26,7 @@
 #define WORK_WITH_WIFI
 #define LED_ON
 #define LOST_BEEP
-#define pwm_MAX_THROTTLE 32000
-#define pwm_OFF_THROTTLE 16000
+
 #define  ARDUINO_ADDR 9
 
 //#define FASLE_GPS_STILL

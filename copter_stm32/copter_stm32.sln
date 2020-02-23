@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "copter_stm32", "copter_stm32.vgdbproj", "{85613696-E5F3-402C-80B0-35A5D162217D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Generic_STM32F103C6_fake_STM32F103C8 = Debug|Generic_STM32F103C6_fake_STM32F103C8
+		Release|Generic_STM32F103C6_fake_STM32F103C8 = Release|Generic_STM32F103C6_fake_STM32F103C8
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{85613696-E5F3-402C-80B0-35A5D162217D}.Debug|Generic_STM32F103C6_fake_STM32F103C8.ActiveCfg = Debug|Generic_STM32F103C6_fake_STM32F103C8
+		{85613696-E5F3-402C-80B0-35A5D162217D}.Debug|Generic_STM32F103C6_fake_STM32F103C8.Build.0 = Debug|Generic_STM32F103C6_fake_STM32F103C8
+		{85613696-E5F3-402C-80B0-35A5D162217D}.Release|Generic_STM32F103C6_fake_STM32F103C8.ActiveCfg = Release|Generic_STM32F103C6_fake_STM32F103C8
+		{85613696-E5F3-402C-80B0-35A5D162217D}.Release|Generic_STM32F103C6_fake_STM32F103C8.Build.0 = Release|Generic_STM32F103C6_fake_STM32F103C8
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4F40DE4E-D8F2-46D4-ABD9-866EE0119503}
+	EndGlobalSection
+EndGlobal

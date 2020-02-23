@@ -10,7 +10,10 @@
 #include "mi2c.h"
 #include "mpu.h"
 
-
+#define MAX90_THROTTLE   45604
+#define pwm_MIN_THROTTLE 26402
+#define pwm_MAX_THROTTLE 48004
+#define pwm_OFF_THROTTLE 24002
 #define OVER_CURRENT 19
 #define ESC_CALIBR 0
 int fd;
@@ -256,13 +259,13 @@ bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с к
 	if (pitch <= 80 && pitch >= -45 && roll > -75 && roll < 110) { 
 
 		//Serial.printf("camAng="); Serial.println(angle);
-		pitch = pwm_OFF_THROTTLE + (180 - pitch)*44.444444;
-		roll = pwm_OFF_THROTTLE + (180 + roll)*44.4444;
+		pitch = pwm_OFF_THROTTLE + (180 - pitch) * 66.67;
+		roll = pwm_OFF_THROTTLE + (180 + roll) * 66.67;
 		char buf[6];
 
 		buf[1] = 8;
-		((uint16_t*)buf)[1] = (uint16_t)(pitch);
-		((uint16_t*)buf)[2] = (uint16_t)roll;
+		((uint16_t*)buf)[2] = (uint16_t)(pitch);
+		((uint16_t*)buf)[1] = (uint16_t)roll;
 		if (write(fd, buf + 1, 5) == -1) {
 			Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 			cout << "arduino write gimbal error" << millis_() << endl;

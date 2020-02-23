@@ -216,7 +216,7 @@ void watch_dog() {
 
 
 		if (fpv_cnt == shmPTR->fpv_cnt) {
-			cout << "fpv killed\n";
+			cout << "fpv killed\n";  
 			shmPTR->fpv_run = false;
 			system("nice -n -20 pkill fpv_");
 			delay(1000);
