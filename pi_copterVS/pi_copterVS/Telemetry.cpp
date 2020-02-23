@@ -403,6 +403,12 @@ bool TelemetryClass::update_buf() {
 	//delay(1000);
 	int i = 0;
 	uint32_t mod = Autopilot.get_control_bits();
+
+	if (shmPTR->status & 0x8000)
+		mod |= WIFI_CAMERA_FOUND;
+	if (shmPTR->inet_ok)
+		mod |= INET_OK;
+
 //	printf("out <- %i\n", mod);
 	loadBUF32(i, mod);
 	//printf("message=", message.c_str());

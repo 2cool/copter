@@ -10,7 +10,7 @@ enum { X, Y, Z };
 enum {
 	MOTORS_ON = 1, CONTROL_FALLING = 2, Z_STAB = 4, XY_STAB = 8, GO2HOME = 0x10, PROGRAM = 0x20, GIMBAL_AXIS = 0x40, FPV_RECIVED = 0x80,
 	MPU_ACC_CALIBR = 0x100, MPU_GYRO_CALIBR = 0x200, COMPASS_CALIBR = 0x400, COMPASS_MOTOR_CALIBR = 0x800, SHUTDOWN = 0x1000, GIMBAL_PLUS = 0x2000,
-	GIMBAL_MINUS = 0x4000, REBOOT = 0x8000, PROGRAM_LOADED= 0x10000, M_ON_AND_GO2HOME = 0x20000, M_ON_AND_PROG_START = 0x40000
+	GIMBAL_MINUS = 0x4000, REBOOT = 0x8000, PROGRAM_LOADED= 0x10000, M_ON_AND_GO2HOME = 0x20000, M_ON_AND_PROG_START = 0x40000,WIFI_CAMERA_FOUND = 0x80000,INET_OK = 0x100000
 };
 
 /*
@@ -28,7 +28,7 @@ struct Memory {
 	uint8_t main_cnt, internet_cnt, wifi_cnt,fpv_cnt;
 
 
-	uint32_t status;  //0-7 wifi signal,8-11-wifi_error, 12-15-fpv_errors, 16-19 ppp_errors
+	uint32_t status;  //0-6 wifi signal,7-14-wifi_noise, 15-fpv_status, 17-inet status
 	uint32_t control_bits;
 	uint32_t control_bits_4_do;
 

@@ -362,6 +362,8 @@ int main()
 		string ret=exec("nice -n -20  nmcli dev wifi | grep YDXJ_1234567");
 		if (ret.length() < 10) {
 			if (print) {
+				shmPTR->status |= 0x8000;
+				shmPTR->status ^= 0x8000;
 				cout << "camera wifi not found...\n";
 				print = false;
 			}
@@ -372,6 +374,7 @@ int main()
 
 	} while (shmPTR->fpv_run);
 	cout << "camera found\n";
+	shmPTR->status |= 0x8000;
 
 	string ret = exec("nice -n -20 ifconfig "+ wlan_fpv);
 	if (ret.find("192.168.42.") == string::npos) {

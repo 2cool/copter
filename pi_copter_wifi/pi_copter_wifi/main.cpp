@@ -173,8 +173,13 @@ void get_signal_strong() {
 	if (ret.length() > 20) {
 		int beg = ret.find("l=-");
 		int len = ret.substr(beg+3).find("dBm");
-		int signal = atoi(ret.substr(beg+3, len).c_str());
-		shmPTR->status = signal;
+		uint signal = atoi(ret.substr(beg+3, len).c_str());
+
+		beg += 18+ret.substr(beg+18).find("l=-");
+		len = ret.substr(beg + 3).find("dBm");
+		uint noise = atoi(ret.substr(beg + 3, len).c_str());
+		shmPTR->status &= (-1^0b11111111111111);
+		shmPTR->status |= signal|(noise<<7);
 	}
 	//string ret = exec("nmcli dev wifi | grep 2coolzNET");
 	

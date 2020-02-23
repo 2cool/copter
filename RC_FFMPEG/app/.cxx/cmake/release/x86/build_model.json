@@ -1,0 +1,72 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG",
+      "sdkFolder": "F:\\Android",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\build\\intermediates",
+      "gradleModulePathName": ":app",
+      "moduleRootFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app",
+      "makeFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "compilerSettingsCacheFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\.cxx",
+      "cxxFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx",
+      "ndkFolder": "F:\\Android\\ndk-bundle",
+      "ndkVersion": "21.0.6113669",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [],
+    "cFlagList": [],
+    "cppFlagsList": [
+      "-frtti -fexceptions"
+    ],
+    "variantName": "release",
+    "soFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\build\\intermediates\\cmake\\release\\lib",
+    "objFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\build\\intermediates\\cmake\\release\\obj",
+    "jsonFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release",
+    "gradleBuildOutputFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cxx\\release",
+    "isDebuggableEnabled": false,
+    "validAbiList": [
+      "ARMEABI_V7A",
+      "ARM64_V8A",
+      "X86",
+      "X86_64"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "X86",
+  "abiPlatformVersion": 19,
+  "cxxBuildFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86",
+  "jsonFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86\\android_gradle_build.json",
+  "gradleBuildOutputFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cxx\\release\\x86",
+  "objFolder": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\build\\intermediates\\cmake\\release\\obj\\x86",
+  "buildCommandFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86\\build_command.txt",
+  "buildOutputFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86\\build_output.txt",
+  "modelOutputFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86\\build_model.json",
+  "cmake": {
+    "cmakeListsWrapperFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cxx\\release\\x86\\CMakeLists.txt",
+    "toolchainWrapperFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cxx\\release\\x86\\android_gradle_build.toolchain.cmake",
+    "buildGenerationStateFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cxx\\release\\x86\\build_generation_state.json",
+    "cacheKeyFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cxx\\release\\x86\\compiler_cache_key.json",
+    "compilerCacheUseFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cxx\\release\\x86\\compiler_cache_use.json",
+    "compilerCacheWriteFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cxx\\release\\x86\\compiler_cache_write.json",
+    "toolchainSettingsFromCacheFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cxx\\release\\x86\\compiler_settings_cache.cmake",
+    "cmakeWrappingBaseFolder": "."
+  },
+  "jsonGenerationLoggingRecordFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86\\json_generation_record.json",
+  "compileCommandsJsonFile": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86\\compile_commands.json"
+}

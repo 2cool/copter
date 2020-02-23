@@ -251,18 +251,13 @@ bool CommanderClass::input(){
 					static bool video_stream_off = true;
 					//cout << "FPV\n";
 					Autopilot.fpv_command_recived();
-					if (*(buf + i) == 0 ^ video_stream_off) {
-						video_stream_off ^= true;
-						shmPTR->fpv_adr = *(buf + i++);			//if fpv_adr == 0 - video stream off
-						shmPTR->fpv_port = *(int16_t*)(buf + i);
-						i += 2;
-						shmPTR->fpv_zoom = *(buf + i++);
-						shmPTR->fpv_code = *(int16_t*)(buf + i);
-						i += 2;
-					}
-					else
-						i += 6;
-					//mega_i2c.beep_code(B_COMMAND_RECEIVED);
+					video_stream_off ^= true;
+					shmPTR->fpv_adr = *(buf + i++);			//if fpv_adr == 0 - video stream off
+					shmPTR->fpv_port = *(int16_t*)(buf + i);
+					i += 2;
+					shmPTR->fpv_zoom = *(buf + i++);
+					shmPTR->fpv_code = *(int16_t*)(buf + i); 
+					i += 2;
 				}
 			}
 		}

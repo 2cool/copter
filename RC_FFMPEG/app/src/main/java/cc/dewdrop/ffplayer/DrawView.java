@@ -83,11 +83,15 @@ public class DrawView extends View {
 
         motors_on[0].enabled(Commander.link);
         motors_on[1].enabled(Commander.link);
-        fpv_.enabled(Commander.link);
-        photo_.enabled(Commander.link);
-        vrc_.enabled(Commander.link);
+        boolean fpvf=Commander.link && ((MainActivity.control_bits&MainActivity.WIFI_CAMERA_FOUND)>0);
+        fpv_.enabled(fpvf);
+        photo_.enabled(fpvf);
+        vrc_.enabled(fpvf);
         do_prog.enabled(MainActivity.prog_is_loaded());
-        ftx.p[ftx.LOC]=constStrLen(Double.toString(Telemetry.lat),8)+"  "+constStrLen(Double.toString(Telemetry.lon),8) + " | -" + (Telemetry.status&255) +"dBm";
+        ftx.p[ftx.LOC]=constStrLen(Double.toString(Telemetry.lat),8)
+                +"  "+constStrLen(Double.toString(Telemetry.lon),8) + " | -"
+                + (Telemetry.status&127)
+                + " -" + ((Telemetry.status>>7)&127) + (((MainActivity.control_bits&MainActivity.INET_OK)>0)?" w":" ");
         ftx.p[ftx._2HM]="2h: "+Integer.toString((int)Telemetry.dist)+"  h:"+Integer.toString(Telemetry.r_accuracy_hor_pos)+"v:"+Integer.toString(Telemetry.r_acuracy_ver_pos);
         ftx.p[ftx.THR]=constStrLen(Double.toString(Telemetry.realThrottle),4);
         ftx.p[ftx.VIBR]=constStrLen(Double.toString(Telemetry.vibration/1000),5);

@@ -42,7 +42,8 @@ public class MainActivity extends Activity  implements SensorEventListener {
     public final static int MOTORS_ON=1, CONTROL_FALLING=2,Z_STAB=4,XY_STAB=8,GO2HOME=16,PROGRAM=32, GIMBAL_AXIS=64,FPV_RECIVED=128;
     public final static int MPU_ACC_CALIBR=0x100, MPU_GYRO_CALIBR = 0x200, COMPASS_CALIBR=0x400,
             COMPASS_MOTOR_CALIBR=0x800, SHUTDOWN=0x1000, GIMBAL_PLUS=0x2000,GIMBAL_MINUS=0x4000,
-            REBOOT=0x8000,PROGRAM_LOADED= 0x10000,SEC_MASK=0xFF000000;
+            REBOOT=0x8000,PROGRAM_LOADED= 0x10000,WIFI_CAMERA_FOUND = 0x80000,INET_OK = 0x100000,SEC_MASK=0xFF000000;
+
     static public int control_bits=0;
     static public int command_bits_=0;
     private static boolean secure_flug=false;
