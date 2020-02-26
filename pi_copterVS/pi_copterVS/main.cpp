@@ -186,6 +186,16 @@ void pipe_handler(int sig) {
 }
 
 
+uint8_t get_cpu_temp() {
+
+	uint8_t cpu_temp;
+	FILE* cpuT = fopen("/etc/armbianmonitor/datasources/soctemp", "r");
+	if (cpuT) {
+		fscanf(cpuT, "%i", &cpu_temp);
+		return cpu_temp;
+	}
+	return 0;
+}
 
 
 int printHelp() {
@@ -201,6 +211,7 @@ string stdout_file_ext = "";
 //-----------------------------------------------------------------------------------------
 bool start_wifi = false, start_inet = false, start_loger = false, start_telegram = false;;
 
+bool min_cpu_freq = false;
 void watch_dog() {
 	delay(1000);
 	while (shmPTR->run_main) {
@@ -210,6 +221,13 @@ void watch_dog() {
 		const uint8_t internet_cnt = shmPTR->internet_cnt;
 		const uint8_t fpv_cnt = shmPTR->fpv_cnt;
 		delay(3000);
+
+		Telemetry.cpu_temp=get_cpu_temp();
+		if (!min_cpu_freq && Telemetry.cpu_temp >= 60) { 
+			min_cpu_freq = true;
+			system("nice -n -20 cpufreq-set -u 480000"); 
+			cout<<"temp to hight!!  set max freq to 480mhz:\t" << millis_() << endl;
+		}
 
 		if (Autopilot.busy())
 			continue;
@@ -233,7 +251,7 @@ void watch_dog() {
 				system("nice -n -20 pkill wifi_p");
 				delay(1000);
 				shmPTR->wifi_run = true;
-				cout << "--------------wifi started:\t" << _ct << endl;;
+				cout << "--------------wifi started:\t" << _ct << endl;
 				string t = "nice -n -20 /root/projects/wifi_p ";
 				t += " &";
 				system(t.c_str());

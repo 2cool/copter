@@ -446,8 +446,12 @@ bool TelemetryClass::update_buf() {
 
 	float yaw=Mpu.get_yaw();
 	loadBUF16(i, (int16_t)(yaw * 182.0));
+
+
+
 	loadBUF32(i, on_power_time+Autopilot.powerOnTime());
 	loadBUF32(i, shmPTR->status);
+	loadBUF8(i, cpu_temp);
 
 	if (message.length() && i + message.length() + 2 < TELEMETRY_BUF_SIZE) {
 		loadBUF16(i, message.length());

@@ -27,6 +27,7 @@ public class Telemetry {
     static public String messages=null;
     static public float heading=0,	battery_consumption=0,vibration=0;
     static public int status=0;
+    static public int cpu_temp=0;
     static public int on_power_time=0;
     static double ap_pitch,ap_roll,realThrottle;  //autopilot
     static private  double ap_throttle=0;
@@ -464,6 +465,8 @@ public class Telemetry {
         i+=4;
         status=load_int32(buf,i);
         i+=4;
+        cpu_temp=load_uint8(buf,i);
+        i++;
        // Log.i("STRR","str= "+Integer.toString(status));
 
         int mes_len=load_int16(buf,i);

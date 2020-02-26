@@ -94,7 +94,7 @@ public class DrawView extends View {
                 + " -" + ((Telemetry.status>>7)&127) + (((MainActivity.control_bits&MainActivity.INET_OK)>0)?" w":" ");
         ftx.p[ftx._2HM]="2h: "+Integer.toString((int)Telemetry.dist)+"  h:"+Integer.toString(Telemetry.r_accuracy_hor_pos)+"v:"+Integer.toString(Telemetry.r_acuracy_ver_pos);
         ftx.p[ftx.THR]=constStrLen(Double.toString(Telemetry.realThrottle),4);
-        ftx.p[ftx.VIBR]=constStrLen(Double.toString(Telemetry.vibration/1000),5);
+        ftx.p[ftx.VIBR]=constStrLen(Double.toString(Telemetry.vibration/1000),5)+ " ,CPU "+Telemetry.cpu_temp+" C°";
         ftx.p[ftx.BAT]=constStrLen(Telemetry.batery,3);
         ftx.p[ftx.YAW]=Integer.toString((int)Telemetry.heading);
         ftx.p[ftx.CAM_ANG]=Integer.toString(Telemetry.gimbalPitch);
@@ -114,7 +114,7 @@ public class DrawView extends View {
             String ss=((s<10)?"0":"")+s;
             ftx.p[ftx.M_ON_T] = ""+sh+":"+sm+":"+ss;
         }
-        v_speed +=0.03*(Telemetry.v_speed- v_speed);
+        v_speed =(float)Telemetry.v_speed;
         ftx.p[ftx.VSPEED]=constStrLen(Double.toString(v_speed),5);
 
         if (Telemetry.messages!=null) {

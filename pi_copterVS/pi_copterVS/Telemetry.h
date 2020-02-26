@@ -39,6 +39,7 @@ class TelemetryClass
 	 bool update_buf();
 	 float full_power;
  public:
+	 uint8_t cpu_temp;
 	 int on_power_time = 0, total_time=0;
 	 void save_voltage();
 	 float get_bat_capacity();
