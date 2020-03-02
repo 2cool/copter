@@ -94,10 +94,15 @@ void HmcClass::set(const float buf[]){
 	cout << "compas " << buf[0] << ","<<buf[1]<<endl;
 }
 //---------------------------------------------------------
-void HmcClass::log_base() {
+
+
+
+void HmcClass::log_base(int16_t sh[], float *b, float cor) {//save calibr,motor-calibr and angle correction
 	if (Log.writeTelemetry) {
 		Log.block_start(LOG::HMC_BASE);
-		Log.loadMem((uint8_t*)c_base, 6, false);
+		Log.loadMem((uint8_t*)sh, 12, false);
+		Log.loadMem((uint8_t*)b, 12 * 4, false);
+		Log.loadMem((uint8_t*)&cor, 4, false);
 		Log.block_end();
 	}
 }  
@@ -126,22 +131,25 @@ void HmcClass::start_motor_compas_calibr(){
 		baseI = 0;
 		current = 0;
 		_base[0] = _base[1] = _base[2] = current = 0;
+		throttle = 0.35;
 
 	}
 }
 
 #define MAX_M_WORK_VOLTAGE 1250.0f
 
-
+#define tests_amount 1000
 void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 	if (millis_() > startTime){
-		if (baseI < 1000){
+		if (baseI < tests_amount){
 			if (Balance.gf(motor_index) == 0 || Balance.gf(motor_index) > MIN_THROTTLE) {
 				current += Telemetry.get_current(motor_index);
 				_base[0] += fmx;
 				_base[1] += fmy;
 				_base[2] += fmz;
 				baseI++;
+				throttle += 0.00045;
+				ya tut vnes izmineniya i ne testil
 			}
 		}
 		else{
@@ -156,7 +164,7 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 				motors_is_on_ = false;
 				int index = motor_index * 3;
 
-				printf("+++ ON  #%i %f %f %f current=%f\n",motor_index, _base[0]/1000, _base[1]/1000, _base[2]/1000,current/1000);
+				printf("+++ ON  #%i %f %f %f current=%f\n",motor_index, _base[0]/ tests_amount, _base[1]/ tests_amount, _base[2]/ tests_amount,current/ tests_amount);
 		
 
 				base[index] =   (float)(((_base[0] - _base[3]) / current));
@@ -183,6 +191,7 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 				
 				printf("\n\n--- OFF # %i %f %f %f current=%f\n", motor_index, _base[0] / 1000, _base[1] / 1000, _base[2] / 1000, current / 1000);
 				startTime = millis_() + 3e3;
+				throttle = 0.35;
 				Autopilot.motors_do_on(true, "CMT");
 				motors_is_on_ = true;
 			}
@@ -415,7 +424,7 @@ bool HmcClass::read_calibration(int16_t sh[]) {
 			cout << sh[4] << "\t" << sh[5] << endl;
 			dz = 1.0f / dz;
 
-			log_base();
+			log_base(sh,base,Mpu.yaw_correction_angle);
 		}
 		else {
 			cout << "compass settings error!!!\n";

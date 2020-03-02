@@ -269,7 +269,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 
 
 	
-	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"rotate", gr, ROTATE);
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"(f2)rotate", gr, ROTATE);
 	yButton += 2;
 
 	tb[tbuttons++] = new TButton(xButton, yButton+=yButoonStep, L"pitch", gr,PITCH);
@@ -297,15 +297,15 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 	yButton = -yButoonStep;
 	xButton = 65;
 
-	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"filter", gr, FILTER);
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"(f1)filter", gr, FILTER);
 	yButton += 3;
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"accX", gr, ACCX);
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"accY", gr, ACCY);
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"accZ", gr, ACCZ);
 	yButton += 5;
 
-	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"Head", gr, C_YAW);
-	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"Yaw", gr, YAW);
+	
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"Yaw   ", gr, YAW);
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"GPS_Yaw", gr, GPS_YAW);
 
 	yButton += 5;
@@ -346,6 +346,11 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"mi2 ", gr, MI2);
 	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"mi3 ", gr, MI3);
 
+	yButton += 10;
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"mag x ", gr, MX);
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"mag y ", gr, MY);
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"mag z ", gr, MZ);
+	tb[tbuttons++] = new TButton(xButton, yButton += yButoonStep, L"Head", gr, M_HEAD);
 
 
 

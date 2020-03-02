@@ -164,8 +164,7 @@ boolean new_mode_ver = false;
 
 
 
-enum { MPU_EMU, MPU_SENS, HMC_BASE, HMC_SENS, HMC, GPS_SENS, TELE, COMM, EMU, AUTO, BAL, MS5611_SENS, XYSTAB, ZSTAB
-};
+enum  { MPU_EMU, MPU_SENS, HMC_BASE, HMC_SENS, HMC, GPS_SENS, TELE, COMM, EMU, AUTO, BAL, MS5611_SENS, XYSTAB, ZSTAB };
 
 
 
@@ -279,12 +278,21 @@ int Graph::parser(byte buf[]) {
 			control_bits = *(uint32_t*)&buf[i];
 			break;
 		}
+		case HMC_BASE:{
+			hmc.parser_base(buf,i);
+			break;
+
+		}
+		case HMC_SENS: {
+			hmc.parser_sens(buf, i, control_bits, flags[FILTER], flags[ROTATE]);
+			break;
+		}
 		case HMC: {
 			hmc.parser(buf, i);
 			break;
 		}
 		case TELE: {
-			tel.parser(buf, i);
+			tel.parser(buf, i, control_bits, flags[FILTER], flags[ROTATE]);
 			break;
 		}
 		case ZSTAB:{
@@ -488,9 +496,9 @@ int Graph::decode_Log() {
 		sensors_data[n].sd[C_PITCH] = bal.ap_pitch;
 		sensors_data[n].sd[C_ROLL] = bal.ap_roll;
 #endif
-	//	sensors_data[n].sd[C_YAW] = bal.ap_yaw;
+	//	sensors_data[n].sd[M_HEAD] = bal.ap_yaw;
 
-		sensors_data[n].sd[C_YAW] = hmc.heading;
+		sensors_data[n].sd[M_HEAD] = hmc.heading;
 
 
 	static float sZ = 0, speedZ = 0;
@@ -523,6 +531,12 @@ int Graph::decode_Log() {
 		sensors_data[n].sd[MI2] = tel.m_current[2];
 		sensors_data[n].sd[MI3] = tel.m_current[3];
 		sensors_data[n].sd[VOLTAGE] = tel.m_current[4];
+
+
+
+		sensors_data[n].sd[MX] = hmc.fmx;
+		sensors_data[n].sd[MY] = hmc.fmy;
+		sensors_data[n].sd[MZ] = hmc.fmz;
 
 
 		//sensors_data[n].sd[STAB_SPEED_Z] = stab.speedZ;
@@ -603,6 +617,16 @@ Graph::Graph(char*fn)
 	name[MI2] = L"MI2";
 	color[MI3] = Color(255, 0, 100, 200);
 	name[MI3] = L"MI3";
+
+
+	color[MX] = Color(255, 200, 0, 0);
+	name[MX] = L"MX";
+	color[MY] = Color(255, 0, 200, 0);
+	name[MY] = L"MY";
+	color[MZ] = Color(255, 100, 100, 0);
+	name[MZ] = L"MZ";
+
+
 /*
 	color[STAB_SPEED_Z] = Color(255, 100, 100, 0);
 	name[STAB_SPEED_Z] = L"Stab_SpZ";
@@ -743,8 +767,8 @@ color[BAR_SPEED] = Color(255, 155, 30, 180);
 	color[GACCZ] = Color(100, 0, 0, 100);
 	name[GACCZ] = L"gaccZ";
 */
-	color[C_YAW] = Color(100, 0, 0, 0);
-	name[C_YAW] = L"Heading";
+	color[M_HEAD] = Color(100, 0, 0, 0);
+	name[M_HEAD] = L"Heading";
 
 	color[YAW] = Color(100, 0, 0, 200);
 	name[YAW] = L"Yaw";
@@ -962,9 +986,9 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 	draw(g, rect, 370, -10, YAW);
 	draw(g, rect, 180, -180, GPS_YAW);
 
-	draw(g, rect, 20, -20, ACCX);
-	draw(g, rect, 20, -20, ACCY);
-	draw(g, rect, 40, -40, ACCZ);
+	draw(g, rect, 5, -5, ACCX);
+	draw(g, rect, 5, -5, ACCY);
+	draw(g, rect, 10, -10, ACCZ);
 	draw(g, rect, 30, -30, GYRO_PITCH);
 	draw(g, rect, 30, -30, GYRO_ROLL);
 	draw(g, rect, 30, -30, GYRO_YAW);
@@ -1001,6 +1025,11 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 	draw(g, rect, 10, 0, MI2);
 	draw(g, rect, 10, 0, MI3);
 	draw(g, rect, 1680, 1440, VOLTAGE);
+
+	draw(g, rect, 1, -1, MX);
+	draw(g, rect, 1, -1, MY);
+	draw(g, rect, 1, -1, MZ);
+	draw(g, rect, 370, -10,  M_HEAD);
 
 
 

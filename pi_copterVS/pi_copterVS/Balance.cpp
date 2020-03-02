@@ -334,8 +334,7 @@ bool BalanceClass::loop()
 
 		if (Hmc.do_compass_motors_calibr) {
 			f_[0] = f_[1] = f_[2] = f_[3] = 0;
-			f_[Hmc.motor_index] = HOVER_THROTHLE;
-			throttle = HOVER_THROTHLE;
+			f_[Hmc.motor_index] = throttle = Hmc.throttle;
 		}
 		else {
 #ifndef FLY_EMULATOR

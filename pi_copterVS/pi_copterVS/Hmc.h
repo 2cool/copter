@@ -84,7 +84,7 @@ class HmcClass
 {
  private:
 	 void log_sens();
-	 void log_base();
+	 void log_base(int16_t sh[], float *b, float cor);
 
 	 void motTest(const float, const float, const float);
 	 int16_t c_base[3];
@@ -94,7 +94,7 @@ class HmcClass
 	friend class StabilizationClass;
  public:
 	 string get_calibr_set();
-
+	 float throttle;
 	 float fmz, fmx, fmy;
 	 void start_motor_compas_calibr();
 	 int32_t startTime;
@@ -106,7 +106,7 @@ class HmcClass
 	 void set(const float buf[]);
 	// int16_t mx, my, mz;
 	 bool motors_power_on;
-	 
+	 float heading;
 	bool init();
 	bool loop();
 	bool ok;
