@@ -989,9 +989,9 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 	draw(g, rect, 5, -5, ACCX);
 	draw(g, rect, 5, -5, ACCY);
 	draw(g, rect, 10, -10, ACCZ);
-	draw(g, rect, 30, -30, GYRO_PITCH);
-	draw(g, rect, 30, -30, GYRO_ROLL);
-	draw(g, rect, 30, -30, GYRO_YAW);
+	draw(g, rect, 180, -180, GYRO_PITCH);
+	draw(g, rect, 180, -180, GYRO_ROLL);
+	draw(g, rect, 180, -180, GYRO_YAW);
 
 
 

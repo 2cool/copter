@@ -138,18 +138,20 @@ void HmcClass::start_motor_compas_calibr(){
 
 #define MAX_M_WORK_VOLTAGE 1250.0f
 
-#define tests_amount 1000
+#define tests_amount 2000
 void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 	if (millis_() > startTime){
 		if (baseI < tests_amount){
-			if (Balance.gf(motor_index) == 0 || Balance.gf(motor_index) > MIN_THROTTLE) {
+			if (Balance.gf(motor_index) == 0 || Balance.gf(motor_index) > 0.1) {
 				current += Telemetry.get_current(motor_index);
 				_base[0] += fmx;
 				_base[1] += fmy;
 				_base[2] += fmz;
 				baseI++;
-				throttle += 0.00045;
-				ya tut vnes izmineniya i ne testil
+				throttle += 0.000275;
+				if (throttle > 0.9)
+					throttle = 0.9;
+				//ya tut vnes izmineniya i ne testil
 			}
 		}
 		else{
