@@ -18,7 +18,7 @@ uint8_t buffer[6];
 int16_t mx, my, mz,c_base[3];
 float dx, dy, dz;
 float base[12] = { -0.011184,-0.032271,0.024606,-0.003847,-0.030249,0.017550,0.005991,-0.017475,0.032292,-0.016693,-0.001853,0.044457 };
-float correction_angle = 19;
+
 
 void Hmc::parser(byte buf[], int n) {
 
@@ -49,7 +49,7 @@ void Hmc::parser_base(byte buf[], int n) {//save calibr,motor-calibr and angle c
 	base[9] = *(float*)&buf[n]; n += 4;
 	base[10] = *(float*)&buf[n]; n += 4;
 	base[11] = *(float*)&buf[n]; n += 4;
-	correction_angle = RAD2GRAD* *(float*)&buf[n]; n += 4;
+	yaw_correction_angle = RAD2GRAD* *(float*)&buf[n]; n += 4;
 	
 	if (sh[0] - sh[1] != 0 && sh[2] - sh[3] != 0 && sh[4] - sh[5] != 0) {
 		dx = (float)(sh[0] - sh[1]) * 0.5f;
@@ -83,7 +83,7 @@ void Hmc::parser_sens(byte buf[], int n, int cont_bits, bool filter, bool rotate
 	float tfmx = -(float)(my - c_base[Y]) * dy;
 	float tfmz = -(float)(mz - c_base[Z]) * dz;
 
-	float FC = (filter) ? 0.01 : 1;
+	float FC = 1;// (filter) ? 0.01 : 1;
 
 	if (cont_bits&1 && !rotate) {
 		float kx, ky, kz, k;
@@ -130,7 +130,7 @@ void Hmc::parser_sens(byte buf[], int n, int cont_bits, bool filter, bool rotate
 	float Yh = fmx * sinRoll * sinPitch + fmy * cosRoll - fmz * sinRoll * cosPitch;
 
 	heading = RAD2GRAD*(float)atan2(Yh, Xh);
-	heading += correction_angle;
+	heading += yaw_correction_angle;
 	if (heading < 0)
 		heading += 360;
 	if (heading >= 360)

@@ -379,8 +379,8 @@ string AutopilotClass::get_set(bool for_save){
 
 void AutopilotClass::set(const float ar[]){
 	cout << "Autopilot set\n";
-	int i = 0;
 	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK){
+		int i = 0;
 		Settings.set(ar[i++], height_to_lift_to_fly_to_home);
 		Balance.set_min_max_throttle(ar[i++], ar[i++]);
 		//i += 2;

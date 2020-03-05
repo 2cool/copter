@@ -105,7 +105,7 @@ class HmcClass
 	 string get_set();
 	 void set(const float buf[]);
 	// int16_t mx, my, mz;
-	 bool motors_power_on;
+
 	 float heading;
 	bool init();
 	bool loop();

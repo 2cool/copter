@@ -52,7 +52,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             // mpu
             {"Q_XY","R_XY","Q_Z","R_Z",_null,_null,_null,_null,_null,_null},
             //compas
-            {"m power on,1,0,100","yaw_correction","calibr_index",_null,_null,_null,_null,_null,_null,_null},
+            {"_nothing_","yaw_correction","calibr_index",_null,_null,_null,_null,_null,_null,_null},
             //rest
             {"vedeoAdr","ppp_inet","telegram",_null,_null,_null,_null,_null,_null,_null},
             //DEBUG

@@ -29,12 +29,6 @@ bool HmcClass::init()
 	motor_index = 0;
 	startTime = 10e3;
 
-#ifdef COMPAS_MOTORS_OFF
-	motors_power_on = false;
-#else
-	motors_power_on = true;
-#endif
-
 	c_base[X] = c_base[Y] = c_base[Z] = 0;
 	dx = dy = dz = 0;
 	//heading = 0;
@@ -71,7 +65,7 @@ string HmcClass::get_set(){
 
 	ostringstream convert;
 	convert << \
-		(motors_power_on ? "1" : "0") << "," << \
+		"1" << "," << \
 		Mpu.yaw_correction_angle * RAD2GRAD << "," << \
 		setings_i;
 	string ret = convert.str();
@@ -84,7 +78,7 @@ string HmcClass::get_set(){
 }
 
 void HmcClass::set(const float buf[]){
-	motors_power_on = (buf[0] > 0);
+	
 	float yaw = constrain(buf[1],-45, 45);
 	Mpu.yaw_correction_angle = yaw * GRAD2RAD;
 
@@ -139,29 +133,20 @@ void HmcClass::start_motor_compas_calibr(){
 #define MAX_M_WORK_VOLTAGE 1250.0f
 
 #define tests_amount 2000
+#define test_throttle 0.6f
 void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 	if (millis_() > startTime){
 		if (baseI < tests_amount){
-			if (Balance.gf(motor_index) == 0 || Balance.gf(motor_index) > 0.1) {
+			if (Balance.gf(motor_index) == 0 || Balance.gf(motor_index) == test_throttle) {
 				current += Telemetry.get_current(motor_index);
 				_base[0] += fmx;
 				_base[1] += fmy;
 				_base[2] += fmz;
 				baseI++;
-				throttle += 0.000275;
-				if (throttle > 0.9)
-					throttle = 0.9;
-				//ya tut vnes izmineniya i ne testil
 			}
 		}
 		else{
 			if (motors_is_on_){
-
-				//float fv = MAX_M_WORK_VOLTAGE / Telemetry.get_voltage();
-
-				
-
-				//fv*=(PRESSURE_AT_0/MS5611.pressure);
 				Autopilot.motors_do_on(false, "CMT");
 				motors_is_on_ = false;
 				int index = motor_index * 3;
@@ -193,7 +178,7 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 				
 				printf("\n\n--- OFF # %i %f %f %f current=%f\n", motor_index, _base[0] / 1000, _base[1] / 1000, _base[2] / 1000, current / 1000);
 				startTime = millis_() + 3e3;
-				throttle = 0.35;
+				throttle = test_throttle;
 				Autopilot.motors_do_on(true, "CMT");
 				motors_is_on_ = true;
 			}
@@ -260,7 +245,7 @@ bool HmcClass::loop(){
 	if (do_compass_motors_calibr)
 		motTest(fmx, fmy, fmz);
 
-	if (Autopilot.motors_is_on() && motors_power_on){
+	if (Autopilot.motors_is_on()){
 		float kx, ky, kz,k;
 		//m0;
 			k = Telemetry.get_current(0);

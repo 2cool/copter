@@ -9,7 +9,7 @@ public:
 	void parser_sens(byte buf[], int n, int cont_bits, bool filter, bool rotate);
 	void parser_base(byte buf[], int n);
 	float fmx, fmy, fmz;
-
+	float yaw_correction_angle = 19;
 
 	Hmc();
 	~Hmc();

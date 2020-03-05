@@ -5,6 +5,7 @@
 #include "Pressure.h"
 #include "KalmanFilter.h"
 
+#include "hmc.h"
 class Pendulum {
 private:
 	
@@ -126,7 +127,26 @@ const float n006 = 0.061035156f;
 //4g
 const float n122 = 1.220740379e-4;
 double qw, qx, qy, qz,g_yaw;
+void Mpu::toEulerianAngle(const Quaternion_& q, float& roll, float& pitch, float& yaw)
+{
+	// roll (x-axis rotation)
+	double sinr = +2.0 * (q.w * q.x + q.y * q.z);
+	double cosr = +1.0 - 2.0 * (q.x * q.x + q.y * q.y);
 
+	roll = atan2(sinr, cosr);
+
+	// pitch (y-axis rotation)
+	double sinp = +2.0 * (q.w * q.y - q.z * q.x);
+	if (fabs(sinp) >= 1)
+		pitch = copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+	else
+		pitch = asin(sinp);
+
+	// yaw (z-axis rotation)
+	double siny = +2.0 * (q.w * q.z + q.x * q.y);
+	double cosy = +1.0 - 2.0 * (q.y * q.y + q.z * q.z);
+	yaw = atan2(siny, cosy);
+}
 void Mpu::toEulerianAngle()
 {
 	// roll (x-axis rotation)
@@ -177,6 +197,61 @@ Pendulum p1(1.01, 0, 0,0);
 #include <iostream>
 using namespace std;
 
+#define PI 3.1415926535897932384626433832795
+#define HALF_PI 1.5707963267948966192313216916398
+#define TWO_PI 6.283185307179586476925286766559
+#define DEG_TO_RAD 0.017453292519943295769236907684886
+#define RAD_TO_DEG 57.295779513082320876798154814105
+#define EULER 2.718281828459045235360287471352
+#define wrap_PI(x) (x < -PI ? x+TWO_PI : (x > PI ? x - TWO_PI: x))
+
+
+
+
+
+
+void Mpu::Madgwic() {
+	const float giroifk = 0.06103515625f;//2000
+	const float accifk = 0.00048828125f;//16
+
+	gyroPitch = giroifk * (float)g[1] - agpitch;
+	gyroRoll = giroifk * (float)g[0] - agroll;
+	gyroYaw = giroifk * (float)g[2] - agyaw;
+	float ax = accifk * (float)a[0];
+	float ay = accifk * (float)a[1];
+	float az = accifk * (float)a[2];
+
+	AHRS.MadgwickAHRSupdate(q, GRAD2RAD * gyroRoll, GRAD2RAD * gyroPitch, GRAD2RAD * gyroYaw, ax, ay, az, hmc.fmx, hmc.fmy, hmc.fmz, dt);
+	toEulerianAngle(q, roll, pitch, yaw);
+
+	gyroPitch = -gyroPitch;
+	gyroYaw = -gyroYaw;
+	pitch = -pitch;
+	yaw = -yaw;
+	yaw += hmc.yaw_correction_angle*GRAD2RAD;
+	yaw = wrap_PI(yaw);
+
+	sin_cos(yaw, sinYaw, cosYaw);
+	sin_cos(pitch, sinPitch, cosPitch);
+	sin_cos(roll, sinRoll, cosRoll);
+
+	tiltPower += (constrain(cosPitch * cosRoll, 0.5f, 1) - tiltPower) * tiltPower_CF;
+
+	accZ = az * cosPitch + sinPitch * ax;
+	accZ = 9.8f * (accZ * cosRoll + sinRoll * ay - 1);
+
+	accX = 9.8f * (ax * cosPitch - az * sinPitch);
+	accY = 9.8f * (-ay * cosRoll + az * sinRoll);
+
+
+
+	pitch *= RAD2GRAD;
+	roll *= RAD2GRAD;
+	yaw *= RAD2GRAD;
+}
+
+
+//-------------------------------------------------------------
 
 
 
@@ -194,9 +269,7 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 	old_itime = itime;
 
 
-	int g[3];
-	int a[3];
-	int q[4];
+
 
 	if (dt > 0.03)
 		dt = 0.03;
@@ -281,6 +354,10 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 	}
 
 
+
+	
+
+
 	static float old_accZ = 0, old_accX = 0, old_accY = 0;
 	static double old_bar_alt = 0, oldSX = 0, oldSY = 0;
 	static bool start_f = false;
@@ -294,6 +371,16 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 
 	if (start_f == false && gps_log.gx != 0 && gps_log.gy != 0)
 		start_f = true;
+
+
+	if (filter) {
+		
+		Madgwic();
+		if (yaw < 0)
+			yaw += 360;
+	}
+
+
 
 
 	if (start_f && filter) {
@@ -436,6 +523,7 @@ void Mpu::init() {
 	kf[X]->init(x0);
 	kf[Y]->init(x0);
 	kf[Z]->init(x0);
+	q.w = 1; q.x = q.y = q.z = 0;
 }
 
 

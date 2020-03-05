@@ -442,7 +442,6 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	float az = accifk * (float)a[2];
 
 	AHRS.MadgwickAHRSupdate(q, GRAD2RAD * gyroRoll, GRAD2RAD * gyroPitch, GRAD2RAD * gyroYaw, ax, ay, az,  Hmc.fmx, Hmc.fmy, Hmc.fmz, mpu_dt);
-	//AHRS.MadgwickAHRSupdate(q, GRAD2RAD * gyroRoll, GRAD2RAD * gyroPitch, GRAD2RAD * gyroYaw, 0, 0, 10, Hmc.fmx, Hmc.fmy, -Hmc.fmz, mpu_dt);
 	gyro_calibr();
 
 	toEulerianAngle(q, roll, pitch, yaw);

@@ -1,4 +1,7 @@
 #pragma once
+#include <stdint.h>
+#include "helper_3dmath.h"
+#include "MadgwickAHRS.h"
 #include "graph.h"
 enum { mPITCH, mROLL, mrPITCH, mrROLL, mYAW, mGYRO_PITCH, mGYRO_ROLL, mGYRO_YAW, mACCX, mACCY, mACCZ,mMAXACC ,mEX,mEY,mALL_E };
 #define M_PI  3.14159265358979323846f
@@ -74,11 +77,11 @@ public:
 	float f_pitch, f_roll;
 	float pitch, roll;
 
-	
+	Quaternion_ q;
 	float yaw, yaw_offset;
-
+	void Madgwic();
 	float DRAG_K, _0007;
-
+	void toEulerianAngle(const Quaternion_& q, float& roll, float& pitch, float& yaw);
 	double acc_callibr_timed;
 	float hower_thr, min_thr, fall_thr;
 	float e_accZ, e_speedZ, w_accZ;

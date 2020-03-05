@@ -140,11 +140,13 @@
   <ItemGroup>
     <ClInclude Include="Balance.h" />
     <ClInclude Include="copter_graph.h" />
+    <ClInclude Include="helper_3dmath.h" />
     <ClInclude Include="hmc.h" />
     <ClInclude Include="gps.h" />
     <ClInclude Include="GPS_Loger.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="KalmanFilter.h" />
+    <ClInclude Include="MadgwickAHRS.h" />
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Mpu.h" />
     <ClInclude Include="myButton.h" />
@@ -166,6 +168,7 @@
     <ClCompile Include="GPS_Loger.cpp" />
     <ClCompile Include="graph.cpp" />
     <ClCompile Include="KalmanFilter.cpp" />
+    <ClCompile Include="MadgwickAHRS.cpp" />
     <ClCompile Include="Matrix33.cpp" />
     <ClCompile Include="Mpu.cpp" />
     <ClCompile Include="myButton.cpp" />

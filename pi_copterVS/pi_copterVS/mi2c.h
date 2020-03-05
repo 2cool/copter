@@ -71,43 +71,6 @@ timer5 	16 		C 			- 				46
 #include "define.h"
 
 
-
-
-/*
-2мегагерца
-
-#define MAX_THROTTLE 4000
-#define OFF_THROTTLE 2000
-#define MAX90_THROTTLE 3800
-#define MIN_THROTTLE 2200
-*/
-//16 мегагерц
-
-#define pwm_MAX_THROTTLE 32000
-#define pwm_OFF_THROTTLE 16000
-#define MAX90_THROTTLE 30400
-#define pwm_MIN_THROTTLE 17600
-//#define MAX90_THROTTLE 30400
-//#define MIN_THROTTLE 17600
-
-//#define OFF1_THROTTLE 1300 // 
-
-//#define MAX1_THROTHLE 4620 //  750 грамма = 90%
-//#define MIN_THROTTLE 1550 //  33 грамма = 0%
-
-
-
-// 
-//#define OFF1_THROTTLE_ 2050 // 
-// //  максимальная мощность типпа 100 процентов. и дымок )
-//#define MAX1_THROTHLE_ 3800 //  750 грамма = 90%
-//#define MIN_THROTTLE_ 2150 //  33 грамма = 0%
-// 16000000 / 8 / 40000 = 50Hz
-// 20 ms = 40000
-
-
-
-//10000
 class Megai2c
 {
 protected:

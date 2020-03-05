@@ -35,7 +35,7 @@
 #ifdef FLY_EMULATOR
 //#define FASLE_GPS_STILL
 //#define MOTORS_OFF
-#define COMPAS_MOTORS_OFF  
+
 #define FALSE_ALTITUDE 30
 #else
 #define BUZZER_R
