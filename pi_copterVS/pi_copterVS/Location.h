@@ -18,7 +18,8 @@ class LocationClass
 
 
 public:
-	
+	uint8_t errors;
+	void print_gps_error();
 	//double cosDirection, sinDirection;
 //	double dir_angle_GRAD;
 	double dt, rdt;

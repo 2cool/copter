@@ -227,7 +227,7 @@ void Megai2c::throttle(const float _n[]) {
 	char* chBuf = (char*)pwm_out;
 	if (write(fd, chBuf + 1, 9) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
-		cout << "arduino write power error" << millis_() << endl;
+		cout << "arduino write power error " << millis_() << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
 #endif

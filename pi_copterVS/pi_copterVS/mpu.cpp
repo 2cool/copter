@@ -159,9 +159,9 @@ bool MpuClass::init()
 
 #ifndef FLY_EMULATOR
 
-	accelgyro.initialize(MPU6050_GYRO_FS_2000, MPU6050_ACCEL_FS_16, MPU6050_DLPF_BW_20);
+	accelgyro.initialize(MPU6050_GYRO_FS_2000, MPU6050_ACCEL_FS_16, MPU6050_DLPF_BW_5);
 	sleep(1);
-	if (accelgyro.initialize(MPU6050_GYRO_FS_2000, MPU6050_ACCEL_FS_16, MPU6050_DLPF_BW_20) == -1)
+	if (accelgyro.initialize(MPU6050_GYRO_FS_2000, MPU6050_ACCEL_FS_16, MPU6050_DLPF_BW_5) == -1)
 		return false;
 
 	bool ok;

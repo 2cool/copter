@@ -25,11 +25,13 @@
 #include "Stabilization.h"
 #include "Autopilot.h"
 #include "Log.h"
+#include "Telemetry.h"
 
 #define DELTA_ANGLE_C 0.001
 #define DELTA_A_RAD (DELTA_ANGLE_C*GRAD2RAD)
 #define DELTA_A_E7 (DELTA_ANGLE_C*10000000)
 
+#define SPEED_ERROR 60
 
 double LocationClass::from_lat2X(const double lat) {
 	return lat * kd_lat_;
@@ -49,10 +51,14 @@ double LocationClass::from_Y2Lon(const double y) {
 }
 
 
+uint8_t bugs = 0;
 
 
-
-
+void LocationClass::print_gps_error() {
+	cout << "gps error " << lat_ << " : " << lon_ << " " << altitude << " " << accuracy_hor_pos_ << " " << accuracy_ver_pos_ << " " << dt << ", " << last_gps_data__time << endl;;
+	mega_i2c.beep_code(B_GPS_ACCURACY_E);
+	Telemetry.addMessage(e_GPS_ERROR);
+}
 
 
 void LocationClass::fromLoc2Pos(const long &lat, const long &lon, double&x, double&y) {
@@ -67,16 +73,38 @@ void LocationClass::xy(){
 	
 	//double t = form_lon2Y((_lon_zero - lon_));
 	double tspeedY = (ty - dY) *rdt;
-	dY = ty;
-	shmPTR->speedY=speedY = constrain(tspeedY,-25,25);
+	if (abs(tspeedY) > SPEED_ERROR) {
+		bugs++;
+		print_gps_error();
+		return;
+	}
+	else {
+		dY = ty;
+		speedY = tspeedY;
+	}
 	//t = from_lat2X((_lat_zero - lat_));
 	double tspeedX = (tx - dX) * rdt;
-	dX = tx;
-	shmPTR->speedX=speedX=constrain(tspeedX,-25,25);
+	if (abs(tspeedX) > SPEED_ERROR) {
+		bugs++;
+		print_gps_error();
+		return;
+	}
+	else {
+		dX = tx;
+		speedX = tspeedX;
+	}
 	//update z
 	double tsz = (altitude - old_alt)*rdt;
-	old_alt = altitude;
-	shmPTR->speedZ=speedZ = tsz;
+	
+	if (abs(speedZ) > SPEED_ERROR) {
+		bugs++;
+		print_gps_error();
+		return;
+	}
+	else {
+		old_alt = altitude;
+		speedZ = tsz;
+	}
 
 #ifdef XY_SAFE_AREA
 	if (Autopilot.motors_is_on() && sqrt(x2home*x2home+y2home*y2home)>XY_SAFE_AREA)
@@ -129,7 +157,11 @@ void LocationClass::updateXY(){
 	double dx = (dX - x_from_zero_2_home);
 	double dy = (dY - y_from_zero_2_home);
 	dist2home = sqrt(dx*dx + dy*dy);
-	shmPTR->dist2home = (float)dist2home;
+	if ((abs(dist2home - shmPTR->dist2home) * rdt) > SPEED_ERROR) {
+		bugs++;
+		print_gps_error();
+		return;
+	}
 	if (fabs(dist2home - oldDist) > MAX_DIST2UPDATE){
 		oldDist = dist2home;
 		update(); //for emulator
@@ -138,6 +170,7 @@ void LocationClass::updateXY(){
 }
 //////////////////////////////////////////////////////////////
 void LocationClass::proceed(SEND_I2C *d) {
+	bugs = 0;
 	last_gps_data__time = millis_();
 	dt = 0.001*(last_gps_data__time - old_time);
 	dt = (dt < 0.2) ? 0.1 : 0.2;
@@ -146,14 +179,14 @@ void LocationClass::proceed(SEND_I2C *d) {
 
 #define REAL_GPS
 #ifdef REAL_GPS
-	shmPTR->accuracy_hor_pos_ = accuracy_hor_pos_ = (d->hAcc > 99) ? 99 : d->hAcc;
-	shmPTR->accuracy_ver_pos_ = accuracy_ver_pos_ = (d->vAcc > 99) ? 99 : d->vAcc;
+	accuracy_hor_pos_ = (d->hAcc > 99) ? 99 : d->hAcc;
+	accuracy_ver_pos_ = (d->vAcc > 99) ? 99 : d->vAcc;
 	if (accuracy_hor_pos_ < MIN_ACUR_HOR_POS_4_JAMM)
 		last_gps_accuracy_ok = last_gps_data__time;
-	shmPTR->gps_altitude_ = d->height;
+	
 	altitude = 0.001*(double)d->height;
-	shmPTR->lat_ = lat_ = d->lat;
-	shmPTR->lon_ = lon_ = d->lon;
+	lat_ = d->lat;
+	lon_ = d->lon;
 	//cout << lat_ << " " << lon_ <<" "<< (uint)accuracy_hor_pos_<< endl;
 #else
 	shmPTR->accuracy_hor_pos_ = accuracy_hor_pos_ = 1;
@@ -174,6 +207,35 @@ void LocationClass::proceed(SEND_I2C *d) {
 
 	if (_lat_zero != 0 || _lon_zero != 0)
 		updateXY();
+
+
+
+
+
+	if (bugs) {
+		altitude = 0.001 * (double)shmPTR->gps_altitude_;
+		accuracy_hor_pos_= shmPTR->accuracy_hor_pos_;
+		accuracy_ver_pos_ = shmPTR->accuracy_ver_pos_;
+		lat_ = shmPTR->lat_;
+		lon_ = shmPTR->lon_;
+		dist2home = shmPTR->dist2home;
+		errors++;
+		if (errors >= 5) {
+			Autopilot.control_falling("GPS");
+		}
+	}
+	else {
+		shmPTR->gps_altitude_ = d->height;
+		shmPTR->accuracy_hor_pos_ = accuracy_hor_pos_;
+		shmPTR->accuracy_ver_pos_ = accuracy_ver_pos_;
+		shmPTR->lat_ = lat_;
+		shmPTR->lon_ = lon_;
+		shmPTR->dist2home = (float)dist2home;
+		shmPTR->speedY = speedY;
+		shmPTR->speedX = speedX;
+		shmPTR->speedZ = speedZ;
+		errors = 0;
+	}
 
 
 	if (Log.writeTelemetry) {
@@ -215,7 +277,8 @@ int LocationClass::init(){
 
 	
 #endif
-	
+	errors = 0;
+	bugs = 0;
 	dist2home = 0;
 	x_from_zero_2_home = y_from_zero_2_home = 0;
 	mspeedx =  mspeedy = 0;

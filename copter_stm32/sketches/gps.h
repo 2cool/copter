@@ -31,7 +31,7 @@ struct SEND_I2C {
 	uint8_t vAcc;
 };
 
-
+int gps_find_loop();
 int gps_setup();
 uint8_t processGPS();
 SEND_I2C* gps_data();
