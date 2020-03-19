@@ -11,6 +11,7 @@
 #include "Telemetry.h"
 #include "Stab.h"
 #include "Hmc.h"
+#include "commander.h"
 //#define LOG_FILE_NAME "d:/tel_log10011.log"
 
 
@@ -303,6 +304,10 @@ int Graph::parser(byte buf[]) {
 			bal.parser(buf, i, control_bits);
 			break;
 		}
+		case COMM: {
+			com.parser(buf, i, len, control_bits, flags[FILTER], flags[ROTATE]);
+			break;
+		}
 		default:
 
 			break;
@@ -482,6 +487,7 @@ int Graph::decode_Log() {
 		sensors_data[n].sd[F2] = bal.f2;
 		sensors_data[n].sd[F3] = bal.f3;
 		sensors_data[n].sd[THROTTLE] = bal.thr;
+		
 
 //#define D_ROTATE
 #ifdef D_ROTATE
@@ -493,8 +499,19 @@ int Graph::decode_Log() {
 		sensors_data[n].sd[C_ROLL] = ap_roll;
 #else
 
-		sensors_data[n].sd[C_PITCH] = bal.ap_pitch;
-		sensors_data[n].sd[C_ROLL] = bal.ap_roll;
+
+
+		if ((control_bits & XY_STAB)) {
+			sensors_data[n].sd[C_PITCH] = bal.ap_pitch;
+			sensors_data[n].sd[C_ROLL] = bal.ap_roll;
+		}
+		else {
+			sensors_data[n].sd[C_PITCH] = com.pitch;
+			sensors_data[n].sd[C_ROLL] = com.roll;
+		}
+
+
+
 #endif
 	//	sensors_data[n].sd[M_HEAD] = bal.ap_yaw;
 

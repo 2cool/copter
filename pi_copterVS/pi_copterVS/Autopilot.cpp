@@ -272,12 +272,15 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 						return;
 					}
 #ifndef OFF_TIMELAG
+					//Debug.dump((float)timelag,0,0,0); 
 					if (timelag > TIMEOUT__LAG) {
-						int32_t _timeout__LAG = TIMEOUT__LAG;
-						if (Mpu.get_Est_Alt() > 15 || Mpu.get_Est_Alt() / (-Mpu.get_Est_SpeedZ()) > 5)
+						int32_t _timeout__LAG =  TIMEOUT__LAG;
+						if (Mpu.get_Est_Alt() > 15 || Mpu.get_Est_Alt() / (-Mpu.get_Est_SpeedZ()) > 5)  
 							_timeout__LAG = 2e3;
-						if (timelag > _timeout__LAG)
+						if (timelag > _timeout__LAG) {
 							Commander.data_reset();
+							cout << "time lag" << "\t" << millis_() << endl;
+						}
 					}
 #endif
 

@@ -29,7 +29,7 @@ void StabilizationClass::setMinMaxI_Thr() {
 }
 void StabilizationClass::init(){
 
-	dist2speed_XY = 0.2f;//0.5
+	dist2speed_XY = 0.2f;//0.5 
 	set_acc_xy_speed_kp(6);
 	set_acc_xy_speed_kI(2.5);
 	set_acc_xy_speed_imax(Balance.get_max_angle());

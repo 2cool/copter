@@ -178,11 +178,11 @@ bool CommanderClass::input(){
 		return true;
 	}
 
-	Autopilot.last_time_data__recived = millis_();
+	
 	uint8_t *buf = shmPTR->commander_buf;
 	if (shmPTR->commander_buf_len >= 12) {
 
-		if (Log.writeTelemetry) {
+		if (Log.writeTelemetry) { 
 			Log.block_start(LOG::COMM,true);
 			Log.loadMem(buf, shmPTR->commander_buf_len,false);
 			Log.block_end(true);
@@ -222,13 +222,21 @@ bool CommanderClass::input(){
 
 
 		if (mask == sec_mask) {
+
+
+		/*	static int32_t old = 0;
+			int32_t now = millis_();
+			cout << now - old << endl; 
+			old = now;
+			*/
+			Autopilot.last_time_data__recived = millis_(); 
 			Autopilot.set_control_bits(mode);
 			throttle = 0.00003125f*(float)i_throttle;
 			yaw = -ANGK*(float)i_yaw;
 			yaw_offset = ANGK*(float)i_yaw_offset;
 			pitch = ANGK*(float)i_pitch;
-		//	Debug.load(0, pitch, roll);
-		//	Debug.dump();
+			//Debug.load(0, pitch, roll);
+			//Debug.dump();
 			roll = ANGK*(float)i_roll;
 			if ((i + 3) < shmPTR->commander_buf_len) {
 				string msg = "";
@@ -271,6 +279,7 @@ bool CommanderClass::input(){
 	else
 	{
 		shmPTR->commander_buf_len = 0;
+		cout << "<12\n";
 		return true;
 	}
 	

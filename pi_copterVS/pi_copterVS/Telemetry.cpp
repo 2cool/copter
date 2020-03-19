@@ -391,14 +391,16 @@ bool gps_or_acuracy = false;
 
 
 int32_t last_update_time=0;
+
 bool TelemetryClass::update_buf() {
-	if (shmPTR->connected == 0 || shmPTR->telemetry_buf_len > 0)
+	const int32_t ct = millis_();
+	if (shmPTR->connected == 0 || shmPTR->telemetry_buf_len > 0) // || ct-last_update_time<20)
 		return false;
 	if (Autopilot.busy()) {
 		shmPTR->telemetry_buf_len=4;
 		return false;
 	}
-
+	last_update_time = ct;
 	//bzero(buf, 32);
 	//delay(1000);
 	int i = 0;

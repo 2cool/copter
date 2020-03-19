@@ -211,24 +211,38 @@ string stdout_file_ext = "";
 //-----------------------------------------------------------------------------------------
 bool start_wifi = false, start_inet = false, start_loger = false, start_telegram = false;;
 
+bool max_cpu_freq = true;
 bool min_cpu_freq = false;
 void watch_dog() {
 	delay(1000);
 	while (shmPTR->run_main) {
-		
-
 		const uint8_t wifi_cnt = shmPTR->wifi_cnt;
 		const uint8_t internet_cnt = shmPTR->internet_cnt;
 		const uint8_t fpv_cnt = shmPTR->fpv_cnt;
 		delay(3000);
 
 		Telemetry.cpu_temp=get_cpu_temp();
-		if (!min_cpu_freq && Telemetry.cpu_temp >= 60) { 
-			min_cpu_freq = true;
-			system("nice -n -20 cpufreq-set -u 480000"); 
-			cout<<"temp to hight!!  set max freq to 480mhz:\t" << millis_() << endl;
-		}
-
+		if (!min_cpu_freq)
+			if (Telemetry.cpu_temp >= 60 && Autopilot.motors_is_on()) {
+				min_cpu_freq = true;
+				system("nice -n -20 cpufreq-set -u 480000 -d 480000");
+				cout << "temp to hight!!  set max freq to 480 mhz:\t" << millis_() << endl;
+			}
+			else {
+				if (Autopilot.motors_is_on()) {
+					if (!max_cpu_freq) {
+						max_cpu_freq = true;
+						cout << "set cpu freq to 1200 mhz:\t" << millis_() << endl;
+						system("nice -n -20 cpufreq-set -u 1200000 -d 1200000");
+					}
+				}else
+					if (max_cpu_freq) {
+						max_cpu_freq = false;
+						cout << "set cpu freq from 480 to 1200 mhz:\t" << millis_() << endl;
+						system("nice -n -20 cpufreq-set -u 1200000 -d 480000");
+					}
+			}
+			
 		if (Autopilot.busy())
 			continue;
 

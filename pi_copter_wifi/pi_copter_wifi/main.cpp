@@ -33,7 +33,7 @@ using namespace std;
 
 key_t          ShmKEY;
 int            ShmID;
-struct Memory *shmPTR;
+struct Memory * shmPTR;
 
 
 
@@ -51,7 +51,7 @@ int init_shmPTR() {
 			cout << "*** shmget error (wifi) ***\n";
 			return 1;
 		}
-		shmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
+		shmPTR = (struct Memory*) shmat(ShmID, NULL, 0);
 	}
 	return 0;
 }
@@ -76,7 +76,7 @@ struct sockaddr_in serv_addr, cli_addr;
 int server() {
 
 
-	
+
 
 
 	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -97,10 +97,10 @@ int server() {
 
 
 	while (flag == 0 && shmPTR->run_main) {
-		while(shmPTR->commander_buf_len != 0)
-				usleep(10000);
+		while (shmPTR->commander_buf_len != 0)
+			usleep(10000);
 		int n, len;
-		n = recvfrom(sockfd, (char*)shmPTR->commander_buf, TELEMETRY_BUF_SIZE, MSG_WAITALL, (struct sockaddr*) & cli_addr, (socklen_t*)& len);
+		n = recvfrom(sockfd, (char*)shmPTR->commander_buf, TELEMETRY_BUF_SIZE, MSG_WAITALL, (struct sockaddr*) & cli_addr, (socklen_t*)&len);
 
 
 		if (n > 0) {
@@ -137,9 +137,9 @@ int server() {
 	}
 	close(sockfd);
 
-		//////////////////////////
+	//////////////////////////
 
-	
+
 }
 
 
@@ -172,17 +172,17 @@ void get_signal_strong() {
 	string ret = exec("nice -n -20 iwconfig wlan0 | grep Signal");
 	if (ret.length() > 20) {
 		int beg = ret.find("l=-");
-		int len = ret.substr(beg+3).find("dBm");
-		uint signal = atoi(ret.substr(beg+3, len).c_str());
+		int len = ret.substr(beg + 3).find("dBm");
+		uint signal = atoi(ret.substr(beg + 3, len).c_str());
 
-		beg += 18+ret.substr(beg+18).find("l=-");
+		beg += 18 + ret.substr(beg + 18).find("l=-");
 		len = ret.substr(beg + 3).find("dBm");
 		uint noise = atoi(ret.substr(beg + 3, len).c_str());
-		shmPTR->status &= (-1^0b11111111111111);
-		shmPTR->status |= signal|(noise<<7);
+		shmPTR->status &= (-1 ^ 0b11111111111111);
+		shmPTR->status |= signal | (noise << 7);
 	}
 	//string ret = exec("nmcli dev wifi | grep 2coolzNET");
-	
+
 }
 
 
@@ -254,7 +254,7 @@ void watch_d() {
 }
 
 std::ofstream out;
-std::streambuf *coutbuf;// старый буфер
+std::streambuf* coutbuf;// старый буфер
 
 void set_wifi_30() {
 	exec("nice -n -20 ifconfig wlan0 down");
@@ -269,7 +269,7 @@ void set_wifi_30() {
 	delay(5000);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	init_shmPTR();
 
@@ -314,15 +314,15 @@ int main(int argc, char *argv[])
 	//usleep(1000000)
 	if (flag == 0) {
 		//while (flag == 0 && shmPTR->run_main) {
-			server();
+		server();
 		//}
 	}
 
 
-	shmdt((void *)shmPTR);
+	shmdt((void*)shmPTR);
 	cout << "   wifi exits...\n";
 	out.close();
-    return 0;
+	return 0;
 }
 
 

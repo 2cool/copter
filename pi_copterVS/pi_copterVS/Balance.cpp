@@ -43,7 +43,7 @@ void BalanceClass::init()
 	c_pitch = c_roll = 0;
 	Stabilization.init();
 	throttle = 0;
-	pitch_roll_stabKP = 2;
+	pitch_roll_stabKP = 0.3;
 	propeller_lost[0]= propeller_lost[1] = propeller_lost[2] = propeller_lost[3] = false;
 	//set_pitch_roll_pids(0.0017,  0.0001, 0.2);  //very old
 	old_time = micros_();
@@ -301,10 +301,19 @@ bool BalanceClass::loop()
 			}
 		}
 
+		float t = pitch_roll_stabKP * wrap_180(Mpu.get_pitch() - c_pitch);
+		t *= t;
+		const float pitch_stab_output = 0;// f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED); 
+		
+		t = pitch_roll_stabKP * (wrap_180(Mpu.get_roll() - c_roll));
+		t *= t;
 
-		const float pitch_stab_output = f_constrain(pitch_roll_stabKP*(wrap_180(Mpu.get_pitch() - c_pitch)), -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED);
-		const float roll_stab_output = f_constrain(pitch_roll_stabKP*(wrap_180(Mpu.get_roll() - c_roll)), -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED);
-		const float yaw_stab_output = (Autopilot.if_strong_wind() && Autopilot.go2homeState())?0:f_constrain(yaw_stabKP*wrap_180(-Autopilot.get_yaw() - Mpu.get_yaw()), -MAX_D_YAW_SPEED, MAX_D_YAW_SPEED);
+		const float roll_stab_output = 0;// f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED);
+
+		const float yaw_stab_output = 0;// (Autopilot.if_strong_wind() && Autopilot.go2homeState()) ? 0 : f_constrain(yaw_stabKP * wrap_180(-Autopilot.get_yaw() - Mpu.get_yaw()), -MAX_D_YAW_SPEED, MAX_D_YAW_SPEED);
+
+		//Debug.dump(pitch_stab_output, roll_stab_output, 0, 0);
+
 
 		const int64_t _ct = micros_();
 		double dt = (_ct - old_time) * 1e-6;

@@ -61,13 +61,13 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <MultiProcNumber>4</MultiProcNumber>
+    <MultiProcNumber>1</MultiProcNumber>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <MultiProcNumber>4</MultiProcNumber>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <MultiProcNumber>4</MultiProcNumber>
+    <MultiProcNumber>2</MultiProcNumber>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="AP_PID.cpp" />

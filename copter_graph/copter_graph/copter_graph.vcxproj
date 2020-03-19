@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Balance.h" />
+    <ClInclude Include="commander.h" />
     <ClInclude Include="copter_graph.h" />
     <ClInclude Include="helper_3dmath.h" />
     <ClInclude Include="hmc.h" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Balance.cpp" />
+    <ClCompile Include="commander.cpp" />
     <ClCompile Include="copter_graph.cpp" />
     <ClCompile Include="hmc.cpp" />
     <ClCompile Include="GPS_Loger.cpp" />

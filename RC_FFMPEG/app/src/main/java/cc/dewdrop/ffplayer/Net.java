@@ -145,7 +145,7 @@ public class Net {
 
     final int buf_size=16384;
     byte buffer[] = new byte[buf_size];
-
+    byte bufferout[] = new byte[buf_size];
     final int IP = 0;
     final int PORT = 1;
 
@@ -169,6 +169,7 @@ public class Net {
                 SERVER_PORT = Integer.parseInt(s[PORT]);
 
                 udpSocket = new DatagramSocket(SERVER_PORT);
+                udpSocket.setSoTimeout(200);
                 InetAddress serverAddr = copterAddress;
                 int offline_cnt=0;
                 while (net_runing && run) {
@@ -177,25 +178,25 @@ public class Net {
                         DatagramPacket packet = new DatagramPacket(buffer, len, serverAddr, SERVER_PORT);
                        // Log.d("UDP","send data. threads="+threads_);
                         udpSocket.send(packet);
-                        DatagramPacket packet1 = new DatagramPacket(buffer, buf_size);
+                        DatagramPacket packet1 = new DatagramPacket(bufferout, buf_size);
                        // Log.d("UDP","about to wait to receive. threads="+threads_);
-                       udpSocket.setSoTimeout(100);
+
                         udpSocket.receive(packet1);
                         Commander.link = true;
                         ip_OK = true;
                         len=packet1.getLength();
-                        Telemetry.bufferReader_(buffer, len);
+                        Telemetry.bufferReader_(bufferout, len);
                         offline_cnt=0;
                             //  Log.d("Receivedtext", text);
-                        long t=System.currentTimeMillis();
-                        if (t-old_t < 50) {
-                            try {
-                                Thread.sleep(old_t+50-t);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        old_t=t;
+                      //  long t=System.currentTimeMillis();
+                      //  if (t-old_t < 500) {
+                          // try {
+                              //  Thread.sleep(500);
+                          //  } catch (InterruptedException e) {
+                          //      e.printStackTrace();
+                          //  }
+                       // }
+                       // old_t=t;
                     } catch (IOException e) {
                         if (offline_cnt++>3) {
                             run=false;
