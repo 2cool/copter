@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #define SHMKEY "/home/igor/logs/"
-#define TELEMETRY_BUF_SIZE 16384
+#define TELEMETRY_BUF_SIZE 1024
 enum { X, Y, Z };
 
 

@@ -462,7 +462,7 @@ void loop()
 		}
 		else {
 			err++;
-			if (err > 50) {
+			if (err > 200) {
 				stop_motors();
 				/*
 				for (int i = 0; i < 8; i++)

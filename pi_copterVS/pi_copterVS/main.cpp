@@ -72,7 +72,7 @@ int zzz = 1;
 
 
 
-void set_wifi_30() {
+void set_wifi_30_() {
 	exec("sudo ifconfig wlan0 down");
 	delay(3000);
 	exec("sudo iw reg set BO");
@@ -145,9 +145,9 @@ bool loop()
 {
 
 	uint64_t beg = micros_();
-	if (beg - timer < 4900)
+	if (beg - timer < 9900)
 	{
-		usleep(4900- (beg - timer));
+		usleep(9900 - (beg - timer));
 	
 	}
 
@@ -188,10 +188,12 @@ void pipe_handler(int sig) {
 
 uint8_t get_cpu_temp() {
 
-	uint8_t cpu_temp;
+	int cpu_temp;
 	FILE* cpuT = fopen("/etc/armbianmonitor/datasources/soctemp", "r");
 	if (cpuT) {
 		fscanf(cpuT, "%i", &cpu_temp);
+		if (cpu_temp > 1000)
+			cpu_temp /= 1000;
 		return cpu_temp;
 	}
 	return 0;
@@ -211,7 +213,7 @@ string stdout_file_ext = "";
 //-----------------------------------------------------------------------------------------
 bool start_wifi = false, start_inet = false, start_loger = false, start_telegram = false;;
 
-bool max_cpu_freq = true;
+bool max_cpu_freq = false;
 bool min_cpu_freq = false;
 void watch_dog() {
 	delay(1000);
@@ -229,24 +231,18 @@ void watch_dog() {
 				cout << "temp to hight!!  set max freq to 480 mhz:\t" << millis_() << endl;
 			}
 			else {
-				if (Autopilot.motors_is_on()) {
-					if (!max_cpu_freq) {
-						max_cpu_freq = true;
-						cout << "set cpu freq to 1200 mhz:\t" << millis_() << endl;
-						system("nice -n -20 cpufreq-set -u 1200000 -d 1200000");
-					}
-				}else
-					if (max_cpu_freq) {
-						max_cpu_freq = false;
-						cout << "set cpu freq from 480 to 1200 mhz:\t" << millis_() << endl;
-						system("nice -n -20 cpufreq-set -u 1200000 -d 480000");
-					}
+				if (!max_cpu_freq) {
+					max_cpu_freq = true;
+					cout << "set cpu freq to 1200 mhz:\t" << millis_() << endl;
+					system("nice -n -20 cpufreq-set -u 1370000 -d 1370000");
+				}
+				
 			}
 			
 		if (Autopilot.busy())
 			continue;
-
-
+#define START_FPV
+#ifdef START_FPV
 		if (fpv_cnt == shmPTR->fpv_cnt) {
 			cout << "fpv killed\n";  
 			shmPTR->fpv_run = false;
@@ -256,7 +252,12 @@ void watch_dog() {
 			cout << "fpv started\n";
 			system("nice -n -20 /root/projects/fpv_ &");
 		}
+#else
+		shmPTR->fpv_run = true;
+#endif
 		const int32_t _ct = millis_();
+#define START_FIFI
+#ifdef START_FIFI
 		if (start_wifi)
 			if (wifi_cnt == shmPTR->wifi_cnt || (Autopilot.last_time_data__recived && (_ct - Autopilot.last_time_data__recived) > 60e3 && (_ct - last_wifi__reloaded) > 60e3)) {
 				last_wifi__reloaded = _ct;
@@ -270,6 +271,9 @@ void watch_dog() {
 				t += " &";
 				system(t.c_str());
 			}
+#else
+		shmPTR->wifi_run = true;
+#endif
 
 		if (start_inet)
 			if (internet_cnt == shmPTR->internet_cnt) {
@@ -384,7 +388,7 @@ int main(int argc, char* argv[]) {
 	else
 		return 0;
 
-	if (init_shmPTR())
+	if (init_shmPTR()) 
 		return 0;
 	if (is_clone())
 		return 0;
@@ -527,6 +531,8 @@ int main(int argc, char* argv[]) {
 		printf("Error delete!\n");
 	}
 #endif
+
+	system("cpufreq-set -u 1370000 -d 480000");
 	return 0;
 
 }

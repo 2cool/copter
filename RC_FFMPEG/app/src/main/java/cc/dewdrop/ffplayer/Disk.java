@@ -120,7 +120,7 @@ public class Disk {
 
 
     public static void save_location_(String fname, double lat, double lon, double alt){
-        if (Telemetry.lat==0 && Telemetry.lon==0)
+        if (Telemetry.lat==0 || Telemetry.lon==0 || Telemetry.r_accuracy_hor_pos<20)
             return;
         // final File file = new File("/sdcard/RC/start_location.save");
         try {

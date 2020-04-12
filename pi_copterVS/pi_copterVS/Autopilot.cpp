@@ -224,6 +224,9 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 
 
 #ifdef LOST_BEEP
+
+	//if ((_ct - last_time_data__recived) > 200)
+	//	cout << "too long " << _ct - last_time_data__recived << endl;
 	
 	if (last_time_data__recived &&  GPS.loc._lat_zero!=0 && GPS.loc._lon_zero!=0  && (_ct - last_time_data__recived)>3e3 && (_ct - last_beep__time) > 3e3) {
 		last_beep__time = _ct;
@@ -278,8 +281,9 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 						if (Mpu.get_Est_Alt() > 15 || Mpu.get_Est_Alt() / (-Mpu.get_Est_SpeedZ()) > 5)  
 							_timeout__LAG = 2e3;
 						if (timelag > _timeout__LAG) {
-							Commander.data_reset();
-							cout << "time lag" << "\t" << millis_() << endl;
+							//Commander.data_reset();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							//cout << "time lag=" << timelag << " " << "\t" << millis_() << endl;
+							mega_i2c.beep_code(B_MPU_TOO_LONG);
 						}
 					}
 #endif
@@ -304,6 +308,15 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 				}
 			}
 
+		}
+	}
+	else {
+		if (shmPTR->connected) { 
+			int32_t timelag = _ct - last_time_data__recived;
+			if (timelag > 100 && timelag < 1000) {
+				//cout << "time lag=" << timelag << " " << "\t" << millis_() << endl;
+				//mega_i2c.beep_code(B_MPU_TOO_LONG);
+			}
 		}
 	}
 
@@ -872,7 +885,7 @@ void AutopilotClass::connectionLost_(){ ///////////////// LOST
 	Telemetry.addMessage(e_LOST_CONNECTION);
 	Commander.controls2zero();
 
-#ifdef OFF_MOTOR_IF_LOST_CONNECTION
+#ifdef DEBUG
 if (motors_is_on())
 off_throttle(true, "lost connection");
 return;

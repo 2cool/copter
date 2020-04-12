@@ -28,12 +28,12 @@ public:
 	*   P - Estimate error covariance
 	*/
 	KalmanFilter(
-		const Eigen::Matrix3d& A,
-		const Eigen::Vector3d& B,
-		const Eigen::RowVector3d& H,
-		const Eigen::Matrix3d& Q,
-		const Eigen::MatrixXd& R,
-		const Eigen::Matrix3d& P
+		const Eigen::Matrix3f& A,
+		const Eigen::Vector3f& B,
+		const Eigen::RowVector3f& H,
+		const Eigen::Matrix3f& Q,
+		const Eigen::MatrixXf& R,
+		const Eigen::Matrix3f& P
 	);
 
 	/**
@@ -49,13 +49,13 @@ public:
 	/**
 	* Initialize the filter with a guess for initial states.
 	*/
-	void init(const Eigen::Vector3d& x0);
+	void init(const Eigen::Vector3f& x0);
 
 	/**
 	* Update the estimated state based on measured values. The
 	* time step is assumed to remain constant.
 	*/
-	void update(const Eigen::VectorXd& y);
+	void update(const Eigen::VectorXf& y);
 
 	/**
 	* Update the estimated state based on measured values,
@@ -66,18 +66,18 @@ public:
 	/**
 	* Return the current state and time.
 	*/
-	Eigen::Vector3d state() { return x_hat; };
+	Eigen::Vector3f state() { return x_hat; };
 
-	void initU(const double x0);
+	void initU(const float x0);
 
-	Eigen::Vector3d B;
-	Eigen::Matrix3d getP() { return P; }
-	Eigen::Vector3d getK() { return K; }
+	Eigen::Vector3f B;
+	Eigen::Matrix3f getP() { return P; }
+	Eigen::Vector3f getK() { return K; }
 
-Eigen::MatrixXd  R;
-Eigen::Matrix3d A, Q, P,P0;
-RowVector3d H;
-Vector3d K;
+Eigen::MatrixXf  R;
+Eigen::Matrix3f A, Q, P,P0;
+RowVector3f H;
+Vector3f K;
 private:
 
 	// Matrices for computation
@@ -96,8 +96,8 @@ private:
 	bool initialized;
 
 	// n-size identity
-	Eigen::Matrix3d I;
+	Eigen::Matrix3f I;
 
 	// Estimated states
-	Eigen::Vector3d x_hat, x_hat_new;
+	Eigen::Vector3f x_hat, x_hat_new;
 };

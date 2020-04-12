@@ -157,6 +157,8 @@ public class Commander {
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    static int cntnntnnt=0;
     static public int get_b(byte buf[]){
 
 
@@ -322,7 +324,7 @@ public class Commander {
         sended_ay=ay;
         sended_ax=ax;
 
-        Log.d("COMM",heading+" "+headingOffset);
+
         return i;
 
     }

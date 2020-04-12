@@ -58,7 +58,7 @@
 using namespace std;
 
 //static const string wlan_fpv = "wlx8c18d960bdda";  //RTL8188EU
-static const string wlan_fpv = "ra0";//MT7601U
+static const string wlan_fpv = "wlx20e6170cacf8";//MT7601U
 
 std::string exec(const std::string cmd) {
 	//printf(cmd.c_str());
@@ -378,8 +378,8 @@ int main()
 
 	string ret = exec("nice -n -20 ifconfig "+ wlan_fpv);
 	if (ret.find("192.168.42.") == string::npos) {
-		system(connect2camera.c_str());
-		sleep3s();
+		//system(connect2camera.c_str());
+		//sleep3s();
 	}
 	
 	while (open_socket() == -1) 

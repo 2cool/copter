@@ -1,0 +1,32 @@
+[
+  {
+    "Sourcefile": "",
+    "Include": "",
+    "Includepath": "C:\\Users\\tcool\\AppData\\Local\\Arduino15\\packages\\stm32duino\\hardware\\STM32F1\\2020.1.24\\cores\\maple"
+  },
+  {
+    "Sourcefile": "",
+    "Include": "",
+    "Includepath": "C:\\Users\\tcool\\AppData\\Local\\Arduino15\\packages\\stm32duino\\hardware\\STM32F1\\2020.1.24\\variants\\generic_stm32f103c"
+  },
+  {
+    "Sourcefile": "C:\\projects\\copter_stm32\\Output\\Generic_STM32F103C6_fake_STM32F103C8\\Debug\\sketch\\copter_stm32.ino.cpp",
+    "Include": "Wire_slave.h",
+    "Includepath": "C:\\Users\\tcool\\AppData\\Local\\Arduino15\\packages\\stm32duino\\hardware\\STM32F1\\2020.1.24\\libraries\\WireSlave\\src"
+  },
+  {
+    "Sourcefile": "C:\\projects\\copter_stm32\\Output\\Generic_STM32F103C6_fake_STM32F103C8\\Debug\\sketch\\copter_stm32.ino.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "C:\\projects\\copter_stm32\\Output\\Generic_STM32F103C6_fake_STM32F103C8\\Debug\\sketch\\gps.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "C:\\Users\\tcool\\AppData\\Local\\Arduino15\\packages\\stm32duino\\hardware\\STM32F1\\2020.1.24\\libraries\\WireSlave\\src\\Wire_slave.cpp",
+    "Include": "",
+    "Includepath": ""
+  }
+]

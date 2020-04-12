@@ -1,4 +1,35 @@
+for Armbian 20.02.1 Bionic i2c
 
+Make sure this 2 lines are written in /boot/armbianEnv.txt:
+
+overlay_prefix=sun8i-h3
+overlays=i2c0
+--------------------------------------------------
+sudo apt-get install gammu
+sudo pico /etc/gammurc
+
+[gammu]
+device = /dev/ttyS2
+connection = at115200
+--------------------------------------------------
+apt-get install ppp
+/etc/ppp/peers/vodafon115200
+
+connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T Bearer"
+/dev/ttyS2
+115200
+noipdefault
+usepeerdns
+defaultroute
+persist
+noauth
+nocrtscts
+local
+
+
+
+
+--------------------------------------------------
 
 if  Write-error on swap-device (253:3:44984)
 
@@ -17,55 +48,39 @@ nano /etc/default/cpufrequtils
 Alter min_speed or max_speed variable.
 
 service cpufrequtils restart
-
 /////////////////////////////////////////////////////////////////////////////////////
-https://forums.kali.org/showthread.php?4129-Increase-Wi-Fi-TX-Power-Signal-Strength
+$ sudo nano /etc/systemd/system/startup.service
 
-# /etc/init.d/pi_copter
-#
-#! /bin/sh
-# Some things that run always
-touch /var/lock/pi_copter
+  [Unit]
+  Description=Startup
 
-echo " taking down wlan0"
-ifconfig wlan0 down
-sleep 3
-iwconfig wlan0 txpower 80
-sleep 2
-ifconfig wlan0 up 
-sleep 5
+  [Service]
+  ExecStart=/usr/local/bin/startup.sh
 
-# Carry out specific functions when asked to by the system
-case "$1" in
-  start)
-		echo "Starting pi_copter "
-		start-stop-daemon -Sbvx /home/start-stop-daemon -Sbvx /root/projects/pi_copter 300 100 f y y y y y $
-		;;
-  stop)
-		echo "Stopping pi_copter"
+  [Install]
+  WantedBy=default.target
 
-				start-stop-daemon -Kvx /root/projects/pi_copter
-		;;
-  *)
-		echo "Usage: /etc/init.d/blah {start|stop}"
-		exit 1
-		;;
-esac
+$ sudo nano /usr/local/bin/startup.sh
 
-exit 0
+  #!/bin/bash
 
+  /root/projects/pi_copter 300 100 f y y y y y
+ 
+$ sudo chmod 744 /usr/local/bin/startup.sh
+$ sudo chmod 664 /etc/systemd/system/startup.service
+$ systemctl daemon-reload
+$ systemctl enable startup.service
 
-Once you've saved your file into the correct location make sure that it's executable by running "chmod 755 /etc/init.d/blah".
+# Test the script
+$ systemctl start startup.service
+$ cat /root/report.txt
 
-update-rc.d pi_copter defaults
+# Reboot
+$ sudo reboot
 
-
-If you wish to remove the script from the startup sequence in the future run:
-root@skx:/etc/rc2.d# update-rc.d -f  blah remove
-
-Igor Toocool, [27.06.17 00:15]
-root@skx:~# update-rc.d pi_copter defaults
-*/
+# Change password for user ubuntu
+$ sudo passwd ubuntu
+/////////////////////////////////////////////////////////////////////////////////////
 
 
 

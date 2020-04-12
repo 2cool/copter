@@ -45,11 +45,11 @@ int m = 1; // Number of measurements
 
 double dt = 1.0 / 30; // Time step
 
-Eigen::Matrix3d A; // System dynamics matrix
-Eigen::RowVector3d H; // Output matrix
-Eigen::Matrix3d Q; // Process noise covariance
-Eigen::MatrixXd R(m, m); // Measurement noise covariance
-Eigen::Matrix3d P; // Estimate error covariance
+Eigen::Matrix3f A; // System dynamics matrix
+Eigen::RowVector3f H; // Output matrix
+Eigen::Matrix3f Q; // Process noise covariance
+Eigen::MatrixXf R(m, m); // Measurement noise covariance
+Eigen::Matrix3f P; // Estimate error covariance
 
 
 enum {X,Y,Z};
@@ -359,7 +359,7 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 
 
 	static float old_accZ = 0, old_accX = 0, old_accY = 0;
-	static double old_bar_alt = 0, oldSX = 0, oldSY = 0;
+	static float old_bar_alt = 0, oldSX = 0, oldSY = 0;
 	static bool start_f = false;
 
 
@@ -395,7 +395,7 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 		old_accZ = accZ;
 		if (press.altitude != old_bar_alt) {
 			old_bar_alt = press.altitude;
-			Eigen::VectorXd z(m);
+			Eigen::VectorXf z(m);
 			z << old_bar_alt;
 			kf[Z]->update(z);
 		}
@@ -411,7 +411,7 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 		old_accX = w_accX;
 		if (gps_log.gx != oldSX) {
 			oldSX = gps_log.gx;
-			Eigen::VectorXd x(m);
+			Eigen::VectorXf x(m);
 			x << oldSX;
 			kf[0]->update(x);
 		}
@@ -429,7 +429,7 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 		old_accY = w_accY;
 		if (gps_log.gy != oldSY) {
 			oldSY = gps_log.gy;
-			Eigen::VectorXd y(m);
+			Eigen::VectorXf y(m);
 			y << oldSY;
 			kf[1]->update(y);
 		}
@@ -511,14 +511,14 @@ void Mpu::init() {
 	Q <<newQ, newQ, .0,newQ, newQ, .0,.0, .0, .0;
 	R << newR;
 	P <<.1, .1, .1,.1, 10000, 10,.1, 10, 100;
-	Vector3d B;
+	Vector3f B;
 	B << 0, 0, 0;
 	// Construct the filter
 	kf[X] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[Y] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[Z] = new KalmanFilter( A,B ,H, Q, R, P);
 	// Construct the filter
-	Eigen::Vector3d x0;
+	Eigen::Vector3f x0;
 	x0 << 0, 0, 0;
 	kf[X]->init(x0);
 	kf[Y]->init(x0);

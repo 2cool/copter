@@ -94,8 +94,7 @@ public class Net {
         //client_runing=false;
     }
 
-    static InetAddress copterAddress, myIP = null;
-    int port = 0;
+
 
     static int threads = 0;
 
@@ -143,7 +142,7 @@ public class Net {
         thread.start();
     }
 
-    final int buf_size=16384;
+    final int buf_size=1024;
     byte buffer[] = new byte[buf_size];
     byte bufferout[] = new byte[buf_size];
     final int IP = 0;
@@ -151,12 +150,14 @@ public class Net {
 
     static int threads_=0;
     private long  old_t=0;
+
+    int errors_cnt=0;
     public boolean runTCPClient(String ip_port) {
         if (threads_>0)
             return false;
         boolean run =true;
         threads_++;
-        DatagramSocket udpSocket=null;
+
 
         if (ip_port == null)
             return false;
@@ -164,71 +165,77 @@ public class Net {
         try {
 
             ///////////
-            try {
-                copterAddress = InetAddress.getByName(s[IP]);
+
+
                 SERVER_PORT = Integer.parseInt(s[PORT]);
 
-                udpSocket = new DatagramSocket(SERVER_PORT);
-                udpSocket.setSoTimeout(200);
-                InetAddress serverAddr = copterAddress;
-                int offline_cnt=0;
+
+
                 while (net_runing && run) {
                     try {
-                        int len = Commander.get_b(buffer);
-                        DatagramPacket packet = new DatagramPacket(buffer, len, serverAddr, SERVER_PORT);
-                       // Log.d("UDP","send data. threads="+threads_);
-                        udpSocket.send(packet);
-                        DatagramPacket packet1 = new DatagramPacket(bufferout, buf_size);
-                       // Log.d("UDP","about to wait to receive. threads="+threads_);
+                        {
+                            DatagramSocket udpSocket = new DatagramSocket(SERVER_PORT);
+                           // udpSocket.setReuseAddress(true);
+                            udpSocket.setSoTimeout(500);
+                            InetAddress copterAddress = InetAddress.getByName(s[IP]);
+                            // Log.d("UDP", "copter address: "+copterAddress);
+                          //  while (net_runing && run) {
+                                int len = Commander.get_b(buffer);
+                                //Log.d("UDP", "len="+len);
+                                DatagramPacket packet = new DatagramPacket(buffer, len, copterAddress, SERVER_PORT);
+                                //  udpSocket.connect(copterAddress, SERVER_PORT);
+                                udpSocket.send(packet);
+                                //  Log.d("UDP", "ok=");
+                                DatagramPacket packet1 = new DatagramPacket(bufferout, buf_size);
+                                udpSocket.receive(packet1);
 
-                        udpSocket.receive(packet1);
-                        Commander.link = true;
-                        ip_OK = true;
-                        len=packet1.getLength();
-                        Telemetry.bufferReader_(bufferout, len);
-                        offline_cnt=0;
-                            //  Log.d("Receivedtext", text);
-                      //  long t=System.currentTimeMillis();
-                      //  if (t-old_t < 500) {
-                          // try {
-                              //  Thread.sleep(500);
-                          //  } catch (InterruptedException e) {
-                          //      e.printStackTrace();
-                          //  }
-                       // }
-                       // old_t=t;
+                                Commander.link = true;
+                                ip_OK = true;
+                                len = packet1.getLength();
+                                //  Log.d("UDP", "recived : "+len);
+                                Telemetry.bufferReader_(bufferout, len);
+                           // }
+                            udpSocket.close();
+
+                        }
+
                     } catch (IOException e) {
-                        if (offline_cnt++>3) {
+                        errors_cnt++;
+                        Log.d("UDP", "ERROR: "+errors_cnt+" "+e.getMessage());
                             run=false;
                             if (Commander.link) {
                                 Telemetry.hom_pos_is_loaded = false;
+
                                 Disk.save_location_(
                                         "/sdcard/RC/lostCon_location.save",
                                         Telemetry.lat,
                                         Telemetry.lon,
                                         Telemetry._alt);
                                 Commander.link = false;
-                                Log.d("UDP", "Error1:");
-                            }
-                        }
-                    }
 
+                                try {
+                                    Thread.sleep(100);
+                                } catch (InterruptedException ex) {
+                                    ex.printStackTrace();
+                                }
+
+                                /// Log.d("UDP", "Error1:");
+                            }
+                    }
                 }
-            }catch(IOException e) {
-                Log.d("UDP", "Error00000:", e);
-            }
+
 
         } finally {
             threads_--;
             Log.d("UDP", "Finally:");
-            if (udpSocket!=null)
-                udpSocket.close();
+          //  if (udpSocket!=null)
+           //     udpSocket.close();
           //  if (Commander.link)
 
             Commander.link = false;
             if (MainActivity.drawView != null)
                 MainActivity.drawView.postInvalidate();
-          //  Log.i("UDP", "UDP_CLIENT KILLED!");
+            Log.i("UDP", "UDP_CLIENT KILLED!");
 
 
         }

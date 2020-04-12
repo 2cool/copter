@@ -143,8 +143,8 @@ SEND_I2C g_data;
 bool GPSClass::loop(){
 	static int32_t old_ct = millis_();
 	const int32_t _ct = millis_();
-	if ((_ct - old_ct) < 20)
-		return false;
+	//if ((_ct - old_ct) < 5)
+	//	return false;
 	old_ct = _ct;
 	int ret = mega_i2c.get_gps(&g_data);
 	
@@ -157,7 +157,7 @@ bool GPSClass::loop(){
 		loc.proceed(&g_data);
 	if ( _ct - loc.last_gps_data__time > 300 && loc.last_gps_data__time){
 		Telemetry.addMessage(e_GPS_ERROR);
-		cout << "gps update error  , uptime=" << _ct << ",msec. dt=" << _ct - loc.last_gps_data__time << "msec. \n";
+		cout << "gps update error  , uptime=" << (float)_ct*0.001f << ",sec. dt=" << _ct - loc.last_gps_data__time << "msec. \n";
 		mega_i2c.beep_code(B_GPS_TOO_LONG);
 	}
 	if (Autopilot.motors_is_on() && (_ct - loc.last_gps_accuracy_ok) > NO_GPS__DATA && loc.last_gps_accuracy_ok) {

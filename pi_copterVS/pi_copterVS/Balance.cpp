@@ -230,8 +230,8 @@ bool BalanceClass::speed_up_control(float n[]) {
 
 
 
-#define MAX_D_ANGLE_SPEED 70
-#define MAX_D_YAW_SPEED 70
+#define MAX_D_ANGLE_SPEED 180
+#define MAX_D_YAW_SPEED 180
 //#define MAX_POWER_K_IF_MAX_ANGLE_30 1.12
 
 
@@ -291,7 +291,7 @@ bool BalanceClass::loop()
 		c_roll = constrain(c_roll, -t_max_angle, t_max_angle);
 		const float maxAngle07 = t_max_angle *0.7f;
 		if (fabs(c_pitch) > maxAngle07 || fabs(c_roll) > maxAngle07) {
-			float k = (float)(RAD2GRAD*acos(cos(c_pitch*GRAD2RAD)*cos(c_roll*GRAD2RAD)));
+			float k = (float)(RAD2GRAD*acos(cos(c_pitch*GRAD2RAD)*cos(c_roll*GRAD2RAD)));  
 			if (k == 0)
 				k = t_max_angle;
 			if (k > t_max_angle) {
@@ -302,15 +302,15 @@ bool BalanceClass::loop()
 		}
 
 		float t = pitch_roll_stabKP * wrap_180(Mpu.get_pitch() - c_pitch);
-		t *= t;
-		const float pitch_stab_output = 0;// f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED); 
+		//t *= abs(t);
+		const float pitch_stab_output = f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED); 
 		
 		t = pitch_roll_stabKP * (wrap_180(Mpu.get_roll() - c_roll));
-		t *= t;
+		//t *= abs(t);
 
-		const float roll_stab_output = 0;// f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED);
+		const float roll_stab_output = f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED);
 
-		const float yaw_stab_output = 0;// (Autopilot.if_strong_wind() && Autopilot.go2homeState()) ? 0 : f_constrain(yaw_stabKP * wrap_180(-Autopilot.get_yaw() - Mpu.get_yaw()), -MAX_D_YAW_SPEED, MAX_D_YAW_SPEED);
+		const float yaw_stab_output =  (Autopilot.if_strong_wind() && Autopilot.go2homeState()) ? 0 : f_constrain(yaw_stabKP * wrap_180(-Autopilot.get_yaw() - Mpu.get_yaw()), -MAX_D_YAW_SPEED, MAX_D_YAW_SPEED);
 
 		//Debug.dump(pitch_stab_output, roll_stab_output, 0, 0);
 
@@ -377,6 +377,7 @@ bool BalanceClass::loop()
 		PID_reset();
 	else
 		speed_up = false;
+
 
 	mega_i2c.throttle(f_);  //670 micros
 	log();
