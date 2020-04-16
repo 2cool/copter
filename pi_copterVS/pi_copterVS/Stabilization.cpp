@@ -19,8 +19,8 @@
 #include "Settings.h"
 
 
-float Z_FILTER = 1;
-float XY_FILTER = 1;
+float Z_FILTER = 0.33;
+float XY_FILTER = 0.33;
 void StabilizationClass::setMaxAng() {
 	set_acc_xy_speed_imax(Balance.get_max_angle());
 }
@@ -31,7 +31,7 @@ void StabilizationClass::init(){
 
 	dist2speed_XY = 0.2f;//0.5 
 	set_acc_xy_speed_kp(6);
-	set_acc_xy_speed_kI(2.5);
+	set_acc_xy_speed_kI(0.001);
 	set_acc_xy_speed_imax(Balance.get_max_angle());
 
 	def_max_speedXY=max_speed_xy = 10;
@@ -42,13 +42,13 @@ void StabilizationClass::init(){
 	//--------------------------------------------------------------------------
 
 	alt2speedZ = 0.2;
-	pids[SPEED_Z_PID].kP( 0.06 );
-	pids[SPEED_Z_PID].kI( 0.12 );
+	pids[SPEED_Z_PID].kP( 0.05 );
+	pids[SPEED_Z_PID].kI( 0.01 );
 
 	setMinMaxI_Thr();
 	
 	//----------------------------------------------------------------------------
-	d_speedX=d_speedY=mc_z=0;
+	mc_x=mc_y=mc_z=0;
 }
 void StabilizationClass::setDefaultMaxSpeeds4Return2HOME() {
 	max_speed_xy = def_max_speedXY;
@@ -209,18 +209,20 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 			ty = Mpu.get_Est_Y();
 			need_speedY = (needYV - ty);
 			
-		}//вичислять нужное ускорение по форумуле a=v*v/(2s)
+		}// a=v*v/(2s)
 		dist2speed(need_speedX, need_speedY);
-		d_speedX += ((Mpu.get_Est_SpeedX() - need_speedX) - d_speedX) * XY_FILTER;
-		d_speedY += ((Mpu.get_Est_SpeedY() - need_speedY) - d_speedY) * XY_FILTER;
 
-	//	mc_x += (mc_pitch - Mpu.get_Est_SpeedZ() - mc_z)*Z_FILTER;
-	//	mc_z = constrain(mc_z, -max_acc_z, max_acc_z);
-	//	const float accX_C =  ((d_speedX * speed_2_acc_XY) - Mpu.w_accX)*acc_2_angle;
-	//	const float accY_C = ((d_speedY * speed_2_acc_XY) - Mpu.w_accY)*acc_2_angle;
 
-		const float w_pitch = -(pids[SPEED_X_SPEED].get_pid(d_speedX, Mpu.get_dt()));
-		const float w_roll = pids[SPEED_Y_SPEED].get_pid(d_speedY, Mpu.get_dt());
+
+
+
+		const float need_accX = (Mpu.get_Est_SpeedX() - need_speedX) * 0.5;
+		const float need_accY = (Mpu.get_Est_SpeedY() - need_speedY) * 0.5;
+
+		mc_x += (need_accX - Mpu.get_Est_accX() - mc_x) * XY_FILTER;
+		const float w_pitch = -(pids[SPEED_X_SPEED].get_pid(mc_x, Mpu.get_dt()));
+		mc_y += (need_accY - Mpu.get_Est_accY() - mc_y) * XY_FILTER;
+		const float w_roll = pids[SPEED_Y_SPEED].get_pid(mc_y, Mpu.get_dt());
 
 		
 	//	Debug.dump(max_speed_xy, max_speedZ_P, max_speedZ_M, 0);
@@ -239,13 +241,13 @@ float StabilizationClass::Z(){
 	//-------------stab
 
 	const float need_speedZ = getSpeed_Z(Autopilot.fly_at_altitude() - Mpu.get_Est_Alt());
+	const float need_accZ = (need_speedZ - Mpu.get_Est_SpeedZ()) * 1;
+	mc_z += (need_accZ - Mpu.get_Est_accZ() - mc_z) * Z_FILTER;
+	float fZ = HOVER_THROTHLE + pids[SPEED_Z_PID].get_pid(mc_z, Mpu.get_dt()) * Balance.powerK();
 
-	mc_z += (need_speedZ - Mpu.get_Est_SpeedZ() - mc_z)*Z_FILTER;
-	//const float accZ_C = ((mc_z * speed_2_acc_Z) - Mpu.faccZ)*acc_2_power;
 
-
-
-	float fZ = HOVER_THROTHLE +  pids[SPEED_Z_PID].get_pid(mc_z, Mpu.get_dt())*Balance.powerK();
+	//mc_z += (need_speedZ - Mpu.get_Est_SpeedZ() - mc_z)*Z_FILTER;
+	//float fZ = HOVER_THROTHLE +  pids[SPEED_Z_PID].get_pid(mc_z, Mpu.get_dt())*Balance.powerK();
 	return fZ;
 }
 
@@ -256,7 +258,7 @@ void StabilizationClass::resset_z(){
 	
 }
 void StabilizationClass::resset_xy_integrator(){
-	d_speedX = d_speedY = 0;
+	mc_x = mc_y = 0;
 	pids[SPEED_X_SPEED].reset_I();
 	pids[SPEED_Y_SPEED].reset_I();
 }

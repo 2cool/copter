@@ -360,7 +360,7 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 
 	static float old_accZ = 0, old_accX = 0, old_accY = 0;
 	static float old_bar_alt = 0, oldSX = 0, oldSY = 0;
-	static bool start_f = false;
+	static bool start_f = true;
 
 
 

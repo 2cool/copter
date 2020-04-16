@@ -53,7 +53,7 @@ class MpuClass
 	//-----------------
 
 	float pitch, roll;
-	float est_alt, est_speedZ;
+	float est_alt, est_speedZ,est_accZ,est_accY,est_accX;
 	float estX, estY, est_speedX, est_speedY;
 
 
@@ -77,6 +77,10 @@ private:
 	 float yaw_correction_angle;
 	 double get_Est_X() { return (double)(estX-x_at_zero)+base_x; }
 	 double get_Est_Y() { return (double)(estY-y_at_zero)+base_y; }
+	 float get_Est_accX() { return est_accX; }
+	 float get_Est_accY() { return est_accY; }
+	 float get_Est_accZ() { return est_accZ; }
+
 	 float get_Est_SpeedX() { return est_speedX; }
 	 float get_Est_SpeedY() { return est_speedY; }
 	 float get_Est_SpeedZ() { return est_speedZ; }

@@ -269,7 +269,7 @@ bool MpuClass::loop() {
 	time = micros_();
 	mpu_dt = (float)(time - oldmpuTime) * 1e-6;
 	oldmpuTime = time;
-	mpu_dt = 0.005;
+	mpu_dt = 0.01;
 	pitch=Emu.get_pitch();
 	roll = Emu.get_roll();
 	gyroPitch = Emu.get_gyroPitch();
@@ -536,6 +536,7 @@ void MpuClass::test_Est_Alt() {
 	}
 	est_speedZ = kf[Z]->state()(1);
 	est_alt = kf[Z]->state()(0);
+	est_accZ = kf[Z]->state()(2);
 
 	if (est_alt >= MAX_LEN) {
 		base_z += MAX_LEN;
@@ -547,6 +548,10 @@ void MpuClass::test_Est_Alt() {
 		est_alt += MAX_LEN;
 		kf[Z]->base(-MAX_LEN);
 	}
+
+
+
+
 	
 	//Debug.dump(est_alt, est_speedZ, alt, -1);
 

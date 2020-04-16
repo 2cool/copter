@@ -342,8 +342,8 @@ void EmuClass::update(const float fm_[4], double dt) {
 		wgyro[Y] = rot12[Z];
 
 		wgyro[Z] = 10 * wgyro[Z] * wgyro[Z];
-		wgyro[X] = 3000 * wgyro[X] * wgyro[X];
-		wgyro[Y] = 3000 * wgyro[Y] * wgyro[Y];
+		wgyro[X] = 0 * wgyro[X] * wgyro[X];
+		wgyro[Y] = 0 * wgyro[Y] * wgyro[Y];
 
 	}
 
@@ -359,12 +359,12 @@ void EmuClass::update(const float fm_[4], double dt) {
 
 
 	const double arm03_force = fmin(fm[0], fm[3]);
-	const double arm03_pitch_rotation = 30*GRAVITY_G * (fm[0] - fm[3]) -gyro_res[PITCH];
+	const double arm03_pitch_rotation = 210 * GRAVITY_G * (fm[0] - fm[3]);// -gyro_res[PITCH];
 	const double arm03_yaw_rot = (motors_pow[0] + motors_pow[3]);
 	const double arm21_force = fmin(fm[1], fm[2]);
-	const double arm21_roll_rotation = 30*GRAVITY_G * (fm[2] - fm[1]) -gyro_res[ROLL];
+	const double arm21_roll_rotation = 210 * GRAVITY_G * (fm[2] - fm[1]);// -gyro_res[ROLL];
 	const double arm21_yaw_rot = (motors_pow[2] + motors_pow[1]);
-	const double yaw_rot_force = 100 * (arm21_yaw_rot - arm03_yaw_rot) - gyro_res[YAW];
+	const double yaw_rot_force = 100 * (arm21_yaw_rot - arm03_yaw_rot);// -gyro_res[YAW];
 	double force = GRAVITY_G * (arm03_force + arm21_force);
 
 	gyro[YAW] += (yaw_rot_force + wgyro[Z])*dt;

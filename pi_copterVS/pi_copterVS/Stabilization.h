@@ -31,7 +31,7 @@ private:
 	
 	float SPEED_Z_CF, SPEED_XY_CF;
 
-	float mc_z,mc_x,mc_y,d_speedX,d_speedY;
+	float mc_z,mc_x,mc_y;
 	float dist2speed_XY;
 	float alt2speedZ;
 

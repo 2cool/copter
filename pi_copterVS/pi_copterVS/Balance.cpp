@@ -276,6 +276,9 @@ bool BalanceClass::loop()
 			throttle = f_constrain(throttle, c_min_throttle, OVER_THROTTLE);
 			t_max_angle = max_angle;
 		}
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		if (throttle > 0.68)
+			throttle = 0.68;
 
 		//Debug.load(0, true_throttle, throttle);
 		//Debug.dump();

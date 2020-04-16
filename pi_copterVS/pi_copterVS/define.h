@@ -8,7 +8,7 @@
 //#define OFF_MOTOR_IF_LOST_CONNECTION  
 //#define OFF_TIMELAG
 //-----------------------------------------------------------------
-//#define FLY_EMULATOR
+#define FLY_EMULATOR
 //----------------------------------------------------------------
 //#define YAW_OFF
 //#define XY_SAFE_AREA 200

@@ -151,7 +151,7 @@ void Balance::parser(byte buf[], int i, uint32_t cb) {
 	f1 = fb[1];
 	f2 = fb[2];
 	f3 = fb[3];
-	thr = (f0 + f1 + f2 + f3)*0.25;
+	thr += ((f0 + f1 + f2 + f3)*0.25-thr)*1;
 
 	i += 16;
 	ap_roll = 1.0 / 16 * (double)(*(int16_t*)&buf[i]);

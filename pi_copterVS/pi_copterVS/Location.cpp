@@ -157,7 +157,9 @@ void LocationClass::updateXY(){
 	double dx = (dX - x_from_zero_2_home);
 	double dy = (dY - y_from_zero_2_home);
 	dist2home = sqrt(dx*dx + dy*dy);
-	if ((abs(dist2home - shmPTR->dist2home) * rdt) > SPEED_ERROR) {
+	double speed = abs(dist2home - shmPTR->dist2home) * rdt;
+	shmPTR->dist2home = dist2home;
+	if (speed > SPEED_ERROR) {
 		bugs++;
 		print_gps_error();
 		return;
