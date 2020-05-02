@@ -218,7 +218,7 @@ bool TelemetryClass::loop()
 	
 	if (update_buf()) {
 		message = "";
-		ret = true;
+
 	}
 
 	return ret;

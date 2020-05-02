@@ -176,7 +176,7 @@ public class Net {
                         {
                             DatagramSocket udpSocket = new DatagramSocket(SERVER_PORT);
                            // udpSocket.setReuseAddress(true);
-                            udpSocket.setSoTimeout(500);
+                            udpSocket.setSoTimeout(2000);
                             InetAddress copterAddress = InetAddress.getByName(s[IP]);
                             // Log.d("UDP", "copter address: "+copterAddress);
                           //  while (net_runing && run) {

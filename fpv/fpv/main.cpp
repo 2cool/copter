@@ -261,7 +261,7 @@ int camera_video_stream() {
 }
 /////////////////////////////////////////////////////////////////////////////////
 
-
+bool write_stream_also_to_file = false;
 string intIP2strIP(uint32_t ip) {
 
 	string sip = to_string(ip & 255) + "." + to_string((ip >> 8) & 255) + "." + to_string((ip >> 16) & 255)+"."+ to_string(ip >> 24);
@@ -282,11 +282,18 @@ std::time_t result = std::time(nullptr);
 	file_name += +".mp4";
 
 
-	string s = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + \
+	string sf = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + \
 		" -b 900k -vcodec copy -r 60 -y " + file_name + " > /dev/null 2>&1  &";
-	cout << s << endl;
+
+
+	string s = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + \
+		 " > /dev/null 2>&1  &";
+
+
+
+	cout << (write_stream_also_to_file?sf:s) << endl;
 	cout << "stream started" << endl;
-	system(s.c_str());
+	system((write_stream_also_to_file?sf.c_str():s.c_str()));
 
 	
 }
@@ -336,7 +343,7 @@ void sleep3s() {
 }
 bool fpv_stream = false;
 int main_cnt_err = 0;
-int main()
+int main(int argc, char* argv[])
 {
 	//stop_ffmpeg_stream();
 	init_shmPTR();
@@ -357,6 +364,11 @@ int main()
 		return 0;
 	}
 
+	if (argc >= 2) {
+		const int tt = string(argv[1]).compare("f");
+		write_stream_also_to_file = (tt == 0);
+	}
+			
 	do {
 		static bool print = true;
 		string ret=exec("nice -n -20  nmcli dev wifi | grep YDXJ_1234567");

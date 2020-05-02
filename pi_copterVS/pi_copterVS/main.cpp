@@ -250,7 +250,7 @@ void watch_dog() {
 			delay(1000);
 			shmPTR->fpv_run = true;
 			cout << "fpv started\n";
-			system("nice -n -20 /root/projects/fpv_ &");
+			system("nice -n -20 /root/projects/fpv_ &"); // if write video to file  fpv_ f
 		}
 #else
 		shmPTR->fpv_run = true;

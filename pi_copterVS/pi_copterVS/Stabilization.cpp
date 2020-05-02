@@ -31,7 +31,7 @@ void StabilizationClass::init(){
 
 	dist2speed_XY = 0.2f;//0.5 
 	set_acc_xy_speed_kp(6);
-	set_acc_xy_speed_kI(0.001);
+	set_acc_xy_speed_kI(3);
 	set_acc_xy_speed_imax(Balance.get_max_angle());
 
 	def_max_speedXY=max_speed_xy = 10;
@@ -43,7 +43,7 @@ void StabilizationClass::init(){
 
 	alt2speedZ = 0.2;
 	pids[SPEED_Z_PID].kP( 0.05 );
-	pids[SPEED_Z_PID].kI( 0.01 );
+	pids[SPEED_Z_PID].kI( 0.025 );
 
 	setMinMaxI_Thr();
 	
@@ -225,11 +225,13 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		const float w_roll = pids[SPEED_Y_SPEED].get_pid(mc_y, Mpu.get_dt());
 
 		
-	//	Debug.dump(max_speed_xy, max_speedZ_P, max_speedZ_M, 0);
+	
 		//----------------------------------------------------------------преобр. в относительную систему координат
 		pitch = (float)(Mpu.cosYaw*w_pitch - Mpu.sinYaw*w_roll);
 		roll = (float)(Mpu.cosYaw*w_roll + Mpu.sinYaw*w_pitch);
 
+
+		//Debug.dump(Mpu.get_Est_accX(), Mpu.get_Est_accY(), pitch, roll);
 		//Debug.load(0, pitch, roll);
 		//Debug.dump();
 }

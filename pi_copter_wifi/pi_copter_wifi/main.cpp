@@ -146,7 +146,7 @@ int server() {
 			}
 			
 			
-			usleep(20000);
+		//	usleep(20000);
 			
 
 			while (flag == 0 && shmPTR->telemetry_buf_len == 0)

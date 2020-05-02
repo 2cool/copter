@@ -596,11 +596,15 @@ float est_XError = 0, est_XErrorI = 0;
 float est_YError = 0, est_YErrorI = 0;
 #define ACC_Cr 10000.0
 void MpuClass::test_Est_XY() {
+
+
 	if (GPS.loc._lat_zero == 0 && GPS.loc._lon_zero == 0)
 		return;
 
+
 	w_accX = (-cosYaw * accX + sinYaw * accY); //relative to world
 	w_accY = (-cosYaw * accY - sinYaw * accX);
+
 	static double old_X = 0,old_Y=0;
 	static float old_accX = 0, old_accY=0;
 	//XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -661,7 +665,7 @@ void MpuClass::test_Est_XY() {
 	//double t[] = { estX, est_speedX, estY, est_speedY };
 	//Debug.load(0, Mpu.w_accX, Mpu.w_accY);
 	//Debug.dump();
-//	Debug.dump(Emu.get_x(), Emu.get_x(), Emu.get_alt(), 0);
+	Debug.dump(est_speedX, est_speedY, get_Est_accX(), get_Est_accY());
 	
 }
 

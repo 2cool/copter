@@ -141,11 +141,9 @@ bool GPSClass::loop(){
 SEND_I2C g_data;
 
 bool GPSClass::loop(){
-	static int32_t old_ct = millis_();
+
 	const int32_t _ct = millis_();
-	//if ((_ct - old_ct) < 5)
-	//	return false;
-	old_ct = _ct;
+
 	int ret = mega_i2c.get_gps(&g_data);
 	
 	if (ret == -1) {
