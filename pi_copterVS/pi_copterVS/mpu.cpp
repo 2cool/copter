@@ -623,6 +623,7 @@ void MpuClass::test_Est_XY() {
 
 	est_speedX = kf[X]->state()(1);
 	estX = kf[X]->state()(0);
+	est_accX = kf[X]->state()(2);
 	if (estX >= MAX_LEN) {
 		base_x += MAX_LEN;
 		estX -= MAX_LEN;
@@ -650,6 +651,7 @@ void MpuClass::test_Est_XY() {
 
 	est_speedY = kf[Y]->state()(1);
 	estY = kf[Y]->state()(0);
+	est_accY = kf[Y]->state()(2);
 
 	if (estY >= MAX_LEN) {
 		base_y += MAX_LEN;
@@ -665,7 +667,7 @@ void MpuClass::test_Est_XY() {
 	//double t[] = { estX, est_speedX, estY, est_speedY };
 	//Debug.load(0, Mpu.w_accX, Mpu.w_accY);
 	//Debug.dump();
-	Debug.dump(est_speedX, est_speedY, get_Est_accX(), get_Est_accY());
+	//Debug.dump(est_speedX, est_speedY, get_Est_accX(), get_Est_accY());
 	
 }
 

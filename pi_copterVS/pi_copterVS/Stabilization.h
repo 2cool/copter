@@ -18,9 +18,9 @@
 class StabilizationClass{
 
 
-#define SPEED_X_SPEED 0
-#define SPEED_Y_SPEED 1
-#define SPEED_Z_PID 2
+#define ACC_X_PID 0
+#define ACC_Y_PID 1
+#define ACC_Z_PID 2
 
 private:
 	
@@ -34,6 +34,8 @@ private:
 	float mc_z,mc_x,mc_y;
 	float dist2speed_XY;
 	float alt2speedZ;
+	float speed2acc_XY;
+	float speed2acc_Z;
 
 #define STAB_PIDS 3
 	AP_PID pids[STAB_PIDS];
@@ -41,10 +43,10 @@ private:
 
 	float needXR, needYR, needXV, needYV;
 
-	void set_acc_xy_speed_kp(const float f){ pids[SPEED_X_SPEED].kP(f);	pids[SPEED_Y_SPEED].kP(f); }
-	void set_acc_xy_speed_kI(const float f){ pids[SPEED_X_SPEED].kI(f);	pids[SPEED_Y_SPEED].kI(f); }
-	void set_acc_xy_speed_kD(const float f,const float fCut){ pids[SPEED_X_SPEED].kD(f, fCut);	pids[SPEED_Y_SPEED].kD(f, fCut); }
-	void set_acc_xy_speed_imax(const float f){ pids[SPEED_X_SPEED].imax(-f,f);	pids[SPEED_Y_SPEED].imax(-f,f); }
+	void set_acc_xy_pid_kp(const float f){ pids[ACC_X_PID].kP(f);	pids[ACC_Y_PID].kP(f); }
+	void set_acc_xy_pid_kI(const float f){ pids[ACC_X_PID].kI(f);	pids[ACC_Y_PID].kI(f); }
+	void set_acc_xy_speed_kD(const float f,const float fCut){ pids[ACC_X_PID].kD(f, fCut);	pids[ACC_Y_PID].kD(f, fCut); }
+	void set_acc_xy_pid_imax(const float f){ pids[ACC_X_PID].imax(-f,f);	pids[ACC_Y_PID].imax(-f,f); }
 	float def_max_speedXY, min_stab_hor_speed, max_speed_xy, min_stab_ver_speed;
 	float def_max_speedZ_P, def_max_speedZ_M,max_speedZ_P,max_speedZ_M;
 public:

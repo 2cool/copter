@@ -43,7 +43,7 @@ void BalanceClass::init()
 	c_pitch = c_roll = 0;
 	Stabilization.init();
 	throttle = 0;
-	pitch_roll_stabKP = 0.3;
+	pitch_roll_stabKP = 2;
 	propeller_lost[0]= propeller_lost[1] = propeller_lost[2] = propeller_lost[3] = false;
 	//set_pitch_roll_pids(0.0017,  0.0001, 0.2);  //very old
 	old_time = micros_();
@@ -327,7 +327,7 @@ bool BalanceClass::loop()
 		float roll_output = pK*pids[PID_ROLL_RATE].get_pid(roll_stab_output + Mpu.gyroRoll, dt);
 		roll_output = constrain(roll_output, -MAX_DELTA, MAX_DELTA);
 		float yaw_output = pK*pids[PID_YAW_RATE].get_pid(yaw_stab_output - Mpu.gyroYaw, dt);
-		yaw_output = constrain(yaw_output, -MAX_YAW_DELTA, MAX_YAW_DELTA);
+		yaw_output =  constrain(yaw_output, -MAX_YAW_DELTA, MAX_YAW_DELTA);
 
 #ifdef YAW_OFF
 		//yaw_output = 0;
@@ -343,6 +343,12 @@ bool BalanceClass::loop()
 		f_[1] = f_constrain((throttle + roll_output - pitch_output + yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
 		f_[2] = f_constrain((throttle - roll_output + pitch_output + yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
 		f_[0] = f_constrain((throttle - roll_output - pitch_output + m_yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
+
+
+
+	//	Debug.dump(c_roll,  c_pitch, 0, 0);
+
+
 
 		if (Hmc.do_compass_motors_calibr) {
 			f_[0] = f_[1] = f_[2] = f_[3] = 0;

@@ -70,9 +70,13 @@ void LocationClass::fromLoc2Pos(const long &lat, const long &lon, double&x, doub
 void LocationClass::xy(){
 	double tx, ty;
 	get(tx, ty);
-	
-	//double t = form_lon2Y((_lon_zero - lon_));
+	if (dY == 0 && dX == 0 && old_alt == 0) {
+		dY = ty;
+		dX = tx;
+		old_alt = altitude;
+	}
 	double tspeedY = (ty - dY) *rdt;
+
 	if (abs(tspeedY) > SPEED_ERROR) {
 		bugs++;
 		print_gps_error();
@@ -83,6 +87,7 @@ void LocationClass::xy(){
 		speedY = tspeedY;
 	}
 	//t = from_lat2X((_lat_zero - lat_));
+
 	double tspeedX = (tx - dX) * rdt;
 	if (abs(tspeedX) > SPEED_ERROR) {
 		bugs++;
@@ -96,7 +101,7 @@ void LocationClass::xy(){
 	//update z
 	double tsz = (altitude - old_alt)*rdt;
 	
-	if (abs(speedZ) > SPEED_ERROR) {
+	if (abs(tsz) > SPEED_ERROR) {
 		bugs++;
 		print_gps_error();
 		return;
@@ -179,7 +184,7 @@ void LocationClass::proceed(SEND_I2C *d) {
 	rdt = 1.0 / dt;
 	old_time = last_gps_data__time;
 
-#define REAL_GPS
+//#define REAL_GPS
 #ifdef REAL_GPS
 	accuracy_hor_pos_ = (d->hAcc > 99) ? 99 : d->hAcc;
 	accuracy_ver_pos_ = (d->vAcc > 99) ? 99 : d->vAcc;
@@ -193,9 +198,14 @@ void LocationClass::proceed(SEND_I2C *d) {
 #else
 	shmPTR->accuracy_hor_pos_ = accuracy_hor_pos_ = 1;
 	shmPTR->accuracy_ver_pos_ = accuracy_ver_pos_ = 1;
-	shmPTR->gps_altitude_ = 15000;
+	const long drand = last_gps_data__time & 0xf;
+	shmPTR->gps_altitude_ = 15000 + drand;
 	altitude = 0.001 * 15000;
-	shmPTR->lat_ = lat_ = 479079700;shmPTR->lon_ = lon_ = 333320180; //
+	
+	shmPTR->lat_ = lat_ = 479079700 + drand;
+	shmPTR->lon_ = lon_ = 333320180 + drand;; //
+
+	last_gps_accuracy_ok = last_gps_data__time;
 	///shmPTR->lat_ = lat_ = 479079060;shmPTR->lon_ = lon_ = 333321560; //dvor
 #endif
 
@@ -295,9 +305,10 @@ int LocationClass::init(){
 	lon_ = 0;
 	dt = 0.1;
 	rdt = 10;
-	speedX = speedY = 0;
+	speedX = speedY = speedZ = 0;
 	cout << "loc init\n";
 	return 0;
+	dX = dY = old_alt = 0;
 }
 
 void LocationClass::setHomeLoc(){
