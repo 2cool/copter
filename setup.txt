@@ -1,5 +1,7 @@
 for Armbian 20.02.1 Bionic i2c
 
+nano /etc/modprobe.d/blacklist.conf add blacklist brcmfmac
+
 Make sure this 2 lines are written in /boot/armbianEnv.txt:
 
 overlay_prefix=sun8i-h3

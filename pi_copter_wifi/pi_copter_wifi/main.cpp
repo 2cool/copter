@@ -205,12 +205,12 @@ std::string exec(const std::string cmd) {
 
 
 //wlan0
-// wlxaca2136245af
+// wlx983f9f1908da
 
 void get_signal_strong() {
 
 
-	string ret = exec("nice -n -20 iwconfig wlan0 | grep Signal");
+	string ret = exec("nice -n -20 iwconfig wlx983f9f1908da | grep Signal");
 	if (ret.length() > 67) {
 		int beg = ret.find("l=-");
 		int len = ret.substr(beg + 3).find("dBm");
@@ -248,7 +248,7 @@ void get_signal_strong() {
 void test_wifi() {
 	int ln = 2;
 	cout << "test wifi work\n";
-	string ret = exec("nice -n -20 ifconfig wlan0");
+	string ret = exec("nice -n -20 ifconfig wlx983f9f1908da");
 	int ip;
 	string myIP = "";
 	ip = ret.find("192.168.");
@@ -261,9 +261,9 @@ void test_wifi() {
 			//printf( "%s %i\n", ret.c_str(),n);
 			ret = exec("nice -n -20 nmcli dev wifi | grep 2coolzNET");
 			if (ret.find(" 2coolzNET ") != string::npos) {
-				exec("nice -n -20 ifconfig wlan0 down");
+				exec("nice -n -20 ifconfig wlx983f9f1908da down");
 				delay(1000);
-				exec("nice -n -20 ifconfig wlan0 up");
+				exec("nice -n -20 ifconfig wlx983f9f1908da up");
 				delay(5000);
 				ln = 2;
 			}
@@ -320,13 +320,13 @@ std::ofstream out;
 std::streambuf* coutbuf;// старый буфер
 
 void set_wifi_30_() {
-	exec("nice -n -20 ifconfig wlan0 down");
+	exec("nice -n -20 ifconfig wlx983f9f1908da down");
 	delay(3000);
 	exec("nice -n -20 iw reg set BO");
 	delay(3000);
-	exec("nice -n -20 iwconfig wlan0 txpower 40");
+	exec("nice -n -20 iwconfig wlx983f9f1908da txpower 40");
 	delay(3000);
-	exec("nice -n -20 ifconfig wlan0 up");
+	exec("nice -n -20 ifconfig wlx983f9f1908da up");
 	delay(2000);
 	exec("nice -n -20 iwconfig");
 	delay(5000);

@@ -375,7 +375,7 @@ std::ofstream out;
 std::streambuf *coutbuf;// старый буфер
 
 int main(int argc, char* argv[]) {
-
+	//system("ifconfig wlan1 down");
 	int counter = test_4_counterFile();
 	if (counter == 0)
 		return 0;
