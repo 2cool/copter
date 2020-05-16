@@ -282,11 +282,11 @@ std::time_t result = std::time(nullptr);
 	file_name += +".mp4";
 
 
-	string sf = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + \
+	string sf = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -vcodec copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + \
 		" -b 900k -vcodec copy -r 60 -y " + file_name + " > /dev/null 2>&1  &";
 
 
-	string s = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -c copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + \
+	string s = "ffmpeg -rtsp_transport udp -i \"rtsp://192.168.42.1:554/live\" -vcodec copy -f h264 udp://" + intIP2strIP(ip) + ":" + to_string(shmPTR->fpv_port) + \
 		 " > /dev/null 2>&1  &";
 
 
@@ -331,8 +331,8 @@ sudo dhclient ra0
 */
 
 
-const static string connect2camera = "ifconfig "+wlan_fpv+" up && wpa_supplicant -B -i"+wlan_fpv+" -c /etc/camera.conf -Dwext && dhclient "+ wlan_fpv;
-
+//const static string connect2camera = "ifconfig "+wlan_fpv+" up && wpa_supplicant -B -i"+wlan_fpv+" -c /etc/camera.conf -Dwext && dhclient "+ wlan_fpv;
+const static string connect2camera = "ifconfig wlx20e6170cacf8 down && ifconfig wlx20e6170cacf8 up && wpa_supplicant -B -iwlx20e6170cacf8 -c /etc/camera.conf -Dwext && dhclient wlx20e6170cacf8";
 
 
 void sleep3s() {
@@ -371,7 +371,7 @@ int main(int argc, char* argv[])
 			
 	do {
 		static bool print = true;
-		string ret=exec("nice -n -20  nmcli dev wifi | grep YDXJ_1234567");
+		string ret=exec("nice -n -20   ifconfig wlx20e6170cacf8 | grep 192.168.42");
 		if (ret.length() < 10) {
 			if (print) {
 				shmPTR->status |= 0x8000;
@@ -388,11 +388,11 @@ int main(int argc, char* argv[])
 	cout << "camera found\n";
 	shmPTR->status |= 0x8000;
 
-	string ret = exec("nice -n -20 ifconfig "+ wlan_fpv);
-	if (ret.find("192.168.42.") == string::npos) {
-		//system(connect2camera.c_str());
-		//sleep3s();
-	}
+//	string ret = exec("nice -n -20 ifconfig "+ wlan_fpv);
+//	if (ret.find("192.168.42.") == string::npos) {
+//		system(connect2camera.c_str());
+//		sleep3s();
+	//}
 	
 	while (open_socket() == -1) 
 		sleep3s();

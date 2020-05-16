@@ -235,8 +235,7 @@ bool CommanderClass::input(){
 			yaw = -ANGK*(float)i_yaw;
 			yaw_offset = ANGK*(float)i_yaw_offset;
 			pitch = ANGK*(float)i_pitch;
-			//Debug.load(0, pitch, roll);
-			//Debug.dump();
+		
 			roll = ANGK*(float)i_roll;
 			if ((i + 3) < shmPTR->commander_buf_len) {
 				string msg = "";
@@ -268,6 +267,8 @@ bool CommanderClass::input(){
 					i += 2;
 				}
 			}
+			//Debug.load(0, pitch, roll);
+			//Debug.dump();
 		}
 		else {
 			cout << "COMMANDER ERROR\n";

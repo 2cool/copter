@@ -95,6 +95,114 @@ void pipe_handler(int sig) {
 int sockfd;
 struct sockaddr_in serv_addr, cli_addr;
 volatile int n, rlen,wn,len;
+
+
+
+
+
+
+
+
+//---------------------------------------------------
+int sender() {
+
+	int sockfd;
+
+	struct sockaddr_in     servaddr;
+
+	// Creating socket file descriptor 
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		perror("socket creation failed");
+		exit(EXIT_FAILURE);
+	}
+
+	memset(&servaddr, 0, sizeof(servaddr));
+
+	// Filling server information 
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(9877);
+	servaddr.sin_addr.s_addr = inet_addr("192.168.0.3");
+
+
+
+	while (flag == 0 && shmPTR->run_main) {
+
+		while (flag == 0 && shmPTR->telemetry_buf_len == 0)
+			usleep(1000);
+		len = shmPTR->telemetry_buf_len;
+		wn = sendto(sockfd, (char*)shmPTR->telemetry_buf, len, MSG_CONFIRM, (const struct sockaddr*) & servaddr, sizeof(servaddr));  //cli_adr
+		
+		if (len == wn) {
+			shmPTR->telemetry_buf_len = 0;
+			//cout << cccc++ << "out "<< wn << endl;
+		}
+		else {
+			cout << "ERROR: len=" << len << ". wn=" << wn << "\n";
+		}
+		usleep(100000);
+	}
+	close(sockfd);
+	return 0;
+}
+//---------------------------------------------------
+int reciever() {
+	struct hostent* hostp;	/* client host info */
+	
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+
+		return -1;
+	}
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	memset(&cli_addr, 0, sizeof(cli_addr));
+	// Filling server information 
+	serv_addr.sin_family = AF_INET; // IPv4 
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr.sin_port = htons(9876);
+
+	if (bind(sockfd, (const struct sockaddr*) & serv_addr, sizeof(serv_addr)) < 0)
+		return -1;
+	int clientlen = sizeof(cli_addr);
+
+	long old_rtime = 0;
+	int old_time = millis_();
+	int max_delta = 0;
+
+
+	while (flag == 0 && shmPTR->run_main) {
+
+		while (shmPTR->commander_buf_len != 0)
+			usleep(1000);
+		uint8_t rbuf[100];
+		int rn = recvfrom(sockfd, (char*)shmPTR->commander_buf, TELEMETRY_BUF_SIZE, 0, (struct sockaddr*) & cli_addr, (socklen_t*)&rlen);
+		//int rn = recvfrom(sockfd, (char*)rbuf, 100, 0, (struct sockaddr*) & cli_addr, (socklen_t*)&clientlen);
+		//int rn = recvfrom(sockfd, (char*)rbuf, 100, 0, (struct sockaddr*) & cli_addr, (socklen_t*)&clientlen);
+		if (rn > 0) {
+			//cout << "in  " << n << endl;
+			shmPTR->commander_buf_len = rn;
+			if (shmPTR->connected == 0) {
+				cout << "ONLINE\n";
+				shmPTR->connected++;
+			}
+			static bool ip_ok = false;
+			shmPTR->client_addr = cli_addr.sin_addr.s_addr;
+
+			if (!ip_ok && cli_addr.sin_addr.s_addr) {
+				const uint32_t ip = cli_addr.sin_addr.s_addr;
+				string sip = to_string(ip & 255) + "." + to_string((ip >> 8) & 255) + "." + to_string((ip >> 16) & 255) + "." + to_string(ip >> 24);
+				ip_ok = true;
+				cout << sip << endl;
+			}
+		}
+		else {
+			cout << "<<error\n";
+		}
+
+	}
+	close(sockfd);
+}
+
+
+
 int server() {
 
 
@@ -123,7 +231,7 @@ int server() {
 	while (flag == 0 && shmPTR->run_main) {
 
 		while (shmPTR->commander_buf_len != 0)
-			usleep(2000);
+			usleep(5000);
 
 
 		n = recvfrom(sockfd, (char*)shmPTR->commander_buf, TELEMETRY_BUF_SIZE, MSG_WAITALL, (struct sockaddr*) & cli_addr, (socklen_t*)&rlen); 
@@ -146,11 +254,11 @@ int server() {
 			}
 			
 			
-		//	usleep(20000);
+			//usleep(20000);
 			
 
 			while (flag == 0 && shmPTR->telemetry_buf_len == 0)
-				usleep(2000);
+				usleep(5000);
 
 			len = shmPTR->telemetry_buf_len;
 			wn = sendto(sockfd, (char*)shmPTR->telemetry_buf, len, MSG_CONFIRM, (const struct sockaddr*) & cli_addr, sizeof(cli_addr));
@@ -377,8 +485,22 @@ int main(int argc, char* argv[])
 	//usleep(1000000)
 	if (flag == 0) {
 		//while (flag == 0 && shmPTR->run_main) {
-		server();
+		//server();
 		//}
+
+		thread tl(reciever);
+		tl.detach();
+
+	//	delay(2000); //add test for client ip
+
+		thread t2(sender);
+		t2.detach();
+
+		while(flag == 0)
+			delay(1000);
+
+
+
 	}
 
 

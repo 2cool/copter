@@ -62,7 +62,7 @@ public class Net {
 
     public static boolean net_runing = true;
     private static int SERVER_PORT = 9876;
-    static private boolean ip_OK = false;
+    static public boolean ip_OK = false;
 
     public static String getIpAddress() {
         try {
@@ -101,6 +101,8 @@ public class Net {
     static Context context;
 
     public void start() {
+       // if (true)
+       //     return;
         Log.d("NET", "start");
         if (threads > 0 || net_runing == false) {
             Log.d("NET", "exit");
@@ -152,22 +154,96 @@ public class Net {
     private long  old_t=0;
 
     int errors_cnt=0;
+
+
+
+
+
+
+
+    private UDPSendServer sendServer;
+    private Thread sendThread;
+    private UDPReceiveServer receiveServer;
+    private Thread receiveThread;
+
+
+
+    static public boolean run =true;
     public boolean runTCPClient(String ip_port) {
         if (threads_>0)
             return false;
-        boolean run =true;
+
         threads_++;
 
-
+/*
         if (ip_port == null)
             return false;
         String s[] = ip_port.split(":");
+
+        SERVER_PORT = Integer.parseInt(s[PORT]);
+
+
+        sendServer = new UDPSendServer("send server");
+        sendServer.setDestination(s[IP], SERVER_PORT);
+        sendServer.setUpdateRate(60);
+
+        receiveServer = new UDPReceiveServer();
+        receiveServer.setReceivePort(SERVER_PORT+1);
+
+        sendThread = new Thread(sendServer);
+        receiveThread = new Thread(receiveServer);
+        sendThread.start();
+      //  receiveThread.start();
+
+*/
+
+
+
+
+
+        String controller_ip = "192.168.0.2";
+        int sendPort = 9876;
+        int recievePort = 9877;
+        int updateRate = 60;
+
+
+        sendServer = new UDPSendServer("send server");
+        sendServer.setDestination(controller_ip, sendPort);
+        sendServer.setUpdateRate(updateRate);
+
+        receiveServer = new UDPReceiveServer();
+        receiveServer.setReceivePort(recievePort);
+
+        sendThread = new Thread(sendServer);
+        receiveThread = new Thread(receiveServer);
+        sendThread.start();
+        receiveThread.start();
+
+
+
+
+
+
+
+
+
+
+
+        while (net_runing) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+/*
         try {
 
             ///////////
 
 
-                SERVER_PORT = Integer.parseInt(s[PORT]);
+
 
 
 
@@ -176,7 +252,7 @@ public class Net {
                         {
                             DatagramSocket udpSocket = new DatagramSocket(SERVER_PORT);
                            // udpSocket.setReuseAddress(true);
-                            udpSocket.setSoTimeout(2000);
+                            udpSocket.setSoTimeout(500);
                             InetAddress copterAddress = InetAddress.getByName(s[IP]);
                             // Log.d("UDP", "copter address: "+copterAddress);
                           //  while (net_runing && run) {
@@ -187,7 +263,7 @@ public class Net {
                                 udpSocket.send(packet);
                                 //  Log.d("UDP", "ok=");
                                 DatagramPacket packet1 = new DatagramPacket(bufferout, buf_size);
-                                udpSocket.receive(packet1);
+                              //  udpSocket.receive(packet1);
 
                                 Commander.link = true;
                                 ip_OK = true;
@@ -239,6 +315,8 @@ public class Net {
 
 
         }
+ */
+
         return false;
     }
 }

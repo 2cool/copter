@@ -1,6 +1,20 @@
 for Armbian 20.02.1 Bionic i2c
 
-nano /etc/modprobe.d/blacklist.conf add blacklist brcmfmac
+nano /etc/modprobe.d/blacklist.conf add 
+blacklist brcmfmac
+to disable wlan0
+
+root@orangepizero:~# cat /etc/NetworkManager/conf.d/default-wifi-powersave-on.conf
+[connection]
+wifi.powersave = 2
+
+все что с верху фигня. главное правильно настроить нетворк менеджер. или виключить его нафиг
+
+
+0 - use global/default value (for the individual connections)
+1 - ignore power management
+2 - disable power management
+3 - enable power management
 
 Make sure this 2 lines are written in /boot/armbianEnv.txt:
 

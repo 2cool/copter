@@ -159,9 +159,13 @@ public class Commander {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     static int cntnntnnt=0;
+    static long old_time=System.currentTimeMillis();
     static public int get_b(byte buf[]){
-
-
+        long time;
+        do{
+            time=System.currentTimeMillis();
+        }while(time-old_time<30);
+        old_time=time;
 
         int i=0;
         //   buf[0]=(byte)MainActivity.command_bits_;
@@ -189,7 +193,7 @@ public class Commander {
                 throttle = 0.5f;
         }
 
-        long time = System.currentTimeMillis();
+       // time = System.currentTimeMillis();
         long _dt_=time-last_time;
         last_time=time;
         if (_dt_>1000)

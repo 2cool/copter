@@ -160,13 +160,10 @@ bool loop()
 
 	if (!Telemetry.loop())
 		GPS.loop();
-
-
 	Balance.loop();
-
-
 	Commander.input();
 	Autopilot.loop();
+
 	if (shmPTR->sim800_reset_time > 0 && shmPTR->sim800_reset_time + 40e3 < millis_())
 		shmPTR->sim800_reset_time = 0;
 
@@ -233,15 +230,15 @@ void watch_dog() {
 			else {
 				if (!max_cpu_freq) {
 					max_cpu_freq = true;
-					cout << "set cpu freq to 1200 mhz:\t" << millis_() << endl;
-					system("nice -n -20 cpufreq-set -u 1370000 -d 1370000");
+					//cout << "set cpu freq to 1200 mhz:\t" << millis_() << endl;
+					//system("nice -n -20 cpufreq-set -u 1370000 -d 1370000");
 				}
 				
 			}
 			
 		if (Autopilot.busy())
 			continue;
-#define START_FPV
+//#define START_FPV
 #ifdef START_FPV
 		if (fpv_cnt == shmPTR->fpv_cnt) {
 			cout << "fpv killed\n";  
@@ -256,7 +253,7 @@ void watch_dog() {
 		shmPTR->fpv_run = true;
 #endif
 		const int32_t _ct = millis_();
-#define START_FIFI
+//#define START_FIFI
 #ifdef START_FIFI
 		if (start_wifi)
 			if (wifi_cnt == shmPTR->wifi_cnt || (Autopilot.last_time_data__recived && (_ct - Autopilot.last_time_data__recived) > 60e3 && (_ct - last_wifi__reloaded) > 60e3)) {
@@ -394,7 +391,7 @@ int main(int argc, char* argv[]) {
 		return 0;
 
 	const double d_uptime = std::stod(exec("awk '{print $1}' /proc/uptime"));
-	
+	system("nice -n -20 cpufreq-set -u 1370000 -d 1370000");
 	shmPTR->in_fly = (shmPTR->control_bits&MOTORS_ON);
 	shmPTR->wifi_cnt = 0;
 	shmPTR->run_main = true;
@@ -532,7 +529,7 @@ int main(int argc, char* argv[]) {
 	}
 #endif
 
-	system("cpufreq-set -u 1370000 -d 480000");
+	//system("cpufreq-set -u 1370000 -d 480000");
 	return 0;
 
 }
