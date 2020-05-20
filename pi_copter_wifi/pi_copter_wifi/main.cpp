@@ -102,13 +102,13 @@ volatile int n, rlen,wn,len;
 
 
 
-
+struct sockaddr_in     servaddr;
 //---------------------------------------------------
 int sender() {
 
 	int sockfd;
 
-	struct sockaddr_in     servaddr;
+	
 
 	// Creating socket file descriptor 
 	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -234,7 +234,7 @@ int server() {
 			usleep(5000);
 
 
-		n = recvfrom(sockfd, (char*)shmPTR->commander_buf, TELEMETRY_BUF_SIZE, MSG_WAITALL, (struct sockaddr*) & cli_addr, (socklen_t*)&rlen); 
+		n = recvfrom(sockfd, (char*)shmPTR->commander_buf, TELEMETRY_BUF_SIZE, MSG_WAITALL, (struct sockaddr*) & cli_addr, (socklen_t*)&rlen);   
 		if (n > 0) {
 
 			//cout << "in  " << n << endl;
@@ -491,14 +491,19 @@ int main(int argc, char* argv[])
 		thread tl(reciever);
 		tl.detach();
 
-	//	delay(2000); //add test for client ip
+		delay(1000);
+		while (shmPTR->client_addr == 0)
+			delay(500);
+
+		servaddr.sin_addr.s_addr = shmPTR->client_addr;// inet_addr("192.168.0.3");
+
 
 		thread t2(sender);
 		t2.detach();
 
 		while(flag == 0)
 			delay(1000);
-
+		
 
 
 	}

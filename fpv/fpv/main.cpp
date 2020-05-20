@@ -371,7 +371,7 @@ int main(int argc, char* argv[])
 			
 	do {
 		static bool print = true;
-		string ret=exec("nice -n -20   ifconfig wlx20e6170cacf8 | grep 192.168.42");
+		string ret=exec("nice -n -20   ifconfig wlx20e6170cacf8 | grep 192.168.42"); 
 		if (ret.length() < 10) {
 			if (print) {
 				shmPTR->status |= 0x8000;

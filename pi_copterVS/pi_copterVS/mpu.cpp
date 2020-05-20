@@ -474,6 +474,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	shmPTR->roll = roll *= RAD2GRAD;
 	shmPTR->yaw = yaw*=RAD2GRAD;
 	log();
+
 	return true;
 }
 

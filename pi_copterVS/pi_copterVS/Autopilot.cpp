@@ -685,6 +685,9 @@ bool AutopilotClass::holdLocationStartStop(){///////////////////////////////////
 bool AutopilotClass::is_all_OK(bool print){
 	const int32_t _ct = millis_();
 	//printf( "\MS5611 err: %f\n",MS5611.getErrorsK());
+
+	
+
 #ifndef DEBUG
 	if (hall_ok<0b1111) {
 		cout << "\n!!!hall_error!!!" << CALIBRATION__TIMEOUT - (int)_ct << " sec." << "\t" << _ct << endl;
@@ -782,6 +785,12 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 
 		if (is_all_OK(!Hmc.do_compass_motors_calibr) == false)
 			return false;
+
+		if (abs(Mpu.get_pitch() > 10 || abs(Mpu.get_roll() > 10 || abs(Mpu.gyroPitch) > 20 || abs(Mpu.gyroRoll) > 20 || abs(Mpu.gyroYaw) > 20))) {
+			cout << " WRONG POSSITION" << "\t" << _ct << endl;
+			mega_i2c.beep_code(B_ACC_ERROR);
+			return false;
+		}
 
 		time_at__start = _ct;
 		Telemetry.update_voltage();

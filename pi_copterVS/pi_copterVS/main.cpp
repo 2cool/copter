@@ -238,7 +238,7 @@ void watch_dog() {
 			
 		if (Autopilot.busy())
 			continue;
-//#define START_FPV
+#define START_FPV 
 #ifdef START_FPV
 		if (fpv_cnt == shmPTR->fpv_cnt) {
 			cout << "fpv killed\n";  
@@ -253,7 +253,7 @@ void watch_dog() {
 		shmPTR->fpv_run = true;
 #endif
 		const int32_t _ct = millis_();
-//#define START_FIFI
+#define START_FIFI
 #ifdef START_FIFI
 		if (start_wifi)
 			if (wifi_cnt == shmPTR->wifi_cnt || (Autopilot.last_time_data__recived && (_ct - Autopilot.last_time_data__recived) > 60e3 && (_ct - last_wifi__reloaded) > 60e3)) {
@@ -391,7 +391,16 @@ int main(int argc, char* argv[]) {
 		return 0;
 
 	const double d_uptime = std::stod(exec("awk '{print $1}' /proc/uptime"));
-	system("nice -n -20 cpufreq-set -u 1370000 -d 1370000");
+	system("cpufreq-set -u 1370000 -d 1370000");
+	system("systemctl stop  remote-fs.target graphical.target  sound.target cryptsetup.target multi-user.target systemd-tmpfiles-clean.timer  motd-news.timer fstrim.timer apt-daily.timer apt-daily-upgrade.timer ");
+#ifndef DEBUG
+	string ret = exec("systemctl | grep NetworkManager.service");
+	if (ret.length() > 10) {
+		cout << "stop " << ret << endl;
+		system("systemctl stop NetworkManager.service && ifconfig wlx983f9f1908da up && wpa_supplicant -B -iwlx983f9f1908da -Dnl80211 -c /etc/wifi.conf && dhclient wlx983f9f1908da && ifconfig wlx20e6170cacf8 up && wpa_supplicant -B -iwlx20e6170cacf8 -c /etc/camera.conf -Dnl80211 && dhclient wlx20e6170cacf8");
+	}
+#endif
+
 	shmPTR->in_fly = (shmPTR->control_bits&MOTORS_ON);
 	shmPTR->wifi_cnt = 0;
 	shmPTR->run_main = true;
