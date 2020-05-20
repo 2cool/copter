@@ -393,13 +393,13 @@ int main(int argc, char* argv[]) {
 	const double d_uptime = std::stod(exec("awk '{print $1}' /proc/uptime"));
 	system("cpufreq-set -u 1370000 -d 1370000");
 	system("systemctl stop  remote-fs.target graphical.target  sound.target cryptsetup.target multi-user.target systemd-tmpfiles-clean.timer  motd-news.timer fstrim.timer apt-daily.timer apt-daily-upgrade.timer ");
-#ifndef DEBUG
+
 	string ret = exec("systemctl | grep NetworkManager.service");
 	if (ret.length() > 10) {
 		cout << "stop " << ret << endl;
 		system("systemctl stop NetworkManager.service && ifconfig wlx983f9f1908da up && wpa_supplicant -B -iwlx983f9f1908da -Dnl80211 -c /etc/wifi.conf && dhclient wlx983f9f1908da && ifconfig wlx20e6170cacf8 up && wpa_supplicant -B -iwlx20e6170cacf8 -c /etc/camera.conf -Dnl80211 && dhclient wlx20e6170cacf8");
 	}
-#endif
+
 
 	shmPTR->in_fly = (shmPTR->control_bits&MOTORS_ON);
 	shmPTR->wifi_cnt = 0;

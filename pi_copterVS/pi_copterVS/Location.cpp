@@ -1,4 +1,7 @@
-// 
+
+
+
+#define REAL_GPS
 // 
 // 
 #include <unistd.h>
@@ -184,7 +187,7 @@ void LocationClass::proceed(SEND_I2C *d) {
 	rdt = 1.0 / dt;
 	old_time = last_gps_data__time;
 
-//#define REAL_GPS
+
 #ifdef REAL_GPS
 	accuracy_hor_pos_ = (d->hAcc > 99) ? 99 : d->hAcc;
 	accuracy_ver_pos_ = (d->vAcc > 99) ? 99 : d->vAcc;
