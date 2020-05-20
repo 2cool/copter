@@ -212,12 +212,31 @@ bool start_wifi = false, start_inet = false, start_loger = false, start_telegram
 
 bool max_cpu_freq = false;
 bool min_cpu_freq = false;
+bool network_manager_running = true;
 void watch_dog() {
 	delay(1000);
 	while (shmPTR->run_main) {
 		const uint8_t wifi_cnt = shmPTR->wifi_cnt;
 		const uint8_t internet_cnt = shmPTR->internet_cnt;
 		const uint8_t fpv_cnt = shmPTR->fpv_cnt;
+
+
+		if (network_manager_running) {
+			string cam =  exec("ifconfig wlx20e6170cacf8 | grep 192.168.42");
+			string wifi = exec("ifconfig wlx983f9f1908da | grep 192.168.0");
+			if (cam.length() > 5 && wifi.length() > 5) {
+				string ret = exec("systemctl | grep NetworkManager.service");
+				if (ret.length() > 10) {
+					cout << "stop " << ret << endl;
+					system("systemctl stop NetworkManager.service && ifconfig wlx983f9f1908da up && wpa_supplicant -B -iwlx983f9f1908da -Dnl80211 -c /etc/wifi.conf && dhclient wlx983f9f1908da && ifconfig wlx20e6170cacf8 up && wpa_supplicant -B -iwlx20e6170cacf8 -c /etc/camera.conf -Dnl80211 && dhclient wlx20e6170cacf8");
+					delay(3000);
+				}
+				network_manager_running = false;
+				
+			}
+		}
+
+
 		delay(3000);
 
 		Telemetry.cpu_temp=get_cpu_temp();
@@ -238,40 +257,44 @@ void watch_dog() {
 			
 		if (Autopilot.busy())
 			continue;
+
+		const int32_t _ct = millis_();
+
+		if (!network_manager_running) {
 #define START_FPV 
 #ifdef START_FPV
-		if (fpv_cnt == shmPTR->fpv_cnt) {
-			cout << "fpv killed\n";  
-			shmPTR->fpv_run = false;
-			system("nice -n -20 pkill fpv_");
-			delay(1000);
-			shmPTR->fpv_run = true;
-			cout << "fpv started\n";
-			system("nice -n -20 /root/projects/fpv_ &"); // if write video to file  fpv_ f
-		}
-#else
-		shmPTR->fpv_run = true;
-#endif
-		const int32_t _ct = millis_();
-#define START_FIFI
-#ifdef START_FIFI
-		if (start_wifi)
-			if (wifi_cnt == shmPTR->wifi_cnt || (Autopilot.last_time_data__recived && (_ct - Autopilot.last_time_data__recived) > 60e3 && (_ct - last_wifi__reloaded) > 60e3)) {
-				last_wifi__reloaded = _ct;
-				cout << "--------------wifi killed:\t" << _ct << endl;
-				shmPTR->wifi_run = false;
-				system("nice -n -20 pkill wifi_p");
+			if (fpv_cnt == shmPTR->fpv_cnt) {
+				cout << "fpv killed\n";
+				shmPTR->fpv_run = false;
+				system("nice -n -20 pkill fpv_");
 				delay(1000);
-				shmPTR->wifi_run = true;
-				cout << "--------------wifi started:\t" << _ct << endl;
-				string t = "nice -n -20 /root/projects/wifi_p ";
-				t += " &";
-				system(t.c_str());
+				shmPTR->fpv_run = true;
+				cout << "fpv started\n";
+				system("nice -n -20 /root/projects/fpv_ &"); // if write video to file  fpv_ f
 			}
 #else
-		shmPTR->wifi_run = true;
+			shmPTR->fpv_run = true;
 #endif
-
+			
+#define START_FIFI
+#ifdef START_FIFI
+			if (start_wifi)
+				if (wifi_cnt == shmPTR->wifi_cnt || (Autopilot.last_time_data__recived && (_ct - Autopilot.last_time_data__recived) > 60e3 && (_ct - last_wifi__reloaded) > 60e3)) {
+					last_wifi__reloaded = _ct;
+					cout << "--------------wifi killed:\t" << _ct << endl;
+					shmPTR->wifi_run = false;
+					system("nice -n -20 pkill wifi_p");
+					delay(1000);
+					shmPTR->wifi_run = true;
+					cout << "--------------wifi started:\t" << _ct << endl;
+					string t = "nice -n -20 /root/projects/wifi_p ";
+					t += " &";
+					system(t.c_str());
+				}
+#else
+			shmPTR->wifi_run = true;
+#endif
+		}
 		if (start_inet)
 			if (internet_cnt == shmPTR->internet_cnt) {
 				cout << "--------------ppp starting" << "\t" << _ct << endl;
@@ -394,11 +417,7 @@ int main(int argc, char* argv[]) {
 	system("cpufreq-set -u 1370000 -d 1370000");
 	system("systemctl stop  remote-fs.target graphical.target  sound.target cryptsetup.target multi-user.target systemd-tmpfiles-clean.timer  motd-news.timer fstrim.timer apt-daily.timer apt-daily-upgrade.timer ");
 
-	string ret = exec("systemctl | grep NetworkManager.service");
-	if (ret.length() > 10) {
-		cout << "stop " << ret << endl;
-		system("systemctl stop NetworkManager.service && ifconfig wlx983f9f1908da up && wpa_supplicant -B -iwlx983f9f1908da -Dnl80211 -c /etc/wifi.conf && dhclient wlx983f9f1908da && ifconfig wlx20e6170cacf8 up && wpa_supplicant -B -iwlx20e6170cacf8 -c /etc/camera.conf -Dnl80211 && dhclient wlx20e6170cacf8");
-	}
+	
 
 
 	shmPTR->in_fly = (shmPTR->control_bits&MOTORS_ON);

@@ -137,7 +137,7 @@ int sender() {
 			//cout << cccc++ << "out "<< wn << endl;
 		}
 		else {
-			cout << "ERROR: len=" << len << ". wn=" << wn << "\n";
+			cout << "SENDER ERROR: len=" << len << ". wn=" << wn << "\n";
 		}
 		usleep(100000);
 	}
