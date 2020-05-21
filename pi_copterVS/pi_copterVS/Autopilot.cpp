@@ -895,9 +895,9 @@ void AutopilotClass::connectionLost_(){ ///////////////// LOST
 	Commander.controls2zero();
 
 #ifdef DEBUG
-if (motors_is_on())
-off_throttle(true, "lost connection");
-return;
+//if (motors_is_on())
+//off_throttle(true, "lost connection");
+//return;
 #endif
 
 	if (motors_is_on())

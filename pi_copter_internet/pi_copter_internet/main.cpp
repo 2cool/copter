@@ -204,7 +204,7 @@ void sendsms() {
 
 //-----------------------------------------------
 string getLocation() {
-	std::string req = "lat:" + std::to_string(shmPTR->lat_) + " lon:" + std::to_string(shmPTR->lon_) + " alt:" + std::to_string((int)(shmPTR->gps_altitude_/1000)) + " hor:" + std::to_string((int)shmPTR->accuracy_hor_pos_);
+	std::string req = "lat:" + std::to_string(shmPTR->lat_) + " lon:" + std::to_string(shmPTR->lon_) + " alt:" + std::to_string((int)(shmPTR->gps_altitude_)) + " hor:" + std::to_string((int)shmPTR->accuracy_hor_pos_);
 	return req;
 }
 
@@ -774,6 +774,7 @@ int start_ppp() {
 		system("pon  vodafon115200");
 		delay(3000);
 		system("route add default dev ppp0");
+		system("echo nameserver 8.8.8.8 > /etc/resolv.conf");
 		delay(3000);
 	}
 	else

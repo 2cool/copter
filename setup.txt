@@ -1,5 +1,16 @@
 for Armbian 20.02.1 Bionic i2c
 
+
+
+ppp cant ping name server
+
+you should have a /etc/ppp/ip-up.d/0dns-up which will setup DNS records, 
+so remove execution bit and use google dns statically.
+
+chmod -x /etc/ppp/ip-up.d/0dns-up
+
+echo nameserver 8.8.8.8 > /etc/resolv.conf
+------------------------------------------
 nano /etc/modprobe.d/blacklist.conf add 
 blacklist brcmfmac
 to disable wlan0

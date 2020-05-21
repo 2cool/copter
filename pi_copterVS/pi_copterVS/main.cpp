@@ -295,6 +295,8 @@ void watch_dog() {
 			shmPTR->wifi_run = true;
 #endif
 		}
+#define START_INET
+#ifdef START_INET
 		if (start_inet)
 			if (internet_cnt == shmPTR->internet_cnt) {
 				cout << "--------------ppp starting" << "\t" << _ct << endl;
@@ -310,9 +312,13 @@ void watch_dog() {
 				if (stdout_file_ext.length()) 
 					t += stdout_file_ext + "i" + to_string(inet_start__cnt++) + ".txt";
 				t += " &";
+				cout << t << endl;
 				system(t.c_str());
 
 			}
+#else
+		shmPTR->internet_run = true;
+#endif
 
 	}
 }
