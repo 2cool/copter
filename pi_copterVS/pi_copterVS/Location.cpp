@@ -1,7 +1,7 @@
 
 
 
-#define REAL_GPS
+//#define REAL_GPS
 // 
 // 
 #include <unistd.h>

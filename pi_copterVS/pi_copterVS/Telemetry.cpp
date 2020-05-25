@@ -484,8 +484,9 @@ bool TelemetryClass::update_buf() {
 
 	} while (true);
 	shmPTR->telemetry_buf_len = i;
-
-	//Debug.dump(-Mpu.get_pitch(), Mpu.get_roll(), 0, 0);
+	static int cnttt = 0;
+	cnttt++;
+//	Debug.dump((float)cnttt, 0, 0, 0);
 	return true;
 }
 //nado echo peredat koordinaty starta i visoti ili luche ih androis socharanaet

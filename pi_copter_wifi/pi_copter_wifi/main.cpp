@@ -121,7 +121,7 @@ int sender() {
 	// Filling server information 
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(9877);
-	servaddr.sin_addr.s_addr = inet_addr("192.168.0.3");
+	servaddr.sin_addr.s_addr = inet_addr("192.168.1.127");
 
 
 

@@ -223,7 +223,7 @@ void watch_dog() {
 
 		if (network_manager_running) {
 			string cam =  exec("ifconfig wlx20e6170cacf8 | grep 192.168.42");
-			string wifi = exec("ifconfig wlx983f9f1908da | grep 192.168.0");
+			string wifi = exec("ifconfig wlx983f9f1908da | grep 192.168.1");
 			if (cam.length() > 5 && wifi.length() > 5) {
 				string ret = exec("systemctl | grep NetworkManager.service");
 				if (ret.length() > 10) {

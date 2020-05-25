@@ -49,7 +49,7 @@ void BalanceClass::init()
 	old_time = micros_();
 
 	//set_pitch_roll_pids(0.001, 0.001, 0.3);  // 10
-	set_pitch_roll_pids(0.0007, 0.00031, MAX_DELTA);//9
+	set_pitch_roll_pids(0.0006, 0.00031, MAX_DELTA);//9
 
 
 	yaw_stabKP = 2;
