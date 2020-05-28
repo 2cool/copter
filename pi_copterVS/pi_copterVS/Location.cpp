@@ -1,7 +1,7 @@
 
 
 
-//#define REAL_GPS
+#define REAL_GPS
 // 
 // 
 #include <unistd.h>
@@ -291,6 +291,9 @@ int LocationClass::init(){
 #ifndef FLY_EMULATOR
 
 	
+#endif
+#ifndef REAL_GPS
+	cout << "___________!!!FAKE GPS!!!___________\n";
 #endif
 	errors = 0;
 	bugs = 0;

@@ -3,15 +3,4 @@
 #include <Arduino.h>
 
 #define SYSPROGS_ARDUINO_EXPAND_GENERATED_PROTOTYPES \
-	void beep(); \
-	void stop_motors(); \
-	void throttle_0(const float n); \
-	void throttle_1(const float n); \
-	void throttle_2(const float n); \
-	void throttle_3(const float n); \
-	void receiveEvent(int countToRead); \
-	void requestEvent(); \
-	uint16 setTimer(int n); \
-	void setup(); \
-	void loop(); \
 

@@ -466,6 +466,15 @@ int main(int argc, char* argv[]) {
 				coutbuf = std::cout.rdbuf(); //запомним старый буфер
 				std::cout.rdbuf(out.rdbuf()); //и теперь все будет в файл!
 			}
+#ifdef DEBUG
+			cout << "___________!!!DEBUG!!!___________\n";
+#endif
+#ifdef FLY_EMULATOR
+			cout << "___________!!!FLY_EMULATOR!!!___________\n";
+#endif
+
+
+
 			cout << "UPTIME=" << d_uptime << endl;
 			
 			Log.writeTelemetry = (argv[4][0] == 'y' || argv[4][0] == 'Y');

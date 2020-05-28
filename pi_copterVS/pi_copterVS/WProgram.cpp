@@ -6,8 +6,8 @@
 #include <sys/ipc.h>
 #include "mpu.h"
 #include <chrono>
-
-static auto start = chrono::steady_clock::now();
+std::chrono::duration<long, std::milli> error_tvv{ 3070000 };
+static auto start = chrono::steady_clock::now();// -error_tvv;
 
 int64_t micros_() {
 
