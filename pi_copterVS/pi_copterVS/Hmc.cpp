@@ -17,7 +17,7 @@
 #include "Log.h"
 #include "GPS.h"
 
-#define DEFAULT_DEV "/dev/i2c-0"
+
 
 
 

@@ -6,7 +6,7 @@
 
 #include "MPU6050.h"
 #include "debug.h"
-#define DEFAULT_DEV "/dev/i2c-0"
+
 
 
 /** Default constructor, uses default I2C address.

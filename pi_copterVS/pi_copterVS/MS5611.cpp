@@ -9,8 +9,26 @@
 
 #define NORM_CT 10000
 
-static int fd4S;
-unsigned int PROM_read(int DA, char PROM_CMD)
+
+
+int open_i2c() {
+	int fd4S;
+	if ((fd4S = open("/dev/i2c-0", O_RDWR)) < 0) {
+		cout << "Failed to open the bus.\n";
+		return -1;
+	}
+
+	if (ioctl(fd4S, I2C_SLAVE, MS5611_ADDRESS) < 0) {
+		cout << "Failed to acquire bus access and/or talk to slave.\n";
+		return -1;
+	}
+	return fd4S;
+
+}
+
+
+
+unsigned int PROM_read(const int DA, char PROM_CMD)
 {
 	uint16_t ret = 0;
 	uint8_t r8b[] = { 0, 0 };
@@ -36,7 +54,7 @@ char RESET = 0x1E;
 //int MS5611Class::error(int e) {	return -1;}
 
 
-int MS5611Class::writeReg(char bar_zero) {
+int MS5611Class::writeReg(const int fd4S,char bar_zero) {
 	if (write(fd4S, &bar_zero, 1) != 1) {
 		cout << "write reset 8 bit Failed to write to the i2c bus." << "\t"<<millis_() << endl;
 		bar_task = 0;
@@ -193,12 +211,13 @@ void MS5611Class::error(const int n) {
 
 bool MS5611Class::phase0() {
 	bar_D[0] = bar_D[1] = bar_D[2] = 0;
-
-	if (writeReg(CONV_D2_4096) == -1) {
+	const int fd4S = open_i2c();
+	if (fd4S == -1 || writeReg(fd4S, CONV_D2_4096) == -1) {
+		close(fd4S);
 		error(11);
 		return true;
 	}
-
+	close(fd4S);
 	b_timeDelay = micros_() + ct;
 	bar_task = 1;
 	return true;
@@ -207,8 +226,10 @@ bool MS5611Class::phase0() {
 bool MS5611Class::phase1()
 {
 	if (micros_()  > b_timeDelay) {
-		if (writeReg(bar_zero) == -1) {
+		const int fd4S = open_i2c();
+		if (fd4S == -1 || writeReg(fd4S,bar_zero) == -1) {
 			error(21);
+			close(fd4S);
 			return true;
 		}
 
@@ -218,9 +239,10 @@ bool MS5611Class::phase1()
 		bar_h = read(fd4S, &bar_D, 3);
 		if (bar_h != 3) {
 			error(22);
+			close(fd4S);
 			return true;
 		}
-
+		
 		D2 = ((int32_t)bar_D[0] << 16) | ((int32_t)bar_D[1] << 8) | bar_D[2];
 		int32_t dT = D2 - (uint32_t)fc[4] * 256;
 		int32_t TEMP = 2000 + ((int64_t)dT * fc[5]) / 8388608;
@@ -235,10 +257,12 @@ bool MS5611Class::phase1()
 		TEMP = TEMP - TEMP2;
 		i_readTemperature = ((int8_t)(TEMP * 0.01));
 
-		if (writeReg(CONV_D1_4096) == -1) {
+		if (writeReg(fd4S, CONV_D1_4096) == -1) {
 			error(23);
+			close(fd4S);
 			return true;
 		}
+		close(fd4S);
 		b_timeDelay = micros_() + ct;
 		return true;
 	}
@@ -250,15 +274,17 @@ bool MS5611Class::phase2() {
 	if (micros_()  > b_timeDelay)
 	{
 		bar_task = 0;
-		//openDev();
+
 		bar_zero = 0;
-		if (writeReg(bar_zero) == -1) {
+		const int fd4S = open_i2c();
+		if (fd4S == -1 || writeReg(fd4S, bar_zero) == -1) {
 			error(31);
+			close(fd4S);
 			return true;
 		}
-
+		
 		bar_h = read(fd4S, &bar_D, 3);
-
+		close(fd4S);
 		if (bar_h != 3) {
 			error(32);
 			return true;
@@ -362,17 +388,10 @@ bool MS5611Class::init() {
 #ifndef FLY_EMULATOR
 	compensation = true;
 
-	if ((fd4S = open("/dev/i2c-0", O_RDWR)) < 0) {
-		cout << "Failed to open the bus.\n";
-		return false;
-	}
+	const int fd4S = open_i2c();
 
-	if (ioctl(fd4S, I2C_SLAVE, MS5611_ADDRESS) < 0) {
-		cout << "Failed to acquire bus access and/or talk to slave.\n";
-		return false;
-	}
 
-	if (writeReg(RESET) == -1) {
+	if (fd4S == -1 || writeReg(fd4S,RESET) == -1) {
 		cout << "Failed to writeReg(RESET)\n";
 		return false;
 	}
@@ -385,6 +404,7 @@ bool MS5611Class::init() {
 			return false;
 		}
 	}
+	close(fd4S);
 
 #endif
 	return true;

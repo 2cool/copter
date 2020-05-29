@@ -16,7 +16,24 @@
 #define pwm_OFF_THROTTLE 24002
 #define OVER_CURRENT 19
 #define ESC_CALIBR 0
-int fd;
+
+
+int open_i2c_() {
+	int fd4S;
+	if ((fd4S = open("/dev/i2c-0", O_RDWR)) < 0) {
+		cout << "Failed to open /dev/i2c-0" << "\t" << millis_() << endl;
+		return -1;
+	}
+	if (ioctl(fd4S, I2C_SLAVE, ARDUINO_ADDR) < 0) {
+		cout << "Failed to acquire /dev/i2c-0 access and/or talk to slave." << "\t" << millis_() << endl;
+		return -1;
+	}
+	return fd4S;
+
+}
+
+
+
 /*
 int Megai2c::getsim(char * str) {
 	char reg = 3;
@@ -48,8 +65,14 @@ void Megai2c::settings(float overCurrentVal, uint8_t esc_calibr0, uint8_t esc_ca
 	send_buf[5] = esc_calibr2;
 	send_buf[6] = esc_calibr3;
 
+	const int fd = open_i2c_();
 
-	write(fd, send_buf, 7);
+	if (fd==-1 || write(fd, send_buf, 7) == -1){
+
+		cout << "read set reg Failed to write to the arduino i2c bus ." << "\t" << millis_() << endl;
+	}
+	close(fd);
+
 }
 /*
 int Megai2c::send2sim(const char *str, int len) {
@@ -137,14 +160,7 @@ int Megai2c::init()
 		return 0;
 	current_led_mode = 100;
 	ring_received = false;
-	if ((fd = open("/dev/i2c-0", O_RDWR)) < 0) {
-		cout << "Failed to open /dev/i2c-0" << "\t"<< millis_() << endl;
-		return -1;
-	}
-	if (ioctl(fd, I2C_SLAVE, ARDUINO_ADDR) < 0) {
-		cout << "Failed to acquire /dev/i2c-0 access and/or talk to slave." << "\t"<< millis_() << endl;
-		return -1;
-	}
+	const int fd = open_i2c_();
 	//--------------------------------init sound & colors 
 	char buf[7];
 
@@ -157,7 +173,9 @@ int Megai2c::init()
 	buf[4] = 255;
 	buf[5] = 0;
 	buf[6] = 0;
-	write(fd, buf, 7);
+	if (fd==-1 || write(fd, buf, 7)==-1)
+		cout<< "write set reg Failed to write to the arduino i2c bus ." << "\t" << millis_() << endl;
+	close(fd);
 	shmPTR->sim800_reset_time = 0;
 
 	mega_i2c.settings(OVER_CURRENT, ESC_CALIBR, ESC_CALIBR, ESC_CALIBR, ESC_CALIBR);
@@ -174,7 +192,10 @@ void Megai2c::beep_code(uint8_t c) {
 		//cout << "BEEP:" << (int)c << endl;
 		if (DO_SOUND) {
 			char chBuf[] = { 1,c };
-			write(fd, chBuf, 2);
+			const int fd = open_i2c_();
+			if (fd==-1 || write(fd, chBuf, 2)==-1)
+				cout << "write  reg Failed to write to the arduino i2c bus ." << "\t" << millis_() << endl;
+			close(fd);
 		}
 	}
 }
@@ -225,11 +246,13 @@ void Megai2c::throttle(const float _n[]) {
 	pwm_out[3] = (uint16_t)(pwm_OFF_THROTTLE + n[2] * pwm_OFF_THROTTLE);
 	pwm_out[4] = (uint16_t)(pwm_OFF_THROTTLE + n[3] * pwm_OFF_THROTTLE);
 	char* chBuf = (char*)pwm_out;
-	if (write(fd, chBuf + 1, 9) == -1) {
+	const int fd = open_i2c_();
+	if (fd == -1 || write(fd, chBuf + 1, 9) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 		cout << "arduino write power error " << millis_() << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
+	close(fd);
 #endif
 }
 
@@ -239,20 +262,24 @@ void Megai2c::set_led_color(uint8_t n, uint8_t r, uint8_t g, uint8_t b) {
 	buf[1] = *(char*)&r;
 	buf[2] = *(char*)&g;
 	buf[3] = *(char*)&b;
-	if (write(fd, buf, 4) == -1) {
+	const int fd = open_i2c_();
+	if (fd == -1 || write(fd, buf, 4) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 		cout << "arduino write LED error" << millis_() << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
+	close(fd);
 }
 void Megai2c::sim800_reset() {
 	char chBuf[] = { 1,16 };
 	shmPTR->sim800_reset_time = millis_();
-	if (write(fd, chBuf, 2) == -1) {
+	const int fd = open_i2c_();
+	if (fd == -1 || write(fd, chBuf, 2) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 		cout << "arduino write sim800 error" << millis_() << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
+	close(fd);
 }
 //0.35555555555555555555555555555556 = 1град
 bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с коптером пра опред обст
@@ -266,11 +293,13 @@ bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с к
 		buf[1] = 8;
 		((uint16_t*)buf)[2] = (uint16_t)(pitch);
 		((uint16_t*)buf)[1] = (uint16_t)roll;
-		if (write(fd, buf + 1, 5) == -1) {
+		const int fd = open_i2c_();
+		if (fd == -1 || write(fd, buf + 1, 5) == -1) {
 			Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 			cout << "arduino write gimbal error" << millis_() << endl;
 			mega_i2c.beep_code(B_I2C_ERR);
 		}
+		close(fd);
 		return true;
 	}
 	else
@@ -283,10 +312,12 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 
 	char reg = 1;
 	char bit_field;
+	const int fd = open_i2c_();
 	if (write(fd, &reg, 1) == -1) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 		cout << "arduino write get_gps error" << millis_() << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
+		close(fd);
 		return -1;
 	}
 	int res = read(fd, &bit_field, 1);
@@ -294,8 +325,10 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 		cout << "arduino read get_gps error" << millis_() << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
+		close(fd);
 		return -1;
 	}
+
 	//--------------------------------------------------------------------------
 	static int32_t last_ring_time = 0;
 	if (last_ring_time > 0 && last_ring_time + 10e3 < millis_()) {
@@ -316,13 +349,23 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 		cout <<"OVERLOAD "<< std::bitset<4>(motors_overload>>2) <<"\t" << millis_()<<endl;
 	}
 	//--------------------------------------------------------------------------
-	return (bit_field & GPS_READY) ? read(fd, (char*)gps_d, sizeof(SEND_I2C)) : 0;
+	int ret = 0;
+	if (bit_field & GPS_READY) {
+		ret = read(fd, (char*)gps_d, sizeof(SEND_I2C));	
+		if (ret==-1)
+			cout << "arduino read gps_ error" << millis_() << endl;
+	}
+	close(fd);
+	return ret;
+	
 
 }
 
 int Megai2c::getiiiiv(char *iiiiv) {
 	char reg = 0;
-	if (write(fd, &reg, 1) == -1) {
+	const int fd = open_i2c_();
+	if (fd == -1 || write(fd, &reg, 1) == -1) {
+		close(fd);
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 		cout << "arduino write iiiiv error" << millis_() << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
@@ -330,11 +373,13 @@ int Megai2c::getiiiiv(char *iiiiv) {
 	}
 	
 	if (read(fd, (char*)iiiiv, 10) == -1) {
+		close(fd);
 		Telemetry.addMessage(e_ARDUINO_RW_ERROR);
 		cout << "arduino read iiiiv error" << millis_() << endl;
 		mega_i2c.beep_code(B_I2C_ERR);
 		return -1;
 	}
+	close(fd);
 	return 0;
 }
 

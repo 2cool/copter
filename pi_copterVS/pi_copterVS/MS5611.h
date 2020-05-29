@@ -53,7 +53,7 @@
 class MS5611Class {
 	
 protected:
-	int writeReg(char bar_zero);
+	int writeReg(const int fd4S,char bar_zero);
 	void error(const int n);
 	int wrong_altitude_cnt;
 	void log_sens();
