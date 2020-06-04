@@ -1,51 +1,20 @@
 {
   "buildFiles": [
+    "C:\\Android\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+    "C:\\Android\\ndk\\21.0.6113669\\build\\cmake\\platforms.cmake",
     "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "F:\\Android\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86 --target clean"
+    "C:\\Android\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86\" clean"
   ],
+  "buildTargetsCommand": "C:\\Android\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
-    "avfilter-Release-x86": {
-      "artifactName": "avfilter",
-      "abi": "x86",
-      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\src\\main\\jniLibs\\x86\\libavfilter.so"
-    },
     "native-lib-Release-x86": {
       "artifactName": "native-lib",
-      "buildCommand": "F:\\Android\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86 --target native-lib",
+      "buildCommand": "C:\\Android\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86\" native-lib",
       "abi": "x86",
-      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\build\\intermediates\\cmake\\release\\obj\\x86\\libnative-lib.so"
-    },
-    "swresample-Release-x86": {
-      "artifactName": "swresample",
-      "abi": "x86",
-      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\src\\main\\jniLibs\\x86\\libswresample.so"
-    },
-    "swscale-Release-x86": {
-      "artifactName": "swscale",
-      "abi": "x86",
-      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\src\\main\\jniLibs\\x86\\libswscale.so"
-    },
-    "avdevice-Release-x86": {
-      "artifactName": "avdevice",
-      "abi": "x86",
-      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\src\\main\\jniLibs\\x86\\libavdevice.so"
-    },
-    "avformat-Release-x86": {
-      "artifactName": "avformat",
-      "abi": "x86",
-      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\src\\main\\jniLibs\\x86\\libavformat.so"
-    },
-    "avutil-Release-x86": {
-      "artifactName": "avutil",
-      "abi": "x86",
-      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\src\\main\\jniLibs\\x86\\libavutil.so"
-    },
-    "avcodec-Release-x86": {
-      "artifactName": "avcodec",
-      "abi": "x86",
-      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\src\\main\\jniLibs\\x86\\libavcodec.so"
+      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\build\\intermediates\\cmake\\release\\obj\\x86\\libnative-lib.so",
+      "runtimeFiles": []
     }
   }
 }

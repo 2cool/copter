@@ -43,20 +43,21 @@ void BalanceClass::init()
 	c_pitch = c_roll = 0;
 	Stabilization.init();
 	throttle = 0;
-	pitch_roll_stabKP = 2;
+	
 	propeller_lost[0]= propeller_lost[1] = propeller_lost[2] = propeller_lost[3] = false;
 	//set_pitch_roll_pids(0.0017,  0.0001, 0.2);  //very old
 	old_time = micros_();
 
 	//set_pitch_roll_pids(0.001, 0.001, 0.3);  // 10
 	set_pitch_roll_pids(0.0006, 0.00031, MAX_DELTA);//9
+	pitch_roll_kD = 0.00031;
 
-
-	yaw_stabKP = 2;
+	
 
 	pids[PID_YAW_RATE].kP(0.0017f);  //setup for 9 prop 
 	pids[PID_YAW_RATE].kI(0.0017f);
 	pids[PID_YAW_RATE].imax(-MAX_YAW_DELTA, MAX_YAW_DELTA);
+	yaw_kD = 0.0017;
 
 	delay(1500);
 
@@ -80,11 +81,11 @@ string BalanceClass::get_set(){
 		pids[PID_PITCH_RATE].kP() << "," << \
 		pids[PID_PITCH_RATE].kI() << "," << \
 		pids[PID_PITCH_RATE].imax() << "," << \
-		pitch_roll_stabKP << "," << \
+		pitch_roll_kD << "," << \
 		pids[PID_YAW_RATE].kP() << "," << \
 		pids[PID_YAW_RATE].kI() << "," << \
 		pids[PID_YAW_RATE].imax() << "," << \
-		yaw_stabKP << "," << \
+		yaw_kD << "," << \
 		max_angle;
 	
 	string ret = convert.str();
@@ -107,6 +108,8 @@ void BalanceClass::set(const float *ar, int n){
 			Settings.set(ar[i++], t);
 			pids[PID_PITCH_RATE].kI(t);
 			pids[PID_ROLL_RATE].kI(t);
+
+			Settings.set(ar[i++], pitch_roll_kD);
 			
 			t = pids[PID_PITCH_RATE].imax();
 			Settings.set(ar[i++], t);
@@ -114,7 +117,7 @@ void BalanceClass::set(const float *ar, int n){
 			pids[PID_ROLL_RATE].imax(-t,t);
 			
 
-			Settings.set(ar[i++], pitch_roll_stabKP);
+			
 
 			t = pids[PID_YAW_RATE].kP();
 			Settings.set(ar[i++], t);
@@ -123,14 +126,14 @@ void BalanceClass::set(const float *ar, int n){
 			t = pids[PID_YAW_RATE].kI();
 			Settings.set(ar[i++], t);
 			pids[PID_YAW_RATE].kI(t);
-			
+
+			Settings.set(ar[i++], yaw_kD);
+
 			t = pids[PID_YAW_RATE].imax();
 			Settings.set(ar[i++], t);
 			pids[PID_YAW_RATE].imax(-t,t);
 			
-			t = yaw_stabKP;
-			Settings.set(ar[i++], t);
-			yaw_stabKP = t;
+
 			
 			t = max_angle;
 			Settings.set(ar[i++], t);
@@ -304,16 +307,16 @@ bool BalanceClass::loop()
 			}
 		}
 
-		float t = pitch_roll_stabKP * wrap_180(Mpu.get_pitch() - c_pitch);
+		const float pitch_error = wrap_180(Mpu.get_pitch() - c_pitch);
 		//t *= abs(t);
-		const float pitch_stab_output = f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED); 
+		//const float pitch_stab_output = f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED); 
 		
-		t = pitch_roll_stabKP * (wrap_180(Mpu.get_roll() - c_roll));
+		const float roll_error = wrap_180(Mpu.get_roll() - c_roll);
 		//t *= abs(t);
 
-		const float roll_stab_output = f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED);
+		//const float roll_stab_output = f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED);
 
-		const float yaw_stab_output =  (Autopilot.if_strong_wind() && Autopilot.go2homeState()) ? 0 : f_constrain(yaw_stabKP * wrap_180(-Autopilot.get_yaw() - Mpu.get_yaw()), -MAX_D_YAW_SPEED, MAX_D_YAW_SPEED);
+		const float yaw_error =  (Autopilot.if_strong_wind() && Autopilot.go2homeState()) ? 0 :  wrap_180(-Autopilot.get_yaw() - Mpu.get_yaw());
 
 		//Debug.dump(pitch_stab_output, roll_stab_output, 0, 0);
 
@@ -322,11 +325,15 @@ bool BalanceClass::loop()
 		double dt = (_ct - old_time) * 1e-6;
 		dt = constrain(dt, 0.001, 0.03);
 		old_time = _ct;
-		float pitch_output = pK*pids[PID_PITCH_RATE].get_pid(pitch_stab_output + Mpu.gyroPitch, dt);
+
+
+		float pitch_output = pK * (pids[PID_PITCH_RATE].get_pid(pitch_error, dt) - Mpu.gyroPitch*pitch_roll_kD);
 		pitch_output = constrain(pitch_output, -MAX_DELTA, MAX_DELTA);
-		float roll_output = pK*pids[PID_ROLL_RATE].get_pid(roll_stab_output + Mpu.gyroRoll, dt);
+
+		float roll_output = pK * (pids[PID_ROLL_RATE].get_pid(roll_error , dt) - Mpu.gyroRoll*pitch_roll_kD);
 		roll_output = constrain(roll_output, -MAX_DELTA, MAX_DELTA);
-		float yaw_output = pK*pids[PID_YAW_RATE].get_pid(yaw_stab_output - Mpu.gyroYaw, dt);
+
+		float yaw_output = pK * (pids[PID_YAW_RATE].get_pid(yaw_error, dt) - Mpu.gyroYaw*yaw_kD);
 		yaw_output =  constrain(yaw_output, -MAX_YAW_DELTA, MAX_YAW_DELTA);
 
 #ifdef YAW_OFF

@@ -1,94 +1,43 @@
-
 {
-	"buildFiles" : [ "C:/Users/tcool/copter/RC_FFMPEG/app/CMakeLists.txt" ],
-	"cleanCommands" : 
-	[
-		"F:\\Android\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\debug\\armeabi-v7a --target clean"
-	],
-	"cppFileExtensions" : [ "cpp" ],
-	"libraries" : 
-	{
-		"avcodec-Debug-armeabi-v7a" : 
-		{
-			"abi" : "armeabi-v7a",
-			"artifactName" : "avcodec",
-			"buildType" : "debug",
-			"output" : "C:/Users/tcool/copter/RC_FFMPEG/app/src/main/jniLibs/armeabi-v7a/libavcodec.so",
-			"toolchain" : "539940201"
-		},
-		"avdevice-Debug-armeabi-v7a" : 
-		{
-			"abi" : "armeabi-v7a",
-			"artifactName" : "avdevice",
-			"buildType" : "debug",
-			"output" : "C:/Users/tcool/copter/RC_FFMPEG/app/src/main/jniLibs/armeabi-v7a/libavdevice.so",
-			"toolchain" : "539940201"
-		},
-		"avfilter-Debug-armeabi-v7a" : 
-		{
-			"abi" : "armeabi-v7a",
-			"artifactName" : "avfilter",
-			"buildType" : "debug",
-			"output" : "C:/Users/tcool/copter/RC_FFMPEG/app/src/main/jniLibs/armeabi-v7a/libavfilter.so",
-			"toolchain" : "539940201"
-		},
-		"avformat-Debug-armeabi-v7a" : 
-		{
-			"abi" : "armeabi-v7a",
-			"artifactName" : "avformat",
-			"buildType" : "debug",
-			"output" : "C:/Users/tcool/copter/RC_FFMPEG/app/src/main/jniLibs/armeabi-v7a/libavformat.so",
-			"toolchain" : "539940201"
-		},
-		"avutil-Debug-armeabi-v7a" : 
-		{
-			"abi" : "armeabi-v7a",
-			"artifactName" : "avutil",
-			"buildType" : "debug",
-			"output" : "C:/Users/tcool/copter/RC_FFMPEG/app/src/main/jniLibs/armeabi-v7a/libavutil.so",
-			"toolchain" : "539940201"
-		},
-		"native-lib-Debug-armeabi-v7a" : 
-		{
-			"abi" : "armeabi-v7a",
-			"artifactName" : "native-lib",
-			"buildCommand" : "F:\\Android\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\debug\\armeabi-v7a --target native-lib",
-			"buildType" : "debug",
-			"files" : 
-			[
-				
-				{
-					"flags" : "  --target=armv7-none-linux-androideabi19 --gcc-toolchain=F:/Android/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=F:/Android/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -Dnative_lib_EXPORTS -I..\\..\\..\\..\\src\\main\\jniLibs\\includes  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -frtti -fexceptions -O0 -fno-limit-debug-info  -fPIC    -c ",
-					"src" : "C:/Users/tcool/copter/RC_FFMPEG/app/src/main/cpp/native-lib.cpp",
-					"workingDirectory" : "C:/Users/tcool/copter/RC_FFMPEG/app/.cxx/cmake/debug/armeabi-v7a"
-				}
-			],
-			"output" : "C:/Users/tcool/copter/RC_FFMPEG/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libnative-lib.so",
-			"toolchain" : "539940201"
-		},
-		"swresample-Debug-armeabi-v7a" : 
-		{
-			"abi" : "armeabi-v7a",
-			"artifactName" : "swresample",
-			"buildType" : "debug",
-			"output" : "C:/Users/tcool/copter/RC_FFMPEG/app/src/main/jniLibs/armeabi-v7a/libswresample.so",
-			"toolchain" : "539940201"
-		},
-		"swscale-Debug-armeabi-v7a" : 
-		{
-			"abi" : "armeabi-v7a",
-			"artifactName" : "swscale",
-			"buildType" : "debug",
-			"output" : "C:/Users/tcool/copter/RC_FFMPEG/app/src/main/jniLibs/armeabi-v7a/libswscale.so",
-			"toolchain" : "539940201"
-		}
-	},
-	"toolchains" : 
-	{
-		"539940201" : 
-		{
-			"cCompilerExecutable" : "F:/Android/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
-			"cppCompilerExecutable" : "F:/Android/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
-		}
-	}
+  "stringTable": {
+    "0": "C:/Users/tcool/copter/RC_FFMPEG/app/.cxx/cmake/debug/armeabi-v7a",
+    "1": "--target=armv7-none-linux-androideabi19 --gcc-toolchain=C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dnative_lib_EXPORTS -I../../../../src/main/jniLibs/includes -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security -frtti -fexceptions -O0 -fno-limit-debug-info -fPIC"
+  },
+  "buildFiles": [
+    "C:\\Android\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+    "C:\\Android\\ndk\\21.0.6113669\\build\\cmake\\platforms.cmake",
+    "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "C:\\Android\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\debug\\armeabi-v7a\" clean"
+  ],
+  "buildTargetsCommand": "C:\\Android\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\debug\\armeabi-v7a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "native-lib-Debug-armeabi-v7a": {
+      "buildCommand": "C:\\Android\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\debug\\armeabi-v7a\" native-lib",
+      "buildType": "debug",
+      "toolchain": "2959316625",
+      "abi": "armeabi-v7a",
+      "artifactName": "native-lib",
+      "files": [
+        {
+          "src": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\src\\main\\cpp\\native-lib.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [],
+      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\build\\intermediates\\cmake\\debug\\obj\\armeabi-v7a\\libnative-lib.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "2959316625": {
+      "cppCompilerExecutable": "C:\\Android\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
 }

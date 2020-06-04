@@ -1,5 +1,5 @@
 {
-  "ndkFolder": "F:\\Android\\ndk-bundle",
+  "ndkFolder": "C:\\Android\\ndk-bundle",
   "messages": [
     {
       "level": "INFO",
@@ -15,15 +15,15 @@
     },
     {
       "level": "INFO",
-      "message": "sdkFolder is F:\\Android"
+      "message": "sdkFolder is C:\\Android"
     },
     {
       "level": "INFO",
-      "message": "Considering F:\\Android\\ndk-bundle in SDK ndk-bundle folder"
+      "message": "Considering C:\\Android\\ndk-bundle in SDK ndk-bundle folder"
     },
     {
       "level": "INFO",
-      "message": "No user requested version, choosing F:\\Android\\ndk-bundle which is version 21.0.6113669"
+      "message": "No user requested version, choosing C:\\Android\\ndk-bundle which is version 21.2.6472646"
     }
   ]
 }

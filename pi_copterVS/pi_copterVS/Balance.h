@@ -40,7 +40,7 @@ class BalanceClass
 	float throttle;
 	//float pitch_roll_stabKP, pitch_roll_rateKP, yaw_rateKP,yaw_stabKP,pitch_roll_rateKI,pitch_roll_rateIMAX,yaw_rateKI,yaw_rateIMAX;
 	//float getThrottle();
-	float yaw_stabKP, pitch_roll_stabKP;
+	float yaw_kD, pitch_roll_kD;
 
 	float f_[4];
 

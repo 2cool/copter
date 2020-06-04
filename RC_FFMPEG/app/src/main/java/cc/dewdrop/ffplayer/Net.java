@@ -201,7 +201,7 @@ public class Net {
 
 
 
-        String controller_ip = "192.168.0.2";
+        String controller_ip = "192.168.1.177";
         int sendPort = 9876;
         int recievePort = 9877;
         int updateRate = 60;

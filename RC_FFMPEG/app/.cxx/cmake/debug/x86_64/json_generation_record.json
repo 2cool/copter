@@ -1,26 +1,44 @@
 [
   {
     "level": "INFO",
-    "message": "Start JSON generation. Platform version: 19 min SDK version: x86_64"
+    "message": "Start JSON generation. Platform version: 19 min SDK version: x86_64",
+    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "debug|x86_64"
   },
   {
     "level": "INFO",
-    "message": "No CMake version was specified in build.gradle. Choosing a suitable version."
+    "message": "No CMake version was specified in build.gradle. Using default version 3.10.2.",
+    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "debug|x86_64"
   },
   {
     "level": "INFO",
-    "message": "Trying to locate CMake in local SDK repository."
+    "message": "Trying to locate CMake in local SDK repository.",
+    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "debug|x86_64"
   },
   {
     "level": "INFO",
-    "message": "- CMake found in SDK at \u0027F:\\Android\\cmake\\3.6.4111459\u0027 had version \u00273.6.0\u0027"
+    "message": "- CMake found in SDK at \u0027C:\\Android\\cmake\\3.10.2.4988404\u0027 had version \u00273.10.2\u0027",
+    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "debug|x86_64"
   },
   {
     "level": "INFO",
-    "message": "JSON \u0027C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\debug\\x86_64\\android_gradle_build.json\u0027 was up-to-date"
+    "message": "CMake \u00273.6.0\u0027 found in SDK did not match requested version \u00273.10.2\u0027.",
+    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "debug|x86_64"
   },
   {
     "level": "INFO",
-    "message": "JSON generation completed without problems"
+    "message": "JSON \u0027C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\debug\\x86_64\\android_gradle_build.json\u0027 was up-to-date",
+    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "debug|x86_64"
+  },
+  {
+    "level": "INFO",
+    "message": "JSON generation completed without problems",
+    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "debug|x86_64"
   }
 ]

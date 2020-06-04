@@ -31,11 +31,11 @@ private:
 	
 	float SPEED_Z_CF, SPEED_XY_CF;
 
-	float mc_z,mc_x,mc_y;
+	float z_error,x_error,y_error;
 	float dist2speed_XY;
 	float alt2speedZ;
-	float speed2acc_XY;
-	float speed2acc_Z;
+	float xy_kD;
+	float z_kD;
 
 #define STAB_PIDS 3
 	AP_PID pids[STAB_PIDS];
