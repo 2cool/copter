@@ -86,8 +86,13 @@ void loger() {
 		string t_log = c_log.str();
 		string t_txt = c_txt.str();
 
-		errors+=(remove(t_log.c_str())!=0);
-		(remove(t_txt.c_str())!=0);
+
+		if (remove(t_log.c_str()) != 0)
+			errors++;
+		else {
+			remove((t_log+"i*").c_str());
+			remove(t_txt.c_str());
+		}		
 		if (errors > 50)
 			break;
 	}
@@ -122,7 +127,11 @@ bool LogClass::init(int counter_) {
 	if (writeTelemetry) {
 		run_loging = true;
 		ostringstream convert;
+#ifdef DEBUG
 		convert << "/home/igor/logs/tel_log" << counter << ".log";
+#else
+		convert << "/home/igor/logs/tel_log_real" << counter << ".log";
+#endif
 		this_log_fname = convert.str();
 		cout << "log 2 " << this_log_fname << endl;
 		logfile.open(this_log_fname.c_str(), fstream::in | fstream::out | fstream::trunc);

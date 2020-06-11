@@ -460,7 +460,11 @@ int main(int argc, char* argv[]) {
 
 			
 			if (argv[3][0] == 'f' || argv[3][0] == 'F') {
+#ifdef DEBUG
 				stdout_file_ext = "/home/igor/logs/log_out" + to_string(counter);
+#else
+				stdout_file_ext = "/home/igor/logs/log_out_real" + to_string(counter);
+#endif
 				fname = stdout_file_ext+".txt";
 				out = std::ofstream(fname.c_str()); //откроем файл для вывод
 				coutbuf = std::cout.rdbuf(); //запомним старый буфер

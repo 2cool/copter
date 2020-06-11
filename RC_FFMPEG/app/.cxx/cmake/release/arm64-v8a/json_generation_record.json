@@ -2,415 +2,433 @@
   {
     "level": "INFO",
     "message": "Start JSON generation. Platform version: 19 min SDK version: arm64-v8a",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "No CMake version was specified in build.gradle. Using default version 3.10.2.",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Trying to locate CMake in local SDK repository.",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "- CMake found in SDK at \u0027C:\\Android\\cmake\\3.10.2.4988404\u0027 had version \u00273.10.2\u0027",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "- CMake found in SDK at \u0027C:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\u0027 had version \u00273.10.2\u0027",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "CMake \u00273.6.0\u0027 found in SDK did not match requested version \u00273.10.2\u0027.",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
-    "tag": "release|arm64-v8a"
-  },
-  {
-    "level": "INFO",
-    "message": "rebuilding JSON C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\\android_gradle_build.json due to:",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "rebuilding JSON C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\\android_gradle_build.json due to:",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "- command changed from previous, will remove stale json folder",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "removing stale contents from \u0027C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\u0027",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "- a dependent build file changed",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "created folder \u0027C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\u0027",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "  - C:\\Android\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "executing cmake Executable : C:\\Android\\cmake\\3.10.2.4988404\\bin\\cmake.exe\narguments : \n-HC:\\Users\\tcool\\copter\\RC_FFMPEG\\app\n-DCMAKE_CXX_FLAGS\u003d-frtti -fexceptions\n-DCMAKE_FIND_ROOT_PATH\u003dC:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\prefab\\arm64-v8a\\prefab\n-DCMAKE_BUILD_TYPE\u003dRelease\n-DCMAKE_TOOLCHAIN_FILE\u003dC:\\Android\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake\n-DANDROID_ABI\u003darm64-v8a\n-DANDROID_NDK\u003dC:\\Android\\ndk\\21.0.6113669\n-DANDROID_PLATFORM\u003dandroid-19\n-DCMAKE_ANDROID_ARCH_ABI\u003darm64-v8a\n-DCMAKE_ANDROID_NDK\u003dC:\\Android\\ndk\\21.0.6113669\n-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON\n-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003dC:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\n-DCMAKE_MAKE_PROGRAM\u003dC:\\Android\\cmake\\3.10.2.4988404\\bin\\ninja.exe\n-DCMAKE_SYSTEM_NAME\u003dAndroid\n-DCMAKE_SYSTEM_VERSION\u003d19\n-BC:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\n-GNinja\njvmArgs : \n\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "  - C:\\Android\\ndk\\21.0.6113669\\build\\cmake\\platforms.cmake",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "release|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "  - C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "release|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "removing stale contents from \u0027C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\u0027",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "release|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "created folder \u0027C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\u0027",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "tag": "release|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "executing cmake Executable : C:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\cmake.exe\narguments : \n-HC:\\Users\\Igor\\copter\\RC_FFMPEG\\app\n-DCMAKE_CXX_FLAGS\u003d-frtti -fexceptions\n-DCMAKE_FIND_ROOT_PATH\u003dC:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\prefab\\arm64-v8a\\prefab\n-DCMAKE_BUILD_TYPE\u003dRelease\n-DCMAKE_TOOLCHAIN_FILE\u003dC:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake\n-DANDROID_ABI\u003darm64-v8a\n-DANDROID_NDK\u003dC:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\ndk\\21.0.6113669\n-DANDROID_PLATFORM\u003dandroid-19\n-DCMAKE_ANDROID_ARCH_ABI\u003darm64-v8a\n-DCMAKE_ANDROID_NDK\u003dC:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\ndk\\21.0.6113669\n-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON\n-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003dC:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\n-DCMAKE_MAKE_PROGRAM\u003dC:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe\n-DCMAKE_SYSTEM_NAME\u003dAndroid\n-DCMAKE_SYSTEM_VERSION\u003d19\n-BC:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\n-GNinja\njvmArgs : \n\n",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "[\u003d\u003d \"CMake Server\" \u003d\u003d[\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"supportedProtocolVersions\":[{\"isExperimental\":true,\"major\":1,\"minor\":1}],\"type\":\"hello\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "]\u003d\u003d \"CMake Server\" \u003d\u003d]\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "{\n  \"type\": \"handshake\",\n  \"cookie\": \"gradle-cmake-cookie\",\n  \"protocolVersion\": {\n    \"isExperimental\": true,\n    \"major\": 1,\n    \"minor\": 1\n  },\n  \"sourceDirectory\": \"C:/Users/tcool/copter/RC_FFMPEG/app\",\n  \"buildDirectory\": \"C:/Users/tcool/copter/RC_FFMPEG/app/.cxx/cmake/release/arm64-v8a\",\n  \"generator\": \"Ninja\"\n}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "{\n  \"type\": \"handshake\",\n  \"cookie\": \"gradle-cmake-cookie\",\n  \"protocolVersion\": {\n    \"isExperimental\": true,\n    \"major\": 1,\n    \"minor\": 1\n  },\n  \"sourceDirectory\": \"C:/Users/Igor/copter/RC_FFMPEG/app\",\n  \"buildDirectory\": \"C:/Users/Igor/copter/RC_FFMPEG/app/.cxx/cmake/release/arm64-v8a\",\n  \"generator\": \"Ninja\"\n}\n",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"gradle-cmake-cookie\",\"inReplyTo\":\"handshake\",\"type\":\"reply\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "{\n  \"type\": \"configure\",\n  \"cacheArguments\": [\n    \"\",\n    \"-DCMAKE_CXX_FLAGS\\u003d-frtti -fexceptions\",\n    \"-DCMAKE_FIND_ROOT_PATH\\u003dC:\\\\Users\\\\tcool\\\\copter\\\\RC_FFMPEG\\\\app\\\\.cxx\\\\cmake\\\\release\\\\prefab\\\\arm64-v8a\\\\prefab\",\n    \"-DCMAKE_BUILD_TYPE\\u003dRelease\",\n    \"-DCMAKE_TOOLCHAIN_FILE\\u003dC:\\\\Android\\\\ndk\\\\21.0.6113669\\\\build\\\\cmake\\\\android.toolchain.cmake\",\n    \"-DANDROID_ABI\\u003darm64-v8a\",\n    \"-DANDROID_NDK\\u003dC:\\\\Android\\\\ndk\\\\21.0.6113669\",\n    \"-DANDROID_PLATFORM\\u003dandroid-19\",\n    \"-DCMAKE_ANDROID_ARCH_ABI\\u003darm64-v8a\",\n    \"-DCMAKE_ANDROID_NDK\\u003dC:\\\\Android\\\\ndk\\\\21.0.6113669\",\n    \"-DCMAKE_EXPORT_COMPILE_COMMANDS\\u003dON\",\n    \"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\\u003dC:\\\\Users\\\\tcool\\\\copter\\\\RC_FFMPEG\\\\app\\\\build\\\\intermediates\\\\cmake\\\\release\\\\obj\\\\arm64-v8a\",\n    \"-DCMAKE_MAKE_PROGRAM\\u003dC:\\\\Android\\\\cmake\\\\3.10.2.4988404\\\\bin\\\\ninja.exe\",\n    \"-DCMAKE_SYSTEM_NAME\\u003dAndroid\",\n    \"-DCMAKE_SYSTEM_VERSION\\u003d19\"\n  ]\n}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "{\n  \"type\": \"configure\",\n  \"cacheArguments\": [\n    \"\",\n    \"-DCMAKE_CXX_FLAGS\\u003d-frtti -fexceptions\",\n    \"-DCMAKE_FIND_ROOT_PATH\\u003dC:\\\\Users\\\\Igor\\\\copter\\\\RC_FFMPEG\\\\app\\\\.cxx\\\\cmake\\\\release\\\\prefab\\\\arm64-v8a\\\\prefab\",\n    \"-DCMAKE_BUILD_TYPE\\u003dRelease\",\n    \"-DCMAKE_TOOLCHAIN_FILE\\u003dC:\\\\Users\\\\Igor\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\ndk\\\\21.0.6113669\\\\build\\\\cmake\\\\android.toolchain.cmake\",\n    \"-DANDROID_ABI\\u003darm64-v8a\",\n    \"-DANDROID_NDK\\u003dC:\\\\Users\\\\Igor\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\ndk\\\\21.0.6113669\",\n    \"-DANDROID_PLATFORM\\u003dandroid-19\",\n    \"-DCMAKE_ANDROID_ARCH_ABI\\u003darm64-v8a\",\n    \"-DCMAKE_ANDROID_NDK\\u003dC:\\\\Users\\\\Igor\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\ndk\\\\21.0.6113669\",\n    \"-DCMAKE_EXPORT_COMPILE_COMMANDS\\u003dON\",\n    \"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\\u003dC:\\\\Users\\\\Igor\\\\copter\\\\RC_FFMPEG\\\\app\\\\build\\\\intermediates\\\\cmake\\\\release\\\\obj\\\\arm64-v8a\",\n    \"-DCMAKE_MAKE_PROGRAM\\u003dC:\\\\Users\\\\Igor\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\cmake\\\\3.10.2.4988404\\\\bin\\\\ninja.exe\",\n    \"-DCMAKE_SYSTEM_NAME\\u003dAndroid\",\n    \"-DCMAKE_SYSTEM_VERSION\\u003d19\"\n  ]\n}\n",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Check for working C compiler: C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Check for working C compiler: C:/Users/Igor/AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe\",\"type\":\"message\"}\n",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "Check for working C compiler: C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "Check for working C compiler: C:/Users/Igor/AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":33,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Check for working C compiler: C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe -- works\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Check for working C compiler: C:/Users/Igor/AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe -- works\",\"type\":\"message\"}\n",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "Check for working C compiler: C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe -- works",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "Check for working C compiler: C:/Users/Igor/AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe -- works",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting C compiler ABI info\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Detecting C compiler ABI info",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":65,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting C compiler ABI info - done\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Detecting C compiler ABI info - done",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting C compile features\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Detecting C compile features",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":96,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":126,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":155,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting C compile features - done\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Detecting C compile features - done",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Check for working CXX compiler: C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Check for working CXX compiler: C:/Users/Igor/AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe\",\"type\":\"message\"}\n",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "Check for working CXX compiler: C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "Check for working CXX compiler: C:/Users/Igor/AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":184,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Check for working CXX compiler: C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -- works\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Check for working CXX compiler: C:/Users/Igor/AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -- works\",\"type\":\"message\"}\n",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "Check for working CXX compiler: C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -- works",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "Check for working CXX compiler: C:/Users/Igor/AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -- works",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting CXX compiler ABI info\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Detecting CXX compiler ABI info",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":211,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting CXX compiler ABI info - done\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Detecting CXX compiler ABI info - done",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting CXX compile features\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Detecting CXX compile features",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":237,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":262,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":287,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":311,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting CXX compile features - done\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Detecting CXX compile features - done",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":1000,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Configuring done\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Configuring done",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"type\":\"reply\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"type\":\"compute\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"compute\",\"progressCurrent\":1000,\"progressMaximum\":1000,\"progressMessage\":\"Generating\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"compute\",\"message\":\"Generating done\",\"type\":\"message\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "Generating done",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"cookie\":\"\",\"inReplyTo\":\"compute\",\"type\":\"reply\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"type\":\"cmakeInputs\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "{\"buildFiles\":[{\"isCMake\":true,\"isTemporary\":false,\"sources\":[\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystem.cmake.in\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCCompiler.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-C.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCXXCompiler.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-CXX.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCCompiler.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompilerABI.c\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCXXCompiler.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake\",\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in\"]},{\"isCMake\":false,\"isTemporary\":false,\"sources\":[\"CMakeLists.txt\",\"C:/Android/ndk/21.0.6113669/build/cmake/android.toolchain.cmake\",\"C:/Android/ndk/21.0.6113669/build/cmake/platforms.cmake\",\"C:/Android/ndk/21.0.6113669/build/cmake/android.toolchain.cmake\"]},{\"isCMake\":false,\"isTemporary\":true,\"sources\":[\".cxx/cmake/release/arm64-v8a/CMakeFiles/3.10.2/CMakeSystem.cmake\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/3.10.2/CMakeCCompiler.cmake\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/3.10.2/CMakeCXXCompiler.cmake\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.c\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.c\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.c\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/3.10.2/CMakeCCompiler.cmake\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.cxx\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.cxx\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.cxx\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.cxx\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/3.10.2/CMakeCXXCompiler.cmake\"]}],\"cmakeRootDirectory\":\"C:/Android/cmake/3.10.2.4988404/share/cmake-3.10\",\"cookie\":\"\",\"inReplyTo\":\"cmakeInputs\",\"sourceDirectory\":\"C:/Users/tcool/copter/RC_FFMPEG/app\",\"type\":\"reply\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "{\"buildFiles\":[{\"isCMake\":true,\"isTemporary\":false,\"sources\":[\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystem.cmake.in\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCCompiler.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-C.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCXXCompiler.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-CXX.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCCompiler.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompilerABI.c\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCXXCompiler.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake\",\"../../../AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in\"]},{\"isCMake\":false,\"isTemporary\":false,\"sources\":[\"CMakeLists.txt\",\"../../../AppData/Local/Android/Sdk/ndk/21.0.6113669/build/cmake/android.toolchain.cmake\",\"../../../AppData/Local/Android/Sdk/ndk/21.0.6113669/build/cmake/platforms.cmake\",\"../../../AppData/Local/Android/Sdk/ndk/21.0.6113669/build/cmake/android.toolchain.cmake\"]},{\"isCMake\":false,\"isTemporary\":true,\"sources\":[\".cxx/cmake/release/arm64-v8a/CMakeFiles/3.10.2/CMakeSystem.cmake\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/3.10.2/CMakeCCompiler.cmake\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/3.10.2/CMakeCXXCompiler.cmake\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.c\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.c\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.c\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/3.10.2/CMakeCCompiler.cmake\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.cxx\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.cxx\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.cxx\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/feature_tests.cxx\",\".cxx/cmake/release/arm64-v8a/CMakeFiles/3.10.2/CMakeCXXCompiler.cmake\"]}],\"cmakeRootDirectory\":\"C:/Users/Igor/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10\",\"cookie\":\"\",\"inReplyTo\":\"cmakeInputs\",\"sourceDirectory\":\"C:/Users/Igor/copter/RC_FFMPEG/app\",\"type\":\"reply\"}\n",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "{\"type\":\"codemodel\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "{\"configurations\":[{\"name\":\"Release\",\"projects\":[{\"buildDirectory\":\"C:/Users/tcool/copter/RC_FFMPEG/app/.cxx/cmake/release/arm64-v8a\",\"name\":\"Project\",\"sourceDirectory\":\"C:/Users/tcool/copter/RC_FFMPEG/app\",\"targets\":[{\"artifacts\":[\"C:/Users/tcool/copter/RC_FFMPEG/app/build/intermediates/cmake/release/obj/arm64-v8a/libnative-lib.so\"],\"buildDirectory\":\"C:/Users/tcool/copter/RC_FFMPEG/app/.cxx/cmake/release/arm64-v8a\",\"fileGroups\":[{\"compileFlags\":\"-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE\u003d2 -Wformat -Werror\u003dformat-security  -frtti -fexceptions -O2 -DNDEBUG  -fPIC  \",\"defines\":[\"native_lib_EXPORTS\"],\"includePath\":[{\"path\":\"C:/Users/tcool/copter/RC_FFMPEG/app/src/main/jniLibs/includes\"}],\"isGenerated\":false,\"language\":\"CXX\",\"sources\":[\"src/main/cpp/native-lib.cpp\"]}],\"fullName\":\"libnative-lib.so\",\"linkFlags\":\"-Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments\",\"linkLibraries\":\"..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libavutil.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libswresample.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libswscale.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libavcodec.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libavformat.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libavfilter.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libavdevice.so -llog -landroid -latomic -lm\",\"linkerLanguage\":\"CXX\",\"name\":\"native-lib\",\"sourceDirectory\":\"C:/Users/tcool/copter/RC_FFMPEG/app\",\"sysroot\":\"C:/Android/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot\",\"type\":\"SHARED_LIBRARY\"}]}]}],\"cookie\":\"\",\"inReplyTo\":\"codemodel\",\"type\":\"reply\"}\n",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "{\"configurations\":[{\"name\":\"Release\",\"projects\":[{\"buildDirectory\":\"C:/Users/Igor/copter/RC_FFMPEG/app/.cxx/cmake/release/arm64-v8a\",\"name\":\"Project\",\"sourceDirectory\":\"C:/Users/Igor/copter/RC_FFMPEG/app\",\"targets\":[{\"artifacts\":[\"C:/Users/Igor/copter/RC_FFMPEG/app/build/intermediates/cmake/release/obj/arm64-v8a/libnative-lib.so\"],\"buildDirectory\":\"C:/Users/Igor/copter/RC_FFMPEG/app/.cxx/cmake/release/arm64-v8a\",\"fileGroups\":[{\"compileFlags\":\"-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE\u003d2 -Wformat -Werror\u003dformat-security  -frtti -fexceptions -O2 -DNDEBUG  -fPIC  \",\"defines\":[\"native_lib_EXPORTS\"],\"includePath\":[{\"path\":\"C:/Users/Igor/copter/RC_FFMPEG/app/src/main/jniLibs/includes\"}],\"isGenerated\":false,\"language\":\"CXX\",\"sources\":[\"src/main/cpp/native-lib.cpp\"]}],\"fullName\":\"libnative-lib.so\",\"linkFlags\":\"-Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments\",\"linkLibraries\":\"..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libavutil.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libswresample.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libswscale.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libavcodec.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libavformat.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libavfilter.so ..\\\\..\\\\..\\\\..\\\\src\\\\main\\\\jniLibs\\\\arm64-v8a\\\\libavdevice.so -llog -landroid -latomic -lm\",\"linkerLanguage\":\"CXX\",\"name\":\"native-lib\",\"sourceDirectory\":\"C:/Users/Igor/copter/RC_FFMPEG/app\",\"sysroot\":\"C:/Users/Igor/AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot\",\"type\":\"SHARED_LIBRARY\"}]}]}],\"cookie\":\"\",\"inReplyTo\":\"codemodel\",\"type\":\"reply\"}\n",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "done executing cmake",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "write build output C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\\build_output.txt",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "write build output C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\\build_output.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
-    "message": "write command file C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\\build_command.txt",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "message": "write command file C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\arm64-v8a\\build_command.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   },
   {
     "level": "INFO",
     "message": "JSON generation completed without problems",
-    "file": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
+    "file": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt",
     "tag": "release|arm64-v8a"
   }
 ]

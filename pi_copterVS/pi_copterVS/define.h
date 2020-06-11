@@ -5,6 +5,7 @@
 #include "glob_header.h" 
 #include "WProgram.h"
 
+
 //#define OFF_MOTOR_IF_LOST_CONNECTION  
 //#define OFF_TIMELAG
 //-----------------------------------------------------------------
@@ -48,7 +49,7 @@
 #define MAX_DIST_ERROR_TO_ACT 50
 #define NO_GPS__DATA 10e3
 
-#define MIN_ACUR_HOR_POS_2_START_ 5
+#define MIN_ACUR_HOR_POS_2_START_ 15
 #define MIN_ACUR_HOR_POS_4_JAMM 30
 
 

@@ -49,15 +49,15 @@ void BalanceClass::init()
 	old_time = micros_();
 
 	//set_pitch_roll_pids(0.001, 0.001, 0.3);  // 10
-	set_pitch_roll_pids(0.0006, 0.00031, MAX_DELTA);//9
-	pitch_roll_kD = 0.00031;
+	set_pitch_roll_pids(0.0016, 0.00065, MAX_DELTA);//9
+	pitch_roll_kD = 0.00065;
 
 	
 
-	pids[PID_YAW_RATE].kP(0.0017f);  //setup for 9 prop 
-	pids[PID_YAW_RATE].kI(0.0017f);
+	pids[PID_YAW_RATE].kP(0.004f);  //setup for 9 prop 
+	pids[PID_YAW_RATE].kI(0.004f);
 	pids[PID_YAW_RATE].imax(-MAX_YAW_DELTA, MAX_YAW_DELTA);
-	yaw_kD = 0.0017;
+	yaw_kD =  0.004;
 
 	delay(1500);
 
@@ -80,12 +80,13 @@ string BalanceClass::get_set(){
 	convert << \
 		pids[PID_PITCH_RATE].kP() << "," << \
 		pids[PID_PITCH_RATE].kI() << "," << \
-		pids[PID_PITCH_RATE].imax() << "," << \
 		pitch_roll_kD << "," << \
+		pids[PID_PITCH_RATE].imax() << "," << \
 		pids[PID_YAW_RATE].kP() << "," << \
 		pids[PID_YAW_RATE].kI() << "," << \
-		pids[PID_YAW_RATE].imax() << "," << \
 		yaw_kD << "," << \
+		pids[PID_YAW_RATE].imax() << "," << \
+		
 		max_angle;
 	
 	string ret = convert.str();
@@ -327,13 +328,13 @@ bool BalanceClass::loop()
 		old_time = _ct;
 
 
-		float pitch_output = pK * (pids[PID_PITCH_RATE].get_pid(pitch_error, dt) - Mpu.gyroPitch*pitch_roll_kD);
+		float pitch_output = pK * (pids[PID_PITCH_RATE].get_pid(pitch_error, dt) + Mpu.gyroPitch*pitch_roll_kD);
 		pitch_output = constrain(pitch_output, -MAX_DELTA, MAX_DELTA);
 
-		float roll_output = pK * (pids[PID_ROLL_RATE].get_pid(roll_error , dt) - Mpu.gyroRoll*pitch_roll_kD);
-		roll_output = constrain(roll_output, -MAX_DELTA, MAX_DELTA);
+		float roll_output = pK * (pids[PID_ROLL_RATE].get_pid(roll_error , dt) + Mpu.gyroRoll*pitch_roll_kD);
+		roll_output =  constrain(roll_output, -MAX_DELTA, MAX_DELTA);
 
-		float yaw_output = pK * (pids[PID_YAW_RATE].get_pid(yaw_error, dt) - Mpu.gyroYaw*yaw_kD);
+		float yaw_output =  pK* (pids[PID_YAW_RATE].get_pid(yaw_error, dt) - Mpu.gyroYaw * yaw_kD);
 		yaw_output =  constrain(yaw_output, -MAX_YAW_DELTA, MAX_YAW_DELTA);
 
 #ifdef YAW_OFF

@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/tcool/copter/RC_FFMPEG/app
+# Install script for directory: C:/Users/Igor/copter/RC_FFMPEG/app
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/tcool/copter/RC_FFMPEG/app/.cxx/cmake/debug/x86/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/Igor/copter/RC_FFMPEG/app/.cxx/cmake/debug/x86/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

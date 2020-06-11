@@ -19,8 +19,8 @@
 #include "Settings.h"
 
 
-float Z_FILTER = 0.33;
-float XY_FILTER = 0.33;
+float Z_FILTER = 0.3;
+float XY_FILTER = 1;
 void StabilizationClass::setMaxAng() {
 	set_acc_xy_pid_imax(Balance.get_max_angle());
 }
@@ -29,25 +29,29 @@ void StabilizationClass::setMinMaxI_Thr() {
 }
 void StabilizationClass::init(){
 
-	xy_kD = 3;
-	z_kD=0.025;
+	
 
-	dist2speed_XY = 0.2f;//0.5 
-	set_acc_xy_pid_kp(6);
-	set_acc_xy_pid_kI(3);
+	dist2speed_XY =  0.2f;//0.5 
+	set_acc_xy_pid_kp( 3.5);
+	set_acc_xy_pid_kI( 0.1);
+	xy_kD = 5;
 	set_acc_xy_pid_imax(Balance.get_max_angle());
 
+	
 	def_max_speedXY=max_speed_xy = 10;
-	min_stab_hor_speed = 0.5;
-	min_stab_ver_speed = 1;
-	def_max_speedZ_P = max_speedZ_P =  3;
-	def_max_speedZ_M = max_speedZ_M = -3;
+	min_stab_hor_speed = 10;
+	//-------------------------------------------
+
+	min_stab_ver_speed = 3;
+	def_max_speedZ_P = max_speedZ_P =  5;
+	def_max_speedZ_M = max_speedZ_M = -5;
 	//--------------------------------------------------------------------------
 
-	alt2speedZ = 0.2;
-	pids[ACC_Z_PID].kP( 0.05 );
-	pids[ACC_Z_PID].kI( 0.025 );
+	alt2speedZ = 0.3;
+	pids[ACC_Z_PID].kP( 0.06 );
+	pids[ACC_Z_PID].kI( 0.03 );
 
+	z_kD=0.03;
 	setMinMaxI_Thr();
 	
 	//----------------------------------------------------------------------------
@@ -76,9 +80,8 @@ void StabilizationClass::setDefaultMaxSpeeds(){//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 void StabilizationClass::max_speed_limiter(float &x, float &y) {
 	const float max_ = max(abs(x), abs(y));
+
 	if (max_ > 0) {
-		x = x / max_ * max_speed_xy;
-		y = y / max_ * max_speed_xy;
 		const float speed2 = (x * x + y * y);
 		const float maxSpeed2 = max_speed_xy * max_speed_xy;
 		if (speed2 > maxSpeed2) {
@@ -213,10 +216,12 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 			need_speedY = (needYV - ty);
 			
 		}// a=v*v/(2s)
+		float tttx = need_speedX;
+		float ttty = need_speedY;
 		dist2speed(need_speedX, need_speedY);
 
-		x_error += (Mpu.get_Est_SpeedX() - need_speedX - x_error) * XY_FILTER;
-		y_error += (Mpu.get_Est_SpeedY() - need_speedY - y_error) * XY_FILTER;
+		x_error += ((Mpu.get_Est_SpeedX() - need_speedX) - x_error) * XY_FILTER;
+		y_error += ((Mpu.get_Est_SpeedY() - need_speedY) - y_error) * XY_FILTER;
 
 		const float w_pitch = -(pids[ACC_X_PID].get_pid(x_error, Mpu.get_dt())) - Mpu.get_Est_accX() * xy_kD;
 		const float w_roll = pids[ACC_Y_PID].get_pid(y_error, Mpu.get_dt()) + Mpu.get_Est_accY() * xy_kD;
@@ -227,9 +232,8 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		roll = (float)(Mpu.cosYaw*w_roll + Mpu.sinYaw*w_pitch);
 
 
-		//Debug.dump(Mpu.get_Est_accX(), Mpu.get_Est_accY(), pitch, roll);
-		//Debug.load(0, pitch, roll);
-		//Debug.dump();
+		//Debug.dump(need_speedX, need_speedY, tttx, ttty);
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -243,9 +247,9 @@ float StabilizationClass::Z(){
 
 	//mc_z += (need_accZ - Mpu.get_Est_accZ() - mc_z) * Z_FILTER;
 
-	float fZ = (HOVER_THROTHLE + pids[ACC_Z_PID].get_pid(z_error, Mpu.get_dt()) - Mpu.get_Est_accZ()*z_kD) * Balance.powerK();
+	float fZ = (HOVER_THROTHLE + pids[ACC_Z_PID].get_pid(z_error, Mpu.get_dt()) - Mpu.get_Est_accZ() * z_kD);// *Balance.powerK();
 
-
+	//Debug.dump(Mpu.get_Est_accZ(), fZ, Mpu.get_Est_SpeedZ(), need_speedZ);
 	//mc_z += (need_speedZ - Mpu.get_Est_SpeedZ() - mc_z)*Z_FILTER;
 	//float fZ = HOVER_THROTHLE +  pids[SPEED_Z_PID].get_pid(mc_z, Mpu.get_dt())*Balance.powerK();
 	return fZ;
