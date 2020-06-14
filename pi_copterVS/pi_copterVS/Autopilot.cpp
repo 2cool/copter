@@ -91,7 +91,7 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	fall_thr = FALLING_THROTTLE;
 	sens_z_p = 5;
 	sens_z_m = 5;
-	sens_xy = 10.0/45.0;
+	sens_xy = Stabilization.get_def_max_speedXY()/Balance.get_max_angle();
 
 	newData = false;
 
@@ -177,23 +177,16 @@ void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 //-------------------------------------------------------------------------
 void AutopilotClass::smart_commander(const float dt){
 
-		const float addX = sens_xy*(Commander.getPitch());
-		const float addY = -sens_xy*(Commander.getRoll());
-		const float cyaw = Commander.getYaw()*GRAD2RAD;
-		const float cosL = (float)cos(cyaw);
-		const float sinL = (float)sin(cyaw);
-		float speedX = addX * cosL + addY *sinL;
-		float speedY = -(addX * sinL - addY *cosL);
+	const float addX = sens_xy* (Commander.getPitch());
+	const float addY = -sens_xy*(Commander.getRoll());
+	const float cyaw = Commander.getYaw()*GRAD2RAD;
+	const float cosL = (float)cos(cyaw);
+	const float sinL = (float)sin(cyaw);
+	float speedX = addX * cosL + addY *sinL;
+	float speedY = -(addX * sinL - addY *cosL);
 
-		Stabilization.add2NeedPos(speedX, speedY, dt);
+	Stabilization.add2NeedPos(speedX, speedY, dt);
 
-	
-
-		
-	//}
-	//else{
-	//	GPS.loc.setSpeedZero();
-	//}
 }
 
 static int32_t last_beep__time = 0;
@@ -366,7 +359,7 @@ void AutopilotClass::log() {
 
 
 void AutopilotClass::set_sensXY(const float max_speed) {
-	sens_xy=max_speed / 45;
+	sens_xy=max_speed / Balance.get_max_angle();
 }
 
 void AutopilotClass::set_sensZ(const float speed_P, const float speed_M) {

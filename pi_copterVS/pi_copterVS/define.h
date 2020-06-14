@@ -25,7 +25,6 @@
 
 
 #define WORK_WITH_WIFI
-#define LED_ON
 #define LOST_BEEP
 
 #define  ARDUINO_ADDR 9
@@ -44,7 +43,6 @@
 //#define ON_MAX_G_MOTORS_OFF
 #endif
 
-//#define MAX_HIGHT_ERROR_TO_FALL 100
 #define MAX_DIST_ERROR_4_PLACE_OVER_ALT 200
 #define MAX_DIST_ERROR_TO_ACT 50
 #define NO_GPS__DATA 10e3
@@ -55,8 +53,6 @@
 
 #define MAX_ANGLE 35
 #define MIN_ANGLE 15
-#define COS_MIN_ANGLE 0.966f
-
 
 #define DOWN_IF_HIGHER_THEN_ON_FLY_TO_HOME 200
 #define HIGHT_TO_LIFT_ON_TO_FLY_TO_HOME 80

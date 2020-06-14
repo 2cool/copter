@@ -280,9 +280,6 @@ bool BalanceClass::loop()
 			throttle = f_constrain(throttle, c_min_throttle, OVER_THROTTLE);
 			t_max_angle = max_angle;
 		}
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		if (throttle > 0.68)
-			throttle = 0.68;
 
 		//Debug.load(0, true_throttle, throttle);
 		//Debug.dump();
@@ -307,7 +304,7 @@ bool BalanceClass::loop()
 				c_roll *= k;
 			}
 		}
-
+		//Debug.dump(c_pitch, c_roll, t_max_angle, 0);
 		const float pitch_error = wrap_180(Mpu.get_pitch() - c_pitch);
 		//t *= abs(t);
 		//const float pitch_stab_output = f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED); 

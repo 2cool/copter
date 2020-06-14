@@ -269,7 +269,7 @@ bool MpuClass::loop() {
 	time = micros_();
 	mpu_dt = (float)(time - oldmpuTime) * 1e-6;
 	oldmpuTime = time;
-	mpu_dt = 0.01;
+	//mpu_dt = 0.01;
 	pitch=Emu.get_pitch();
 	roll = Emu.get_roll();
 	gyroPitch = Emu.get_gyroPitch();

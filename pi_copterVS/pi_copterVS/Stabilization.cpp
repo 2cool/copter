@@ -33,7 +33,7 @@ void StabilizationClass::init(){
 
 	dist2speed_XY =  0.2f;//0.5 
 	set_acc_xy_pid_kp( 3.5);
-	set_acc_xy_pid_kI( 0.1);
+	set_acc_xy_pid_kI( 1.7);
 	xy_kD = 5;
 	set_acc_xy_pid_imax(Balance.get_max_angle());
 
@@ -153,8 +153,6 @@ void StabilizationClass::set_max_sped_ver(float &maxP, float &maxM, bool only_te
 	}
 }
 void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
-
-
 	max_speed_xy = (speedX == 0 && speedY == 0) ? min_stab_hor_speed : sqrt(speedX * speedX + speedY * speedY);
 	if (max_speed_xy > def_max_speedXY)
 		max_speed_xy = def_max_speedXY;
@@ -193,6 +191,7 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 		needYR += speedY * dt;
 		needYV = needYR + distY;
 	}
+	
 }
 float StabilizationClass::get_dist2goal(){
 	double dx= Mpu.get_Est_X() - needXV;
@@ -232,7 +231,7 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		roll = (float)(Mpu.cosYaw*w_roll + Mpu.sinYaw*w_pitch);
 
 
-		//Debug.dump(need_speedX, need_speedY, tttx, ttty);
+		//Debug.dump(need_speedX, x_error, Mpu.get_Est_SpeedX(), pitch);
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

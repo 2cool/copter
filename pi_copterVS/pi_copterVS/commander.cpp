@@ -220,7 +220,7 @@ bool CommanderClass::input(){
 		i += 2;
 		mask ^= get16to8bMask(i_roll);
 
-
+#define CONTROL_MAX_ANGLE  45.0f
 		if (mask == sec_mask) {
 
 
@@ -234,9 +234,10 @@ bool CommanderClass::input(){
 			throttle = 0.00003125f*(float)i_throttle;
 			yaw = -ANGK*(float)i_yaw;
 			yaw_offset = ANGK*(float)i_yaw_offset;
-			pitch = ANGK*(float)i_pitch;
-		
-			roll = ANGK*(float)i_roll;
+			const float angle_k = Balance.get_max_angle() * (1.0f / CONTROL_MAX_ANGLE);
+			pitch = angle_k * ANGK*(float)i_pitch;
+			roll = angle_k * ANGK*(float)i_roll;
+
 			if ((i + 3) < shmPTR->commander_buf_len) {
 				string msg = "";
 				msg += *(buf + i++);
@@ -267,8 +268,8 @@ bool CommanderClass::input(){
 					i += 2;
 				}
 			}
-			//Debug.load(0, pitch, roll);
-			//Debug.dump();
+
+			//Debug.dump( pitch, roll,yaw,yaw_offset);
 		}
 		else {
 			cout << "COMMANDER ERROR\n";
