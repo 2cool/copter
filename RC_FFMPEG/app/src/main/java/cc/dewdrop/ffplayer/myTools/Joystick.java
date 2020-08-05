@@ -3,6 +3,7 @@ package cc.dewdrop.ffplayer.myTools;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.MotionEvent;
 
 public class Joystick {
@@ -11,7 +12,7 @@ public class Joystick {
     private boolean return_backX,return_backY, block_X, block_Y;
     private float x,y,size;
     private String label="";
-    private float trackX,trackY,old_posX,old_posY,shiftX,shiftY;
+    private float trackX,trackY,old_posX,old_posY,shiftX,shiftY,double_t_trackX,double_t_trackY;
     private float j_x,j_y;
     private int index;
 
@@ -56,6 +57,37 @@ public class Joystick {
             return true;
         }else
             return false;
+    }
+    private int double_tap;
+    private long touchUPtime;
+
+    public boolean double_touch=false;
+
+    private void double_touch(MotionEvent event){
+        int pointerIndex = event.getActionIndex();
+        final float gx = event.getX(pointerIndex);
+        final float gy = event.getY(pointerIndex);
+        double_tap+= 1;
+
+        if (System.currentTimeMillis() - touchUPtime > 500)
+            touchUPtime = 0;
+        if (touchUPtime == 0 || System.currentTimeMillis() - touchUPtime > 500) {
+            touchUPtime = System.currentTimeMillis();
+
+        } else if (double_tap >= 2) {
+            if (System.currentTimeMillis() - touchUPtime< 500) {
+                Log.d("TELE", " OK " + Math.abs(double_t_trackX-gx)+Math.abs(double_t_trackY-gy));
+                double_touch=(Math.abs(double_t_trackX-gx)+Math.abs(double_t_trackY-gy))<30;
+                double_tap = 0;
+                touchUPtime = 0;
+            } else {
+                double_tap = 1;
+                touchUPtime = System.currentTimeMillis();
+            }
+
+        }
+
+
     }
     private void end(){
         index=-1;
@@ -112,8 +144,12 @@ public class Joystick {
                 if (index<=0 && gx >= x && gx <= x + size && gy >= y && gy <= y + size) {
                     end();
                     index=pointerIndex;
-                    trackX=gx;
-                    trackY=gy;
+                    trackX = gx;
+                    trackY = gy;
+                    if (double_tap == 0){
+                        double_t_trackX = gx;
+                        double_t_trackY = gy;
+                    }
                     if (!block_X){
                         shiftX = gx - old_posX;//??
                         old_posX=gx;
@@ -127,11 +163,15 @@ public class Joystick {
                 break;
             }
             case MotionEvent.ACTION_UP: // прерывание последнего касания
+                double_touch(event);
                 end();
+
                 break;
             case MotionEvent.ACTION_POINTER_UP: // прерывания касаний
                 if (index==event.getActionIndex()){
+                    double_touch(event);
                     end();
+
                     ret=true;
                 }
                 break;
@@ -141,6 +181,7 @@ public class Joystick {
                 if (index >= 0) {
                     trackX = event.getX(index);
                     trackY = event.getY(index);
+
                     if (!block_X) {
 
                         if (setJX(trackX - shiftX)) {

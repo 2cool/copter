@@ -3,7 +3,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <RemoteDebuggingMode>gdb</RemoteDebuggingMode>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
-    <RemoteTarget>-11341636;192.168.1.112 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteTarget>322596058;192.168.0.122 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggingTarget>322596058;192.168.0.122 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
+    <RemoteDebuggerCommandArguments>300 10  n n y n n n</RemoteDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <RemoteDebuggingMode>gdbserver</RemoteDebuggingMode>

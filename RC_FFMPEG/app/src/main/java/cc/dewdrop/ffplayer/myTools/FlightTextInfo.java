@@ -61,7 +61,7 @@ public class FlightTextInfo {
         }
         txt.setTextSize(25);
         Paint txt2=new Paint(txt);
-        txt2.setColor(Color.GREEN);
+        txt2.setColor(0xff007700);
         for (int i=0; i<FIELDS; i++) {
             if (i==1)
                 paint[i] = new Paint(txt2);

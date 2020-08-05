@@ -548,7 +548,7 @@ public class DrawMap extends View {
 
         Paint black=new Paint();
         if (type==7)
-            black.setColor(Color.GREEN);
+            black.setColor(0xff007700);
         else
             black.setColor(Color.BLACK);
 

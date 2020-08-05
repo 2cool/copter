@@ -66,13 +66,13 @@ public class Monitor {
         this.bm=bm;
         this.cmps=cmps;
         white = new Paint();
-        white.setColor(Color.WHITE);
+        white.setColor(0xff007700);
         white.setStrokeWidth(2);
         white.setTextSize(size/6);
         //   white.setAlpha(255);
 
         green=new Paint();
-        green.setColor(Color.GREEN);
+        green.setColor(0xff007700);
         green.setStrokeWidth(3);
 
         red=new Paint();
@@ -111,7 +111,7 @@ public class Monitor {
                 bm.getWidth(),
                 matrix,
                 true);
-        c.drawBitmap(cropped2, xpos - cropped2.getWidth() / 2, ypos - cropped2.getHeight() / 2, white);
+        c.drawBitmap(cropped2, xpos - cropped2.getWidth() / 2, ypos - cropped2.getHeight() / 2, white); //pitch roll
 
 
         //draw central horizontal line of pitch
@@ -155,7 +155,7 @@ public class Monitor {
                 cmps.getHeight(),
                 matrix,
                 true);
-        c.drawBitmap(compsN, xpos - compsL * scale * 0.5f, ypos - size1 * 1.5f, white);
+        c.drawBitmap(compsN, xpos - compsL * scale * 0.5f, ypos - size1 * 1.5f, white);   //yaw
         //phone direction
         green.setAlpha((DrawView.head_less_.is_pressed()) ? 255 : 100);
         //----------------------------------------------------------------------------

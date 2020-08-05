@@ -19,10 +19,10 @@ public class BatteryMonitor {
         border=size*0.02f;
         sizeY=size*0.2f;
         white=new Paint();
-        white.setColor(Color.WHITE);
+        white.setColor(0xff007700);
         white.setStyle(Paint.Style.STROKE);
         green=new Paint();
-        green.setColor(Color.GREEN);
+        green.setColor(0xff007700);
 
         charge=(sizeX-border-border)*1;
     }

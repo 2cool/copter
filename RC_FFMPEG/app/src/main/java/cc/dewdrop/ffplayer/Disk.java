@@ -22,6 +22,8 @@ public class Disk {
     private static File myFile=null;
     private static String filename=null;
 
+    private static FileOutputStream bb_fos=null;
+    private static File black_box_file=null;
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
@@ -240,6 +242,48 @@ public class Disk {
         }
 
     }
+    public static int save_black_box_log(String log){
+
+        try {
+
+            {
+                final File file = new File("/sdcard/RC");
+                if (!file.exists()) {
+                    if (file.mkdir()) {
+                        //System.out.println("Directory is created!");
+                    } else {
+                        System.out.println("Failed to create directory!");
+                    }
+                }
+            }
+
+            Calendar c = Calendar.getInstance();
+            String filename = ""+c.getTime();
+            filename=filename.replace(':','_').replace(' ','_');
+            filename="RC/"+filename+"_black_box.log";
+
+            if (black_box_file==null) {
+                black_box_file = new File(Environment.getExternalStorageDirectory(), filename);
+                if (!black_box_file.exists())
+                    black_box_file.createNewFile();
+                bb_fos = new FileOutputStream(myFile , false);
+            }
+            byte[] data = log.getBytes();
+            try {
+
+                bb_fos.write(data);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return 1;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 1;
+        }
+        return 0;
+    }
 
     public static int createOrOpen_(){
         try {
@@ -285,6 +329,10 @@ public class Disk {
                     Telemetry._alt);
           //  Log.i("MSGG", "disk close");
 
+            if (bb_fos!=null){
+                bb_fos.flush();
+                bb_fos.close();
+            }
 
             if (fos!=null) {
                 fos.flush();

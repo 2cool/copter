@@ -375,6 +375,7 @@ public class Telemetry {
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     static int old_cb=0;
     static public void bufferReader_(byte buf[],int buf_len){
+
         //   Log.d("BUFREAD","bufRead");
         int i=0;
       //  Log.d("COMMANDER", " tel "+telemetry_couter);
@@ -479,6 +480,15 @@ public class Telemetry {
         //parser(buf,i);
         i+=2;
         block_cnt=0;
+
+
+        if ((MainActivity.control_bits&MainActivity.MOTORS_ON) !=0 ) {
+            String black_box = "" + lat + "," + lon + "," + speed + "," + _alt + "," + v_speed + "," + r_accuracy_hor_pos + "\n";
+            Disk.save_black_box_log(black_box);
+        }
+
+
+
         while (mes_len>0){
             System.arraycopy(buf, i-2,log_buffer[readedI&mask], 0,  mes_len+2);
             readedI++;
