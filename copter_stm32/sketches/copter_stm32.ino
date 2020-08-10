@@ -150,6 +150,9 @@ int temp;
 
 char inBuf[32];
 volatile uint8_t reg = 15;
+
+volatile bool new_connection_established = false;
+
 void receiveEvent(int countToRead) {
 	cnt_rec++;
 	if (countToRead == 1) {
@@ -164,8 +167,27 @@ void receiveEvent(int countToRead) {
 	switch (inBuf[0] & 7)
 	{
 	case 0:
+		if (new_connection_established == false)
 		{
-			uint8_t len = inBuf[0] >> 3;
+			const uint8_t len = inBuf[0] >> 3;
+			uint16_t temp = *((uint16_t*)&inBuf[1]);
+			if (len = 0)
+			{
+				bool ok = temp == pwm_OFF_THROTTLE;
+				temp = *((uint16_t*)&inBuf[3]);
+				ok &= temp == pwm_OFF_THROTTLE;
+				temp = *((uint16_t*)&inBuf[5]);
+				ok &= temp == pwm_OFF_THROTTLE;
+				temp = *((uint16_t*)&inBuf[7]);
+				ok &= temp == pwm_OFF_THROTTLE;
+				new_connection_established = ok;
+			}
+			
+			
+		}
+		else
+		{
+			const uint8_t len = inBuf[0] >> 3;
 			uint16_t temp = *((uint16_t*)&inBuf[1]);
 			if (len == 0) {
 				pwmWrite(M0, constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE));
@@ -479,7 +501,7 @@ void loop()
 		
 		
 	}
-
+	static int32_t old_ring_time = 0;
 	static bool old_pulse = false;
 
 	if (beep_code)
@@ -487,9 +509,19 @@ void loop()
 	else {
 
 		ring_to_send |= ring = digitalRead(RING) == LOW;
+		
+		if (old_ring_time == 0)
+			old_ring_time = buzzer_time;
+		else
+		{
+			if (ring == false)
+				old_ring_time = 0;
+		}
 
 		if (millis() > 5000 && ring) {
 			buzzer_time = millis();
+			
+			
 			unsigned long t = buzzer_time & 255;
 			//bool puls = t <= 127;
 			bool puls = (micros() & (unsigned long)65536) == 0;
@@ -503,7 +535,7 @@ void loop()
 				   	 pixels.setPixelColor(i, pixels.Color(col[eRING][1], col[eRING][0], col[eRING][2]));   // Moderately bright green pi_copter_color.
 			pixels.show();
 				*/
-				if (do_sound)
+				if (do_sound && buzzer_time - old_ring_time < 5000)
 					digitalWrite(BUZZER, puls);
 			}
 			ring_was = true;
