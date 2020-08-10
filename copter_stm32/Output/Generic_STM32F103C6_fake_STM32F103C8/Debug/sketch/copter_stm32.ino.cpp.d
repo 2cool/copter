@@ -1,5 +1,5 @@
-C:\projects\copter_stm32\Output\Generic_STM32F103C6_fake_STM32F103C8\Debug\sketch\copter_stm32.ino.cpp.o: \
- C:\projects\copter_stm32\Output\Generic_STM32F103C6_fake_STM32F103C8\Debug\sketch\copter_stm32.ino.cpp \
+C:\Users\tcool\copter\copter_stm32\Output\Generic_STM32F103C6_fake_STM32F103C8\Debug\sketch\copter_stm32.ino.cpp.o: \
+ C:\Users\tcool\copter\copter_stm32\Output\Generic_STM32F103C6_fake_STM32F103C8\Debug\sketch\copter_stm32.ino.cpp \
  C:\Users\tcool\AppData\Local\Arduino15\packages\stm32duino\hardware\STM32F1\2020.1.24\cores\maple/Arduino.h \
  C:\Users\tcool\AppData\Local\Arduino15\packages\stm32duino\hardware\STM32F1\2020.1.24\cores\maple/wirish.h \
  C:\Users\tcool\AppData\Local\Arduino15\packages\stm32duino\hardware\STM32F1\2020.1.24\cores\maple/WString.h \
@@ -55,4 +55,4 @@ C:\projects\copter_stm32\Output\Generic_STM32F103C6_fake_STM32F103C8\Debug\sketc
  C:\Users\tcool\AppData\Local\Arduino15\packages\stm32duino\hardware\STM32F1\2020.1.24\system/libmaple/include/libmaple/i2c.h \
  C:\Users\tcool\AppData\Local\Arduino15\packages\stm32duino\hardware\STM32F1\2020.1.24\system/libmaple/stm32f1/include/series/i2c.h \
  C:\Users\tcool\AppData\Local\Arduino15\packages\stm32duino\hardware\STM32F1\2020.1.24\system/libmaple/include/libmaple/i2c_common.h \
- C:\projects\copter_stm32\Output\Generic_STM32F103C6_fake_STM32F103C8\Debug\sketch\gps.h
+ C:\Users\tcool\copter\copter_stm32\Output\Generic_STM32F103C6_fake_STM32F103C8\Debug\sketch\gps.h

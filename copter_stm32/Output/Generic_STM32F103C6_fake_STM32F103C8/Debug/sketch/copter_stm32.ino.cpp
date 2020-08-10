@@ -1,5 +1,5 @@
-#line 1 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
-#line 1 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 1 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 1 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 
 #include <stdint.h>
 #include <Arduino.h>
@@ -45,7 +45,7 @@ enum { eNO_CON, eRING };
 volatile uint8_t col[][3] = { { 1, 0, 0 }, { 255, 0, 0 } };
 volatile bool  do_sound = true;
 
-
+bool disconnected = true;
 
 volatile uint8_t overloadF = 0;
 volatile uint8_t new_colors_i = 0;
@@ -65,29 +65,29 @@ bool ring_was = false;
 uint8_t beep_bit_n = 0;
 uint32 beep_time = 0,buzzer_time=0;
 uint8_t old_beep_code = 255;
-#line 66 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 66 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void beep();
-#line 113 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 113 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void stop_motors();
-#line 122 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 122 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void throttle_0(const float n);
-#line 125 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 125 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void throttle_1(const float n);
-#line 129 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 129 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void throttle_2(const float n);
-#line 132 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 132 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void throttle_3(const float n);
-#line 153 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 156 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void receiveEvent(int countToRead);
-#line 260 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 280 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void requestEvent();
-#line 312 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 332 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 uint16 setTimer(int n);
-#line 330 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 350 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void setup();
-#line 421 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 441 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void loop();
-#line 66 "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino"
+#line 66 "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino"
 void beep() {
 
 	if (old_beep_code != beep_code)
@@ -175,6 +175,9 @@ int temp;
 
 char inBuf[32];
 volatile uint8_t reg = 15;
+
+volatile bool new_connection_established = false;
+
 void receiveEvent(int countToRead) {
 	cnt_rec++;
 	if (countToRead == 1) {
@@ -189,8 +192,25 @@ void receiveEvent(int countToRead) {
 	switch (inBuf[0] & 7)
 	{
 	case 0:
+		if (new_connection_established == false)
 		{
-			uint8_t len = inBuf[0] >> 3;
+			const uint8_t len = inBuf[0] >> 3;
+			uint16_t temp = *((uint16_t*)&inBuf[1]);
+			if (len == 0)
+			{
+				bool ok = temp == pwm_OFF_THROTTLE;
+				temp = *((uint16_t*)&inBuf[3]);
+				ok &= temp == pwm_OFF_THROTTLE;
+				temp = *((uint16_t*)&inBuf[5]);
+				ok &= temp == pwm_OFF_THROTTLE;
+				temp = *((uint16_t*)&inBuf[7]);
+				ok &= temp == pwm_OFF_THROTTLE;
+				new_connection_established = ok;
+			}
+		}
+		else
+		{
+			const uint8_t len = inBuf[0] >> 3;
 			uint16_t temp = *((uint16_t*)&inBuf[1]);
 			if (len == 0) {
 				pwmWrite(M0, constrain(temp, pwm_OFF_THROTTLE, pwm_MAX_THROTTLE));
@@ -440,11 +460,13 @@ void setup()
 
 
 
-
+unsigned long buzzer_stop_time = 0;
 
 
 void loop()
 {
+	
+	
 	static unsigned long old_t = 0;
 	if (cnt_reset > 0 && cnt_reset < millis()) {
 		cnt_reset = 0;
@@ -468,7 +490,16 @@ void loop()
 	
 	fb[4] += ((float)(analogRead(BAT)) - fb[4])*CF;    //volt
 
-	unsigned long t = millis();
+	const unsigned long t = millis();
+	
+	
+	if (t - buzzer_stop_time > 5000)
+	{
+		buzzer_stop_time = t;
+		digitalWrite(BUZZER, LOW);
+	}
+	
+	
 	if (t - old_t >= 2)	{
 		old_t = t;
 		const int av = gps.available();
@@ -487,7 +518,7 @@ void loop()
 		}
 		else {
 			err++;
-			if (err > 200) {
+			if ( (disconnected = (err > 200)) ) {
 				stop_motors();
 				/*
 				for (int i = 0; i < 8; i++)
@@ -504,7 +535,7 @@ void loop()
 		
 		
 	}
-
+	static int32_t old_ring_time = 0;
 	static bool old_pulse = false;
 
 	if (beep_code)
@@ -512,9 +543,19 @@ void loop()
 	else {
 
 		ring_to_send |= ring = digitalRead(RING) == LOW;
+		
+		if (old_ring_time == 0)
+			old_ring_time = buzzer_time;
+		else
+		{
+			if (ring == false)
+				old_ring_time = 0;
+		}
 
 		if (millis() > 5000 && ring) {
 			buzzer_time = millis();
+			
+			
 			unsigned long t = buzzer_time & 255;
 			//bool puls = t <= 127;
 			bool puls = (micros() & (unsigned long)65536) == 0;
@@ -528,7 +569,7 @@ void loop()
 				   	 pixels.setPixelColor(i, pixels.Color(col[eRING][1], col[eRING][0], col[eRING][2]));   // Moderately bright green pi_copter_color.
 			pixels.show();
 				*/
-				if (do_sound)
+				if (do_sound && (disconnected || buzzer_time - old_ring_time < 5000))
 					digitalWrite(BUZZER, puls);
 			}
 			ring_was = true;
@@ -562,10 +603,7 @@ void loop()
 		//pixels.show();
 		new_colors_i = 0;
 	}
-	if (buzzer_time && millis() - buzzer_time > 1000) {
-		digitalWrite(BUZZER, 0);
-		buzzer_time = 0;
-	}
+	
 
 	
 	//wdt_reset();

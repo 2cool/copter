@@ -63,16 +63,17 @@ public class FlightTextInfo {
         Paint txt2=new Paint(txt);
         txt2.setColor(0xff007700);
         for (int i=0; i<FIELDS; i++) {
-            if (i==1)
-                paint[i] = new Paint(txt2);
-            else
+           // if (i==1)
+          //      paint[i] = new Paint(txt2);
+         //   else
                 paint[i]=new Paint(txt);
            // paint[i].setColor(txt_color);
         }
 
     }
     public void paint(Canvas c){
-
+        Paint black=new Paint();
+        black.setColor(0xff000000);
         Rect b=new Rect();
         paint[0].getTextBounds("Text",0,4,b);
         int h=(int)(1.5*(b.bottom-b.top));
@@ -80,7 +81,13 @@ public class FlightTextInfo {
         int y=r.top+h;
         for (int i=0; i<FIELDS;i++ ){
             if (f[i]){
+
+                float w = paint[i].measureText(name[i]+p[i]+unt[i]);
+                float textSize = paint[i].getTextSize();
+                c.drawRect(x, y+3, x+w+3, y-textSize, black);
+              //  c.drawText(name[i]+p[i]+unt[i],x,y,black_bold);
                 c.drawText(name[i]+p[i]+unt[i],x,y,paint[i]);
+
                 y+=h;
             }
         }

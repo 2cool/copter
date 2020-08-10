@@ -16,7 +16,7 @@ import cc.dewdrop.ffplayer.Telemetry;
 import static java.lang.Math.cos;
 
 public class Monitor {
-    Paint white,green,red;
+    Paint white,green,red,black;
     private float compsL;
     private float hight_t=0,hight,speed_t=0,speed;
     private double pitch, roll, yaw;
@@ -54,6 +54,8 @@ public class Monitor {
         hight=0;
         yaw=0;
         speed=0;
+        black=new Paint();
+        black.setColor(0xff000000);
         gray=new Paint();
         gray.setColor(Color.BLACK);
         gray.setAlpha(35);
@@ -66,13 +68,13 @@ public class Monitor {
         this.bm=bm;
         this.cmps=cmps;
         white = new Paint();
-        white.setColor(0xff007700);
+        white.setColor(Color.WHITE);
         white.setStrokeWidth(2);
         white.setTextSize(size/6);
         //   white.setAlpha(255);
 
         green=new Paint();
-        green.setColor(0xff007700);
+        green.setColor(Color.GREEN);
         green.setStrokeWidth(3);
 
         red=new Paint();
@@ -88,7 +90,6 @@ public class Monitor {
     //  static float angle=0;//115;
     private Matrix matrix = new Matrix();
     public void paint(Canvas c) {
-
         //draw monitoring of pitch and yaw;
         c.drawRect(xpos - size * 0.7f, ypos - size, xpos + size * 0.7f, ypos + size, gray);
         matrix.reset();
@@ -111,7 +112,7 @@ public class Monitor {
                 bm.getWidth(),
                 matrix,
                 true);
-        c.drawBitmap(cropped2, xpos - cropped2.getWidth() / 2, ypos - cropped2.getHeight() / 2, white); //pitch roll
+        c.drawBitmap(cropped2, xpos - cropped2.getWidth() / 2, ypos - cropped2.getHeight() / 2, white);
 
 
         //draw central horizontal line of pitch
@@ -137,9 +138,18 @@ public class Monitor {
         Rect r = new Rect();
         white.getTextBounds(text, 0, text.length(), r);
         //draw speed
-        c.drawText(text, xpos - bm.getWidth() / 2.7f - (r.right - r.left), ypos + (r.bottom - r.top) / 2, white);
+        float  xx = xpos - bm.getWidth() / 2.7f - (r.right - r.left);
+        float yy = ypos + (r.bottom - r.top) / 2;
+        float w = white.measureText(text);
+        c.drawRect(xx ,   yy,xx+w,yy-white.getTextSize(),black);
+        c.drawText(text, xx, yy, white);
+
         text = Float.toString(speed) + " m/c";
-        c.drawText(text, xpos + bm.getWidth() / 3, ypos + (r.bottom - r.top) / 2, white);
+        xx = xpos + bm.getWidth() / 3;
+        yy = ypos + (r.bottom - r.top) / 2;
+        w = white.measureText(text);
+        c.drawRect(xx ,   yy,xx+w,yy-white.getTextSize(),black);
+        c.drawText(text, xx, yy, white);
         //draw pointer of yaw
         c.drawLine(xpos, ypos - size1, xpos, ypos - size1 * 1.25f, white);
 
@@ -155,14 +165,14 @@ public class Monitor {
                 cmps.getHeight(),
                 matrix,
                 true);
-        c.drawBitmap(compsN, xpos - compsL * scale * 0.5f, ypos - size1 * 1.5f, white);   //yaw
+        c.drawBitmap(compsN, xpos - compsL * scale * 0.5f, ypos - size1 * 1.5f, white);
         //phone direction
         green.setAlpha((DrawView.head_less_.is_pressed()) ? 255 : 100);
         //----------------------------------------------------------------------------
 
         float dy = (float) Math.max(-90, Math.min(90, DrawView.wrap_180(MainActivity.yaw - DrawView.wrap_180(yaw))));
         //Log.d("MONIT",Float.toString(dy)+" "+Double.toString(MainActivity.yaw)+ " "+Double.toString(yaw));
-        final float w = -(scale * compsL);
+        w = -(scale * compsL);
         float d_yaw = w * dy / 180;
         d_yaw += w * 0.5;
         float x = xpos - compsL * scale * 0.5f - d_yaw;

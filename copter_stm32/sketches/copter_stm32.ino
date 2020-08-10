@@ -43,7 +43,7 @@ enum { eNO_CON, eRING };
 volatile uint8_t col[][3] = { { 1, 0, 0 }, { 255, 0, 0 } };
 volatile bool  do_sound = true;
 
-
+bool disconnected = true;
 
 volatile uint8_t overloadF = 0;
 volatile uint8_t new_colors_i = 0;
@@ -171,7 +171,7 @@ void receiveEvent(int countToRead) {
 		{
 			const uint8_t len = inBuf[0] >> 3;
 			uint16_t temp = *((uint16_t*)&inBuf[1]);
-			if (len = 0)
+			if (len == 0)
 			{
 				bool ok = temp == pwm_OFF_THROTTLE;
 				temp = *((uint16_t*)&inBuf[3]);
@@ -182,8 +182,6 @@ void receiveEvent(int countToRead) {
 				ok &= temp == pwm_OFF_THROTTLE;
 				new_connection_established = ok;
 			}
-			
-			
 		}
 		else
 		{
@@ -437,11 +435,13 @@ void setup()
 
 
 
-
+unsigned long buzzer_stop_time = 0;
 
 
 void loop()
 {
+	
+	
 	static unsigned long old_t = 0;
 	if (cnt_reset > 0 && cnt_reset < millis()) {
 		cnt_reset = 0;
@@ -465,7 +465,16 @@ void loop()
 	
 	fb[4] += ((float)(analogRead(BAT)) - fb[4])*CF;    //volt
 
-	unsigned long t = millis();
+	const unsigned long t = millis();
+	
+	
+	if (t - buzzer_stop_time > 5000)
+	{
+		buzzer_stop_time = t;
+		digitalWrite(BUZZER, LOW);
+	}
+	
+	
 	if (t - old_t >= 2)	{
 		old_t = t;
 		const int av = gps.available();
@@ -484,7 +493,7 @@ void loop()
 		}
 		else {
 			err++;
-			if (err > 200) {
+			if ( (disconnected = (err > 200)) ) {
 				stop_motors();
 				/*
 				for (int i = 0; i < 8; i++)
@@ -535,7 +544,7 @@ void loop()
 				   	 pixels.setPixelColor(i, pixels.Color(col[eRING][1], col[eRING][0], col[eRING][2]));   // Moderately bright green pi_copter_color.
 			pixels.show();
 				*/
-				if (do_sound && buzzer_time - old_ring_time < 5000)
+				if (do_sound && (disconnected || buzzer_time - old_ring_time < 5000))
 					digitalWrite(BUZZER, puls);
 			}
 			ring_was = true;
@@ -569,10 +578,7 @@ void loop()
 		//pixels.show();
 		new_colors_i = 0;
 	}
-	if (buzzer_time && millis() - buzzer_time > 1000) {
-		digitalWrite(BUZZER, 0);
-		buzzer_time = 0;
-	}
+	
 
 	
 	//wdt_reset();

@@ -701,14 +701,13 @@ bool AutopilotClass::is_all_OK(bool print){
 	}
 #endif
 
-	if (shmPTR->inet_ok == false) {
+	if (shmPTR->inet_ok == false && !ignore_the_lack_of_internet_at_startup) {
 		if (print) {
 			Telemetry.addMessage(e_NO_INTERNET);
 			cout << "inet dont work" << "\t" << _ct << endl;
 		}
 #ifndef DEBUG
-		if (!ignore_the_lack_of_internet_at_startup)
-			return false;
+		return false;
 #endif
 	}
 

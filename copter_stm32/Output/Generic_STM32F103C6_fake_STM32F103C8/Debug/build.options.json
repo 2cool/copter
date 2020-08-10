@@ -6,6 +6,6 @@
   "hardwareFolders": "C:\\Program Files (x86)\\Sysprogs\\VisualGDB\\Arduino\\hardware,C:\\Users\\tcool\\AppData\\Local\\Arduino15\\packages",
   "otherLibrariesFolders": "D:\\Users\\2cool\\Documents\\Arduino\\Libraries",
   "runtime.ide.version": "10600",
-  "sketchLocation": "C:\\projects\\copter_stm32\\sketches\\copter_stm32.ino",
+  "sketchLocation": "C:\\Users\\tcool\\copter\\copter_stm32\\sketches\\copter_stm32.ino",
   "toolsFolders": "C:\\Program Files (x86)\\Sysprogs\\VisualGDB\\Arduino/tools-builder,C:\\Users\\tcool\\AppData\\Local/Arduino15/packages"
 }
