@@ -87,7 +87,6 @@ void AutopilotClass::init(){////////////////////////////////////////////////////
 	lowest_height = shmPTR->lowest_altitude_to_fly;
 	last_time_data__recived = 0;
 	min_hor_accuracy_2_start = MIN_ACUR_HOR_POS_2_START_;
-	ignore_the_lack_of_internet_at_startup = false;
 	fall_thr = FALLING_THROTTLE;
 	sens_z_p = 5;
 	sens_z_m = 5;
@@ -378,9 +377,9 @@ string AutopilotClass::get_set(bool for_save){
 		shmPTR->fly_at_start << "," << \
 		Telemetry.get_bat_capacity() << ",";
 	if (for_save)
-		convert << MIN_ACUR_HOR_POS_2_START_ << "," << 0;
+		convert << MIN_ACUR_HOR_POS_2_START_ ;
 	else
-		convert << min_hor_accuracy_2_start << "," << ignore_the_lack_of_internet_at_startup;
+		convert << min_hor_accuracy_2_start ;
 
 	string ret = convert.str();
 	return string(ret);
@@ -401,7 +400,7 @@ void AutopilotClass::set(const float ar[]){
 			Telemetry.set_bat_capacity(ar[i++]);
 		min_hor_accuracy_2_start = ((ar[i] > MIN_ACUR_HOR_POS_4_JAMM) ? MIN_ACUR_HOR_POS_4_JAMM : ar[i]);
 		i++;
-		ignore_the_lack_of_internet_at_startup = (ar[i++] > 0);
+		
 
 		int ii;
 		for (ii = 0; ii < i; ii++){
@@ -701,7 +700,7 @@ bool AutopilotClass::is_all_OK(bool print){
 	}
 #endif
 
-	if (shmPTR->inet_ok == false && !ignore_the_lack_of_internet_at_startup) {
+	if (shmPTR->inet_ok == false &&  Commander.ppp_inet){
 		if (print) {
 			Telemetry.addMessage(e_NO_INTERNET);
 			cout << "inet dont work" << "\t" << _ct << endl;

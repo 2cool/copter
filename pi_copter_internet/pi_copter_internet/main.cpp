@@ -891,13 +891,15 @@ std::streambuf *coutbuf;// старый буфер
 
 int main(int argc, char *argv[])//lat,lon,.......
 {
-	printf("<start loger y> <start telegram y> <cout to file>\n");
+	printf("<start loger y> <start telegram y> <cout to file>\n"); 
 	if (argc >= 3) {
 
 		f_start_loger = (argv[1][0] == 'y' || argv[1][0] == 'Y');
 		f_start_telegram = (argv[2][0] == 'y' || argv[2][0] == 'Y');
 		f_start_ppp = f_start_loger | f_start_telegram;
 	}
+	cout  <<"stat: start loger "<<argv[1][0]<<"> <start telegram "<<argv[2][0]<<">";
+	
 	if (argc >=4 ){
 		out = std::ofstream(argv[3]); //откроем файл для вывод
 		coutbuf = std::cout.rdbuf(); //запомним старый буфер

@@ -27,7 +27,6 @@ class AutopilotClass
 
 
  protected:
-	 bool ignore_the_lack_of_internet_at_startup;
 	 double dist2home_at_begin;
 #ifdef FALL_IF_GPS_ALT_NOT_MATCH_BAROM_ALT_
 	 float gps_alt_at_begin, bar_alt_at_begin;

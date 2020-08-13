@@ -53,7 +53,7 @@ int Megai2c::getsim(char * str) {
 
 //add flag for next poweron start with full throthle
 void Megai2c::settings(float overCurrentVal, uint8_t esc_calibr0, uint8_t esc_calibr1, uint8_t esc_calibr2, uint8_t esc_calibr3) {
-	char send_buf[6];
+	char send_buf[7];
 	send_buf[0] = 2;
 
 	if (overCurrentVal > HALL_EFFECT_SENSOR_MAX_CURRENT)

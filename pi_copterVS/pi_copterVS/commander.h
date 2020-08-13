@@ -26,8 +26,8 @@ class CommanderClass
 	
 
  public:
-	
-	 volatile bool ppp_inet, telegram_bot;
+	 volatile bool start_sim800_control=false;
+	 volatile bool ppp_inet=false, telegram_bot=false;
 	
 	 void setThrottle(const float t){ throttle = t; }
 	 void setPitch(const float p){ pitch = p; }

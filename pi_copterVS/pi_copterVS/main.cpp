@@ -200,15 +200,15 @@ uint8_t get_cpu_temp() {
 int printHelp() {
 	cout << PROG_VERSION << endl;
 	cout << "<-help> for this help\n";
-	cout << " <fly at start at hight in sm > <lower hight in sm> <f=write stdout to file > <log com and tel y> <start wifi> <start sms> <start gps_inet_loger> <start telegram>\n";
-	cout << "example to write in log file : pi_copter 300 100 f n y y y y\n";
-	cout << "example to write in stdout   : pi_copter 300 100 s n y y y y\n";
+	cout << " <fly at start at hight in sm > <lower hight in sm> <f=write stdout to file > <log com and tel y> <start wifi>\n";
+	cout << "example to write in log file : pi_copter 300 100 f n y \n";
+	cout << "example to write in stdout   : pi_copter 300 100 s n y \n";
 	return -1;
 }
 int32_t last_wifi__reloaded = 0, inet_start__cnt=0;
 string stdout_file_ext = "";
 //-----------------------------------------------------------------------------------------
-bool start_wifi = false, start_inet = false, start_loger = false, start_telegram = false;;
+bool start_wifi = false;// , start_inet = false, start_loger = false, start_telegram = false;;
 
 bool max_cpu_freq = false;
 bool min_cpu_freq = false;
@@ -297,7 +297,7 @@ void watch_dog() {
 		}
 #define START_INET
 #ifdef START_INET
-		if (start_inet)
+		if (Commander.start_sim800_control)
 			if (internet_cnt == shmPTR->internet_cnt) {
 				cout << "--------------ppp starting" << "\t" << _ct << endl;
 				shmPTR->internet_run = false;
@@ -305,9 +305,9 @@ void watch_dog() {
 				delay(1000);
 				shmPTR->internet_run = true;
 				string t = "nice -n -20 /root/projects/ppp_p ";
-				t += ((start_loger) ? "y" : "n");
+				t += ((Commander.ppp_inet) ? "y" : "n");
 				t += " ";
-				t += (start_telegram ? "y" : "n");
+				t += (Commander.telegram_bot ? "y" : "n");
 				t += " ";
 				if (stdout_file_ext.length()) 
 					t += stdout_file_ext + "i" + to_string(inet_start__cnt++) + ".txt";
@@ -437,8 +437,7 @@ int main(int argc, char* argv[]) {
 	shmPTR->fly_at_start = 3;
 	shmPTR->lowest_altitude_to_fly = 1.6f;
 
-	thread tl(watch_dog);
-	tl.detach();
+	
 	string fname;
 	
 	Debug.n_debug = 0;
@@ -448,7 +447,7 @@ int main(int argc, char* argv[]) {
 		if (tt == 0) {
 			return printHelp();
 		}
-		if (argc >= 9) {
+		if (argc >= 6) {
 			int t = atoi(argv[1]);
 			//t = constrain(t, 300, 300);/////
 			shmPTR->fly_at_start = 0.01f*(float)t;
@@ -483,10 +482,10 @@ int main(int argc, char* argv[]) {
 			
 			Log.writeTelemetry = (argv[4][0] == 'y' || argv[4][0] == 'Y');
 			shmPTR->wifi_run = start_wifi = (argv[5][0] == 'y' || argv[5][0] == 'Y');
-			start_inet = (argv[6][0] == 'y' || argv[6][0] == 'Y');
-			start_inet |= start_loger=(argv[7][0] == 'y' || argv[7][0] == 'Y');
-			start_inet |= start_telegram=(argv[8][0] == 'y' || argv[8][0] == 'Y');
-			shmPTR->internet_run = start_inet;
+			//start_inet = (argv[6][0] == 'y' || argv[6][0] == 'Y');
+			//start_inet |= start_loger=(argv[7][0] == 'y' || argv[7][0] == 'Y');
+			//start_inet |= start_telegram=(argv[8][0] == 'y' || argv[8][0] == 'Y');
+			shmPTR->internet_run = Commander.ppp_inet;
 		}
 
 	}
@@ -521,6 +520,10 @@ int main(int argc, char* argv[]) {
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	if (init(counter) == 0) {
 		shmPTR->reboot = 0;
+
+		thread tl(watch_dog);
+		tl.detach();
+
 		while (shmPTR->run_main){
 			if (loop()) {
 				shmPTR->main_cnt++;

@@ -29,7 +29,7 @@ void CommanderClass::controls2zero() {
 }
 bool CommanderClass::init()
 {
-
+	start_sim800_control = true;
 	ppp_inet = true;
 	telegram_bot = false;
 	controls2zero();
@@ -295,7 +295,9 @@ bool CommanderClass::input(){
 
 
 string CommanderClass::get_set() {
-	string s = (ppp_inet) ? "1" : "0";
+	string s = (start_sim800_control) ? "1" : "0";
+	s += ",";
+	s += (ppp_inet) ? "1" : "0";
 	s += ",";
 	s+= (telegram_bot) ? "1" : "0";
 	
@@ -309,10 +311,19 @@ void CommanderClass::set(const float buf[]) {
 	//shmPTR->fpv_adr = (shmPTR->client_addr&0xffffff00) | (uint8_t)buf[0];
 	//shmPTR->fpv_port = buf[1];
 	//shmPTR->fpv_zoom = buf[2];//0
-	ppp_inet = buf[0] > 0;
-	telegram_bot = buf[1] > 0;
-	if (telegram_bot)
-		ppp_inet = true;
+	start_sim800_control = buf[0] > 0;
+	if (start_sim800_control == false) {
+		ppp_inet = telegram_bot = false;
+		//system("pkill ppp_p");
+		//system("poff -a");
+	}
+	else {
+		ppp_inet = buf[1] > 0;
+		telegram_bot = buf[2] > 0;
+		if (telegram_bot)
+			ppp_inet = true;
+	}
+//	Debug.dump(0.0, ppp_inet, telegram_bot,0);
 	//cout << "trans adr %f\n", buf[0];
 	//thread t(stop_stream);
 //	t.detach();
