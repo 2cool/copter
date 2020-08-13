@@ -729,9 +729,9 @@ bool AutopilotClass::is_all_OK(bool print){
 				mega_i2c.beep_code(B_GPS_ACCURACY_E);
 				Telemetry.addMessage(e_GPS_ERROR);
 			}
-//#ifndef DEBUG
+#ifndef DEBUG
 			return false;
-//#endif 
+#endif 
 		}
 		if (print)
 			cout << "OK" << "\t" << _ct << endl;

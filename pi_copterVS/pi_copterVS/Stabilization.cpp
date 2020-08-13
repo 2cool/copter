@@ -18,9 +18,8 @@
 #include "Log.h"
 #include "Settings.h"
 
-
 float Z_FILTER = 0.3;
-float XY_FILTER = 1;
+float XY_FILTER = 0.76;
 void StabilizationClass::setMaxAng() {
 	set_acc_xy_pid_imax(Balance.get_max_angle());
 }
@@ -31,10 +30,10 @@ void StabilizationClass::init(){
 
 	
 
-	dist2speed_XY =  0.2f;//0.5 
-	set_acc_xy_pid_kp( 3.5);
-	set_acc_xy_pid_kI( 1.7);
-	xy_kD = 5;
+	dist2speed_XY =  0.55f;
+	set_acc_xy_pid_kp( 3);
+	set_acc_xy_pid_kI( 0.06);
+	xy_kD = 1.8;
 	set_acc_xy_pid_imax(Balance.get_max_angle());
 
 	
@@ -49,9 +48,9 @@ void StabilizationClass::init(){
 
 	alt2speedZ = 0.3;
 	pids[ACC_Z_PID].kP( 0.06 );
-	pids[ACC_Z_PID].kI( 0.03 );
+	pids[ACC_Z_PID].kI( 0.015 );
 
-	z_kD=0.03;
+	z_kD=0.024;
 	setMinMaxI_Thr();
 	
 	//----------------------------------------------------------------------------

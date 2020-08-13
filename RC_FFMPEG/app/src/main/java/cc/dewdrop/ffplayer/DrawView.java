@@ -42,7 +42,8 @@ public class DrawView extends View {
     static public Img_button[]motors_on=new Img_button[2];
 
     static public Img_button control_type_acc_, head_less_;
-    static public final float maxAngle=45; //only 45
+    static public  float maxAngle=35;
+    static private float maxAngleChangerStep=-10;
     Monitor monitor;
     static private int screen=viewMain;
     FlightTextInfo ftx;
@@ -274,7 +275,7 @@ public class DrawView extends View {
         final int  jbuttonsY=(int)(nY-bR/(sm[1]/nY))-1;
         j_left=new Joystick(bR*k,sm[1]-bR*(1+k),bR,true,true,false,false,green_c);
         j_right=new Joystick(sm[0]-bR*(1+k),sm[1]-bR*(1+k),bR,true,true,false,false,green_c);
-        j_right.setLabel(Integer.toString((int)maxAngle));
+        j_right.setLabel(Integer.toString((int)(100.0*maxAngle/45)));
 
         ///  Rect r=new Rect(100,100,100+(int)(sm[2]/3f),100+(int)(sm[2]/3f));
 
@@ -597,6 +598,22 @@ public class DrawView extends View {
 
         j_left.onTouchEvent(event);
         j_right.onTouchEvent(event);
+		if (j_right.double_touch){
+
+
+            BeepHelper.beep();
+            if (maxAngle==15)
+                maxAngleChangerStep=10;
+            else
+            if (maxAngle==45)
+                maxAngleChangerStep=-10;
+            maxAngle+=maxAngleChangerStep;
+            
+            j_right.setLabel(Integer.toString((int)(100.0*maxAngle/45)));
+            //Log.d("TELE", " OK " + maxAngle);
+
+            j_right.double_touch=false;
+        }
         do_prog.onTouchEvent(event);
         if (do_prog.getStat()==3){
             MainActivity.Prog();
