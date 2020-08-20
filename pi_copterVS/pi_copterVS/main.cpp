@@ -228,7 +228,16 @@ void watch_dog() {
 				string ret = exec("systemctl | grep NetworkManager.service");
 				if (ret.length() > 10) {
 					cout << "stop " << ret << endl;
-					system("systemctl stop NetworkManager.service && ifconfig wlx983f9f1908da up && wpa_supplicant -B -iwlx983f9f1908da -Dnl80211 -c /etc/wifi.conf && dhclient wlx983f9f1908da && ifconfig wlx20e6170cacf8 up && wpa_supplicant -B -iwlx20e6170cacf8 -c /etc/camera.conf -Dnl80211 && dhclient wlx20e6170cacf8");
+					system("systemctl stop NetworkManager.service && \
+							ifconfig iwlx983f9f1908da down && \
+							iw reg set GY && \
+							ifconfig wlx983f9f1908da up && 	\
+							iwconfig wlx983f9f1908da txpower 30 && \
+							wpa_supplicant -B -iwlx983f9f1908da -Dnl80211 -c /etc/wifi.conf && \
+							dhclient wlx983f9f1908da && \
+							ifconfig wlx20e6170cacf8 up && \
+							wpa_supplicant -B -iwlx20e6170cacf8 -c /etc/camera.conf -Dnl80211 && \
+							dhclient wlx20e6170cacf8");
 					delay(3000);
 				}
 				network_manager_running = false;
