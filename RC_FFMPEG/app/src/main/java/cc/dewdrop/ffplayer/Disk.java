@@ -247,7 +247,7 @@ public class Disk {
         try {
 
             {
-                final File file = new File("/sdcard/RC");
+                final File file = new File("/sdcard/RC/BLACK_BOX/");
                 if (!file.exists()) {
                     if (file.mkdir()) {
                         //System.out.println("Directory is created!");
@@ -257,29 +257,34 @@ public class Disk {
                 }
             }
 
-            Calendar c = Calendar.getInstance();
-            String filename = ""+c.getTime();
-            filename=filename.replace(':','_').replace(' ','_');
-            filename="RC/"+filename+"_black_box.log";
+
 
             if (black_box_file==null) {
-                black_box_file = new File(Environment.getExternalStorageDirectory(), filename);
-                if (!black_box_file.exists())
-                    black_box_file.createNewFile();
-                bb_fos = new FileOutputStream(myFile , false);
+                Calendar c = Calendar.getInstance();
+                String filename = ""+c.getTime();
+                filename=filename.replace(':','_').replace(' ','_');
+                filename="/sdcard/RC/BLACK_BOX/"+filename+"_black_box.log";
+               // Log.d("DISK_SAVE1",filename);
+                black_box_file = new File( filename);
+                black_box_file.createNewFile();
+               // Log.d("DISK_SAVE1","createNewFile ");
+                bb_fos = new FileOutputStream(black_box_file , true);
+               // Log.d("DISK_SAVE1","FileOutputStream ");
             }
             byte[] data = log.getBytes();
             try {
-
+               // Log.d("DISK_SAVE","saved  1");
                 bb_fos.write(data);
 
             } catch (Exception e) {
                 e.printStackTrace();
+                Log.d("DISK_SAVE1","saved err1 "+e.getMessage());
                 return 1;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.d("DISK_SAVE1","saved err2 "+e.getMessage());
             return 1;
         }
         return 0;

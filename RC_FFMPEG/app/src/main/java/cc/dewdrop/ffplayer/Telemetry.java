@@ -373,6 +373,7 @@ public class Telemetry {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
+    static String old_black_box_str="";
     static int old_cb=0;
     static public void bufferReader_(byte buf[],int buf_len){
 
@@ -395,10 +396,10 @@ public class Telemetry {
         realThrottle=(realThrottle-1000)*0.001f;
 
 
-        int ilat=load_int32(buf,i);
+        final int ilat=load_int32(buf,i);
         i+=4;
         lat=0.0000001*(double)ilat;
-        int ilon=load_int32(buf,i);
+        final int ilon=load_int32(buf,i);
         i+=4;
         lon=0.0000001*(double)ilon;
         //Log.i("DKDKD",Double.toString(lat)+ " "+Double.toHexString(lon));
@@ -482,9 +483,13 @@ public class Telemetry {
         block_cnt=0;
 
 
-        if ((MainActivity.control_bits&MainActivity.MOTORS_ON) !=0 ) {
-            String black_box = "" + lat + "," + lon + "," + speed + "," + _alt + "," + v_speed + "," + r_accuracy_hor_pos + "\n";
-            Disk.save_black_box_log(black_box);
+        if ( (MainActivity.motorsOnF()   && r_accuracy_hor_pos<99) || Math.abs(v_speed)>3)  {
+            String black_box = "" + ilat + "," + ilon + "," + (int)speed + "," + (int)_alt + "," + (int)v_speed + "," + r_accuracy_hor_pos + "\n";
+            if (!black_box.contentEquals(old_black_box_str)) {
+                Disk.save_black_box_log(black_box);
+                old_black_box_str=black_box;
+               // Log.d("DISK_SAVE", "saved");
+            }
         }
 
 
