@@ -233,7 +233,7 @@ void watch_dog() {
 				if (ret.length() > 10) {
 					cout << "stop " << ret << endl;
 					system("systemctl stop NetworkManager.service && \
-							ifconfig iwlx983f9f1908da down && \
+							ifconfig wlx983f9f1908da down && \
 							iw reg set GY && \
 							ifconfig wlx983f9f1908da up && 	\
 							iwconfig wlx983f9f1908da txpower 30 && \
@@ -308,7 +308,7 @@ void watch_dog() {
 			shmPTR->wifi_run = true;
 #endif
 		}
-#define START_INET
+//#define START_INET
 #ifdef START_INET
 		if (Commander.start_sim800_control)
 			if (internet_cnt == shmPTR->internet_cnt) {

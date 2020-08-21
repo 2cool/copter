@@ -207,7 +207,12 @@ public class Commander {
         MainActivity.command_bits_=0;
 
         i+=4;
-        int t=(int)(throttle *32000.0);
+        int t;
+        if ((MainActivity.control_bits & MainActivity.Z_STAB) !=0) {
+            float _thr = (float)(0.5+ (throttle-0.5)* DrawView.jleftK);
+            t = (int) (_thr *  32000.0);
+        }else
+            t = (int) (throttle * 32000.0);
         load_16int2buf(buf, i, t);
         mask^=get16to8bMask(t);
         i+=2;

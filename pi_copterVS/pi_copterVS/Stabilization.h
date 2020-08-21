@@ -47,15 +47,15 @@ private:
 	void set_acc_xy_pid_kI(const float f){ pids[ACC_X_PID].kI(f);	pids[ACC_Y_PID].kI(f); }
 	void set_acc_xy_speed_kD(const float f,const float fCut){ pids[ACC_X_PID].kD(f, fCut);	pids[ACC_Y_PID].kD(f, fCut); }
 	void set_acc_xy_pid_imax(const float f){ pids[ACC_X_PID].imax(-f,f);	pids[ACC_Y_PID].imax(-f,f); }
-	float def_max_speedXY, min_stab_hor_speed, max_speed_xy, min_stab_ver_speed;
-	float def_max_speedZ_P, def_max_speedZ_M,max_speedZ_P,max_speedZ_M;
+	float def_max_speedXY, min_stab_XY_speed, current_max_speed_xy;
+	float def_max_speedZ_P, def_max_speedZ_M,current_max_speedZ_P,current_max_speedZ_M, min_stab_Z_speed;
 public:
 	void set_max_speed_hor(float& s, bool only_test = false);
 	void set_max_sped_ver(float &ps, float &ns, bool only_test = false);
 	float get_def_max_speedXY() { return def_max_speedXY; }
-	float get_min_stagXY() { return min_stab_hor_speed; }
+	float get_min_stagXY() { return min_stab_XY_speed; }
 	float get_def_max_speedZ_M() { return def_max_speedZ_M; }
-	float get_max_speedXY_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_XY, min_stab_hor_speed); }
+	float get_max_speedXY_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_XY, min_stab_XY_speed); }
 	float get_max_speedZ_M_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_Z, -def_max_speedZ_M); }
 	float get_max_speedZ_P_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_Z, def_max_speedZ_P); }
 	void setMaxAng();
@@ -71,7 +71,7 @@ public:
 	void  resset_xy_integrator();
 	//float getAltitude() { return sZ; }
 	float getSpeed_Z(const float dist){
-		return constrain(dist*alt2speedZ, max_speedZ_M, max_speedZ_P);
+		return constrain(dist*alt2speedZ, current_max_speedZ_M, current_max_speedZ_P);
 	}
 
 	float getDist_Z(float speed){

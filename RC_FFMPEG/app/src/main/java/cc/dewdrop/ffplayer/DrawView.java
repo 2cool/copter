@@ -43,6 +43,7 @@ public class DrawView extends View {
 
     static public Img_button control_type_acc_, head_less_;
     static public  float maxAngle=35;
+    static public  float jleftK=1;
     static private float maxAngleChangerStep=-10;
     Monitor monitor;
     static private int screen=viewMain;
@@ -81,7 +82,10 @@ public class DrawView extends View {
 
     boolean old_hold_on=false;
     private  void updateControls(){
-
+        if (MainActivity.altHoldF())
+            j_left.setLabel(Integer.toString((int) (100.0 * jleftK)));
+        else
+            j_left.setLabel("+");
         motors_on[0].enabled(Commander.link);
         motors_on[1].enabled(Commander.link);
         boolean fpvf=Commander.link && ((MainActivity.control_bits&MainActivity.WIFI_CAMERA_FOUND)>0);
@@ -184,7 +188,6 @@ public class DrawView extends View {
 
     void menu_DrawView(final Context context){
 
-
         sc=new Square_Cells(9,0,0.3f,sm);
         int nX=sc.getMaxX();
         int nY=sc.getMaxY();
@@ -276,7 +279,7 @@ public class DrawView extends View {
         j_left=new Joystick(bR*k,sm[1]-bR*(1+k),bR,true,true,false,false,green_c);
         j_right=new Joystick(sm[0]-bR*(1+k),sm[1]-bR*(1+k),bR,true,true,false,false,green_c);
         j_right.setLabel(Integer.toString((int)(100.0*maxAngle/45)));
-
+        j_left.setLabel(Integer.toString((int)(100.0*jleftK)));
         ///  Rect r=new Rect(100,100,100+(int)(sm[2]/3f),100+(int)(sm[2]/3f));
 
 
@@ -598,6 +601,16 @@ public class DrawView extends View {
 
         j_left.onTouchEvent(event);
         j_right.onTouchEvent(event);
+        if (j_left.double_touch){
+            if ((MainActivity.control_bits & MainActivity.Z_STAB) !=0) {
+                BeepHelper.beep();
+                jleftK -= 0.25;
+                if (jleftK <= 0)
+                    jleftK = 1;
+
+            }
+            j_left.double_touch=false;
+        }
 		if (j_right.double_touch){
 
 
@@ -608,7 +621,7 @@ public class DrawView extends View {
             if (maxAngle==45)
                 maxAngleChangerStep=-10;
             maxAngle+=maxAngleChangerStep;
-            
+
             j_right.setLabel(Integer.toString((int)(100.0*maxAngle/45)));
             //Log.d("TELE", " OK " + maxAngle);
 
