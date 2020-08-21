@@ -221,7 +221,11 @@ void watch_dog() {
 		const uint8_t fpv_cnt = shmPTR->fpv_cnt;
 
 
+
+
+
 		if (network_manager_running) {
+#ifndef DEBUG
 			string cam =  exec("ifconfig wlx20e6170cacf8 | grep 192.168.42");
 			string wifi = exec("ifconfig wlx983f9f1908da | grep 192.168.1");
 			if (cam.length() > 5 && wifi.length() > 5) {
@@ -241,11 +245,11 @@ void watch_dog() {
 					delay(3000);
 				}
 				network_manager_running = false;
-				
 			}
+#else
+			network_manager_running = false;
+#endif // !DEBUG
 		}
-
-
 		delay(3000);
 
 		Telemetry.cpu_temp=get_cpu_temp();
