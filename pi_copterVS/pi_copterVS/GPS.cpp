@@ -43,11 +43,11 @@ int32_t tkskks = 0;
 //#define FALSE_LON 333368000
 
 //pole
-#define FALSE_LAT 479000293
-#define FALSE_LON 332533204
+//#define FALSE_LAT 479093270
+//#define FALSE_LON 333304280
 
-
-
+#define FALSE_LAT 479035710
+#define FALSE_LON 333395120
 //#define FALSE_LAT 478877891 
 //#define FALSE_LON 333048704
 

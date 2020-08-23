@@ -23,7 +23,7 @@ public class Telemetry {
     static public double roll=0,pitch=0,yaw=0;
     static private double _start_lat=0,_start_lon=0;
     static private boolean start_data_is_loaded=false;
-    static public double dist=0,speed=0,v_speed=0,speed_time=0,direction;
+    static public double dist=0,speed=0,v_speed=0,speed_time=0;//,direction;
     static public String messages=null;
     static public float heading=0,	battery_consumption=0,vibration=0;
     static public int status=0;
@@ -39,7 +39,7 @@ public class Telemetry {
     static final int VOLT_50  =1520;
     static boolean F_MIN_VOLT=false;
     static boolean F_VOLT50 =false;
-    static final double GRAD2RAD = 0.01745329251994329576923690768489;
+    static public  final double GRAD2RAD = 0.01745329251994329576923690768489;
 
     static public float settings[]=new float[10];
     static public int n_settings;
@@ -155,7 +155,7 @@ public class Telemetry {
 
 
 
-    static double bearing(double lat, double lon, double lat2, double lon2){
+    static public double bearing(double lat, double lon, double lat2, double lon2){
         double rll = (lon2 - lon);
         double rlat = (lat);
         double rlat2 = (lat2);
@@ -245,7 +245,7 @@ public class Telemetry {
 
 
 
-    static double RAD2GRAD =57.29578;
+    static public final double RAD2GRAD =57.29578;
 
 
     static float qw,qx,qy,qz;
@@ -564,7 +564,7 @@ public class Telemetry {
             if (cur_time-speed_time>200) {
                 //вічисляем растояние до старта и угол
                 dist=dist(_start_lat,_start_lon,lat,lon);
-                direction=RAD2GRAD*bearing(_start_lat,_start_lon,lat,lon);
+             //   direction=RAD2GRAD*bearing(_start_lat,_start_lon,lat,lon);
               //  dist=(_start_lat==0 || _start_lon==0)?0:dist(_start_lat,_start_lon,lat,lon);
               //  final double dDist = dist(old_Lat, old_Lon, lat, lon);
                 speed_time = cur_time;
@@ -576,7 +576,7 @@ public class Telemetry {
             start_data_is_loaded=false;
             _start_lat = _start_lon = 0;
             dist=0;
-            direction=0;
+            //direction=0;
 
         }
 //fly time

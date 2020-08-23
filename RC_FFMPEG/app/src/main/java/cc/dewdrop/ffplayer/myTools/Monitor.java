@@ -6,15 +6,17 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 
 import cc.dewdrop.ffplayer.DrawView;
+import cc.dewdrop.ffplayer.GPSservice;
 import cc.dewdrop.ffplayer.MainActivity;
 import cc.dewdrop.ffplayer.Telemetry;
 
 import static java.lang.Math.cos;
-
+import android.location.Location;
 public class Monitor {
     Paint white,green,red,black;
     private float compsL;
@@ -75,11 +77,11 @@ public class Monitor {
 
         green=new Paint();
         green.setColor(Color.GREEN);
-        green.setStrokeWidth(3);
+        green.setStrokeWidth(10);
 
         red=new Paint();
         red.setColor(Color.RED);
-        red.setStrokeWidth(3);
+        red.setStrokeWidth(10);
 
 
         compsL= (float)cmps.getWidth()*9.0f/25.0f;
@@ -138,17 +140,17 @@ public class Monitor {
         Rect r = new Rect();
         white.getTextBounds(text, 0, text.length(), r);
         //draw speed
-        float  xx = xpos - bm.getWidth() / 2.7f - (r.right - r.left);
+        float xx = xpos - bm.getWidth() / 2.7f - (r.right - r.left);
         float yy = ypos + (r.bottom - r.top) / 2;
         float w = white.measureText(text);
-        c.drawRect(xx ,   yy,xx+w,yy-white.getTextSize(),black);
+        c.drawRect(xx, yy, xx + w, yy - white.getTextSize(), black);
         c.drawText(text, xx, yy, white);
 
         text = Float.toString(speed) + " m/c";
         xx = xpos + bm.getWidth() / 3;
         yy = ypos + (r.bottom - r.top) / 2;
         w = white.measureText(text);
-        c.drawRect(xx ,   yy,xx+w,yy-white.getTextSize(),black);
+        c.drawRect(xx, yy, xx + w, yy - white.getTextSize(), black);
         c.drawText(text, xx, yy, white);
         //draw pointer of yaw
         c.drawLine(xpos, ypos - size1, xpos, ypos - size1 * 1.25f, white);
@@ -180,15 +182,20 @@ public class Monitor {
         c.drawLine(x, y, x, y + cmps.getHeight() * 0.5f, green);
 
         //----------------------------------------------------------------------------
-        dy = (float) Math.max(-90, Math.min(90, DrawView.wrap_180(Telemetry.direction + MainActivity.yaw)));
-     //   Log.d("MONIT","dir "+Double.toString(Telemetry.direction)+" telefon_yaw "+Double.toString(MainActivity.yaw));
-        //final float w=-(scale*compsL);
-        d_yaw = w * dy / 180;
-        d_yaw += w * 0.5;
-        x = xpos - compsL * scale * 0.5f - d_yaw;
-        y = ypos - size1 * 1.5f + cmps.getHeight() * 0.5f;
-        c.drawLine(x, y, x, y + cmps.getHeight() * 0.5f, red);
+        if (GPSservice.mLastLocation != null){
+            double phLat = GPSservice.mLastLocation.getLatitude();
+            double phLon = GPSservice.mLastLocation.getLongitude();
 
+            double direction = Telemetry.RAD2GRAD * Telemetry.bearing(phLat, phLon, Telemetry.lat, Telemetry.lon);
+            dy = (float) Math.max(-90, Math.min(90, DrawView.wrap_180(direction + MainActivity.yaw)));
+          //  Log.d("MONIT", "dir " + Double.toString(direction) + " telefon_yaw " + Double.toString(MainActivity.yaw));
+            //final float w=-(scale*compsL);
+            d_yaw = w * dy / 180;
+            d_yaw += w * 0.5;
+            x = xpos - compsL * scale * 0.5f - d_yaw;
+            y = ypos - size1 * 1.5f + cmps.getHeight() * 0.5f;
+            c.drawLine(x, y, x, y + cmps.getHeight() * 0.5f, red);
+    }
 
     }
 
