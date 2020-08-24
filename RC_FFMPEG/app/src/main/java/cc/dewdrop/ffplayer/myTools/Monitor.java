@@ -172,7 +172,7 @@ public class Monitor {
         green.setAlpha((DrawView.head_less_.is_pressed()) ? 255 : 100);
         //----------------------------------------------------------------------------
 
-        float dy = (float) Math.max(-90, Math.min(90, DrawView.wrap_180(MainActivity.yaw - DrawView.wrap_180(yaw))));
+        float dy = (float) Math.max(-90, Math.min(90, DrawView.wrap_180(MainActivity.get_yaw() - DrawView.wrap_180(yaw))));
         //Log.d("MONIT",Float.toString(dy)+" "+Double.toString(MainActivity.yaw)+ " "+Double.toString(yaw));
         w = -(scale * compsL);
         float d_yaw = w * dy / 180;
@@ -187,7 +187,7 @@ public class Monitor {
             double phLon = GPSservice.mLastLocation.getLongitude();
 
             double direction = Telemetry.RAD2GRAD * Telemetry.bearing(phLat, phLon, Telemetry.lat, Telemetry.lon);
-            dy = (float) Math.max(-90, Math.min(90, DrawView.wrap_180(direction + MainActivity.yaw)));
+            dy = (float) Math.max(-90, Math.min(90, DrawView.wrap_180(direction + MainActivity.get_yaw())));
           //  Log.d("MONIT", "dir " + Double.toString(direction) + " telefon_yaw " + Double.toString(MainActivity.yaw));
             //final float w=-(scale*compsL);
             d_yaw = w * dy / 180;

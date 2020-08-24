@@ -37,7 +37,10 @@ public class MainActivity extends Activity  implements SensorEventListener {
    static public FFVideoView mVideoView;
    public static boolean update=true;
     public static int updateTimeMsec=50;
-    public static float pitch=0,roll=0,yaw=0;
+    public static float pitch=0,roll=0,yaw_=0;
+    public static float yaw_correction=0;
+    public static float get_yaw(){return yaw_+yaw_correction;}
+
     private static boolean runMainUpdate=true;
     public final static int MOTORS_ON=1, CONTROL_FALLING=2,Z_STAB=4,XY_STAB=8,GO2HOME=16,PROGRAM=32, GIMBAL_AXIS=64,FPV_RECIVED=128;
     public final static int MPU_ACC_CALIBR=0x100, MPU_GYRO_CALIBR = 0x200, COMPASS_CALIBR=0x400,
@@ -451,7 +454,7 @@ double angK=0.3;
             old_time=now;
             pitch-=angK*0.5*RAD2GRAD*event.values[1]*dt;
             roll+=angK*0.5*RAD2GRAD*event.values[0]*dt;
-            yaw+=0.5*RAD2GRAD*event.values[2]*dt;
+            yaw_+=0.5*RAD2GRAD*event.values[2]*dt;
             // Commander.yaw-=event.values[2]*dt;
              //Log.i("MATHr","roll="+(roll)+", pitch="+(pitch));
            // Log.i("GYRO","gyro_work "+Double.toString(f));
@@ -480,11 +483,11 @@ double angK=0.3;
              magnetometerWork=true;
             double f=gyroscopeWork?1:0.1;
             double t_yaw=(DrawView.wrap_180((double)event.values[0]+90));
-            if (t_yaw>90 && yaw<-90)
-                yaw+=360;
-            else if (t_yaw<-90 && yaw>90)
-                yaw-=360;
-            yaw += (t_yaw - yaw )*f;
+            if (t_yaw>90 && yaw_<-90)
+                yaw_+=360;
+            else if (t_yaw<-90 && yaw_>90)
+                yaw_-=360;
+            yaw_ += (t_yaw - yaw_ )*f;
             //  Commander.heading=(float)heading_t;
            // Log.d("SENhD", Double.toString(yaw));
         }

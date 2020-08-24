@@ -91,6 +91,7 @@ class HmcClass
 	 
 	float   dx, dy, dz;
 	int setings_i;
+	int phone_yaw_correction = 0;
 	friend class StabilizationClass;
  public:
 	 string get_calibr_set();

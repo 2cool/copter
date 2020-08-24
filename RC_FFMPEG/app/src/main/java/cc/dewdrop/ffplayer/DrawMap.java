@@ -389,8 +389,8 @@ public class DrawMap extends View {
             red.setStyle(Paint.Style.FILL);
             red.setStrokeWidth(5);
             g.drawCircle(xy.x,xy.y,8,red);
-            int x=(int)(100*Math.sin(Math.toRadians(-MainActivity.yaw+90)));
-            int y=(int)(100*Math.cos(Math.toRadians(-MainActivity.yaw+90)));
+            int x=(int)(100*Math.sin(Math.toRadians(-MainActivity.get_yaw()+90)));
+            int y=(int)(100*Math.cos(Math.toRadians(-MainActivity.get_yaw()+90)));
             g.drawLine(xy.x,xy.y,xy.x-x,xy.y-y,red);
 
         }

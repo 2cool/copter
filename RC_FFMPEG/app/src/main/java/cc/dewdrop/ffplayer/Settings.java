@@ -33,7 +33,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             {0.2,0.2,0.2,0.2,0.2,0.2,1,0.2,0.2,0.2},
             {0.2,0.2,0.2,0.2,0.2,0.2,1,2,1,1},
             {0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
-            {0.2,10,3,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
+            {10,10,10,10,0.2,0.2,0.2,0.2,0.2,0.2},
             {5,5,1,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
             {20,20,10,1,0.2,0.2,0.2,0.2,0.2,0.2}
 
@@ -52,7 +52,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             // mpu
             {"Q_XY","R_XY","Q_Z","R_Z",_null,_null,_null,_null,_null,_null},
             //compas
-            {"_nothing_","yaw_correction","calibr_index",_null,_null,_null,_null,_null,_null,_null},
+            {"yaw_correction","calibr_index","phone_yaw_corr",_null, _null,_null,_null,_null,_null,_null},
             //rest
             {"start_sim800 need restart","ppp_inet need restart","telegram need restart",_null,_null,_null,_null,_null,_null,_null},
             //DEBUG
@@ -246,11 +246,20 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
     }
 
 
+    public void   update_phone_settings(int index) {
+        if (index==5) {
+            MainActivity.yaw_correction = Float.parseFloat(textV[2].getText().toString());
+            if (MainActivity.yaw_correction>45)
+                MainActivity.yaw_correction=45;
+            else if (MainActivity.yaw_correction<-45)
+                MainActivity.yaw_correction=-45;
+        }
 
+    }
     public void upload_settings(View view) {
         if (Telemetry.n_settings!= -2) {
-
-          //  Log.i("SETT1", "UPLOADING SETINGS");
+          update_phone_settings(Telemetry.n_settings);
+           // Log.i("SETT1", "UPLOADING SETINGS");
             Commander.n = menu_n;
             for (int i = 0; i < 10; i++) {
                 if (textV[i].getText().toString().length() > 0)
@@ -294,6 +303,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
                // f=Math.ceil(f);
             }
         }else {
+
             String sf[] = a[menu_n][i].split(",");
             if (sf.length >= 4) {
                 dk = 0.5 * Float.parseFloat(sf[1]);

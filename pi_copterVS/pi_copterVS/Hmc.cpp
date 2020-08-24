@@ -24,6 +24,7 @@
 //enum{X,Y,Z};
 bool HmcClass::init()
 {
+	phone_yaw_correction = 0;
 	setings_i = 0;
 	do_compass_motors_calibr = false;
 	motor_index = 0;
@@ -65,9 +66,10 @@ string HmcClass::get_set(){
 
 	ostringstream convert;
 	convert << \
-		"1" << "," << \
+		
 		Mpu.yaw_correction_angle * RAD2GRAD << "," << \
-		setings_i;
+		setings_i << "," << \
+		phone_yaw_correction;
 	string ret = convert.str();
 	return string(ret);
 
@@ -79,10 +81,11 @@ string HmcClass::get_set(){
 
 void HmcClass::set(const float buf[]){
 	
-	float yaw = constrain(buf[1],-45, 45);
+	float yaw = constrain(buf[0],-45, 45);
 	Mpu.yaw_correction_angle = yaw * GRAD2RAD;
 
-	setings_i = buf[2];
+	setings_i = buf[1];
+	phone_yaw_correction = constrain(buf[2], -45, 45);
 	calibration(false);
 
 	cout << "compas " << buf[0] << ","<<buf[1]<<endl;

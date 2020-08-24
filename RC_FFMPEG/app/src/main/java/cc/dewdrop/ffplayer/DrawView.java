@@ -462,7 +462,7 @@ public class DrawView extends View {
             yaw_off.set(head_less_.is_pressed());
             j_left.set_block_X(yaw_off.is_pressed());
             if (head_less_.is_pressed()){
-                heading=Telemetry.heading-MainActivity.yaw;
+                heading=Telemetry.heading-MainActivity.get_yaw();
             }else {
               //  Commander.heading=heading = MainActivity.yaw;
                 Commander.heading=heading=Telemetry.heading;
@@ -591,7 +591,7 @@ public class DrawView extends View {
         if (go_to_home.getStat()==3) {
             MainActivity.toHome();
             if (head_less_.is_pressed()) {
-                Commander.headingOffset = (float) (Telemetry.heading - MainActivity.yaw);
+                Commander.headingOffset = (float) (Telemetry.heading - MainActivity.get_yaw());
               //  Commander.heading = heading = (float) MainActivity.yaw;
             }else{
                 Commander.heading = heading=Telemetry.heading;
@@ -716,7 +716,7 @@ public class DrawView extends View {
 
         extra_buttons.paint(c);
 
-        old_yaw=MainActivity.yaw;
+        old_yaw=MainActivity.get_yaw();
         ma_pitch+=(MainActivity.pitch / maxAngle - ma_pitch)*1;
         ma_roll+=(MainActivity.roll  / maxAngle - ma_roll)*1;
 
@@ -738,7 +738,7 @@ public class DrawView extends View {
 
 
                 //отключить флаг управления всегда включен
-                Commander.heading=(float)MainActivity.yaw;
+                Commander.heading=(float)MainActivity.get_yaw();
                 heading += 45 * j_left.get_JX() * dt;
                 heading=(float)wrap_180(heading);
                 heading=Commander.headingOffset = (yaw_off.is_pressed())?0: heading;

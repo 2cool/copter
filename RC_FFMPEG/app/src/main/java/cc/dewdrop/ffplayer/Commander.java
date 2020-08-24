@@ -252,7 +252,7 @@ public class Commander {
                 tax = ax;
                 tay = ay;
             }else{
-                double da=GRAD2RAD*(Telemetry.heading-MainActivity.yaw);
+                double da=GRAD2RAD*(Telemetry.heading-MainActivity.get_yaw());
                 //Log.d("HEADING",Double.toString(da));
                 tax=(float)(ax*Math.cos(da)-ay*Math.sin(da));
                 tay=(float)(ax*Math.sin(da)+ay*Math.cos(da));
