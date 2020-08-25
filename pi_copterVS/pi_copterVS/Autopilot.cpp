@@ -142,15 +142,17 @@ void AutopilotClass::add_2_need_altitude(float speed, const float dt){
 			set_alt = true;
 		}
 		if (speed < 0) {
-			if (Mpu.get_Est_Alt() < 20)
-				speed *= (fmax(Mpu.get_Est_Alt(), 0) / 30.0);
-			if (speed > -0.1)
-				speed = -0.1;
-		}
-		if (speed > 0) 
-			speedP = speed;
-		else 
+			if (Mpu.get_Est_Alt() < 20) {
+				const float m = fmax( Mpu.get_Est_Alt() / 30.0, 0) ;
+				const float k = constrain(m,0.2,1);
+				speed *= k;
+			}
 			speedM = speed;
+		}
+		else  
+			speedP = speed;
+		
+			
 		Stabilization.set_max_sped_ver(speedP, speedM);
 
 		flyAtAltitude_V = Stabilization.getDist_Z(speedP+speedM);
