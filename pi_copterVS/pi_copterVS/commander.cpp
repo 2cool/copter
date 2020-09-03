@@ -1,6 +1,4 @@
- 
-// 
-// 
+
 #include <cstdio>
 #include <signal.h>
 
