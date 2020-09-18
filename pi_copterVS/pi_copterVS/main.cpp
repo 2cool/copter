@@ -216,6 +216,7 @@ bool start_wifi = false;// , start_inet = false, start_loger = false, start_tele
 bool max_cpu_freq = false;
 bool min_cpu_freq = false;
 bool network_manager_running = true;
+
 void watch_dog() {
 	delay(1000);
 	while (shmPTR->run_main) {
@@ -229,9 +230,18 @@ void watch_dog() {
 
 		if (network_manager_running) {
 #ifndef DEBUG
+			static uint8_t ap_ok = 0;
+			static uint8_t camera_ok = 0;
 			string cam =  exec("ifconfig wlx1cbfce0162cc | grep 192.168.42");
+			ap_ok += cam.length() > 5;
+			if (ap_ok == 1)
+				myDisplay.textDisplay("AP-ok, ");
 			string wifi = exec("ifconfig wlx983f9f1908da | grep 192.168.1");
-			if (cam.length() > 5 && wifi.length() > 5) {
+			camera_ok += wifi.length() > 5;
+			if (camera_ok == 1)
+				myDisplay.textDisplay("cam-ok, ");
+			
+			if (camera_ok && ap_ok) {
 				string ret = exec("systemctl | grep NetworkManager.service");
 				if (ret.length() > 10) {
 					cout << "stop " << ret << endl;
@@ -249,6 +259,7 @@ void watch_dog() {
 				}
 				network_manager_running = false;
 			}
+			
 #else
 			network_manager_running = false;
 #endif // !DEBUG
@@ -491,11 +502,11 @@ int main(int argc, char* argv[]) {
 #ifdef DEBUG
 			cout << "___________!!!DEBUG!!!___________\n";
 
-			myDisplay.textDisplay("!!!DEBUG!!!\t");
+			myDisplay.textDisplay("!!!DEBUG!!!, ");
 #endif
 #ifdef FLY_EMULATOR
 			cout << "___________!!!FLY_EMULATOR!!!___________\n";
-			myDisplay.textDisplay("!!!FLY_EMULATOR!!!");
+			myDisplay.textDisplay("!!!FLY_EMULATOR!!!, ");
 #endif
 
 
@@ -545,7 +556,7 @@ int main(int argc, char* argv[]) {
 	
 	if (init(counter) == 0) {
 		shmPTR->reboot = 0;
-
+		myDisplay.textDisplay("connecting to AP and camera");
 		thread tl(watch_dog);
 		tl.detach();
 

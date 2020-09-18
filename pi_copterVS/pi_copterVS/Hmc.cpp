@@ -16,7 +16,7 @@
 #include "debug.h"
 #include "Log.h"
 #include "GPS.h"
-
+#include "ssd1306.h"
 
 
 
@@ -119,7 +119,9 @@ bool motors_is_on_ = false;
 double _base[6],current;
 void HmcClass::start_motor_compas_calibr(){
 	if (do_compass_motors_calibr == false && Autopilot.motors_is_on()==false){
-		cout << "START MOTOR COMPAS CAL\n";
+		cout << "START MOTOR COMPAS CAL\n"; 
+		myDisplay.clearDisplay();
+		myDisplay.textDisplay("!!!START MOTOR COMPAS CAL!!!\n");
 		do_compass_motors_calibr = true;
 		motors_is_on_ = false;
 		c_base[X] = c_base[Y] = c_base[Z] = 0;
@@ -168,6 +170,7 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 					startTime = millis_() + 3e3;
 				}
 				else{
+					myDisplay.clearDisplay();
 					do_compass_motors_calibr = false;
 					Autopilot.reset_compas_motors_calibr_bit();
 					Settings.write_commpas_motors_correction(base);
@@ -305,8 +308,7 @@ void HmcClass::newCalibration(int16_t sh[]){
 	long cnt = 0;
 	long fcnt = 0;
 	int print_time = millis_();
-	int led_time = print_time;
-	int color = 4;
+
 	//float f[] = { 0,0,0,0 };
 	while (true){
 		fcnt++;
@@ -348,20 +350,27 @@ void HmcClass::newCalibration(int16_t sh[]){
 			//printf("min_Z: %i\n", mz);
 			new_val |= 4;
 		}
-		mega_i2c.set_led_mode(color, 10, false);
+
 		GPS.loop(); //for led
 		//mega_i2c.throttle(f);
 		delay(10);
+		
 		if (new_val) {
-			if (new_val >= 4)
-				color = 8;
-			else if (new_val >= 2)
-				color = 7;
-			else
-				color = 6;
+			string xyz = "";
+			if (new_val & 1)
+				xyz += "X ";
+			if (new_val & 2)
+				xyz += "Y ";
+			if (new_val & 4)
+				xyz += "Z ";
+			if (new_val)
+				xyz += ",";
+			myDisplay.textDisplay(xyz.c_str());
+
+			
 			const int32_t mill = millis_();
 			print_time = mill + 1000;
-			led_time = mill + 1000;
+
 			int i = 0;
 			cout <<"X: "<< sh[i++] << "\t" << sh[i++] << endl;
 			cout <<"Y: "<< sh[i++] << "\t" << sh[i++] << endl;
@@ -371,10 +380,11 @@ void HmcClass::newCalibration(int16_t sh[]){
 		}
 		else {
 			const int32_t mill = millis_();
-			if (mill > led_time)
-				color = 5;
+			
 			if (mill > print_time) {
 				cout << if_no_change_cnt_to_stop - cnt << endl;
+				string str = "" + to_string(if_no_change_cnt_to_stop - cnt)+", ";
+				myDisplay.textDisplay(str.c_str());
 				print_time += 1000;
 			}
 		}
@@ -383,18 +393,22 @@ void HmcClass::newCalibration(int16_t sh[]){
 		//wdt_reset();
 	}
 	cout << "Stop Rottation\n";
+	myDisplay.clearDisplay();
 	
 }
 bool HmcClass::read_calibration(int16_t sh[]) {
 	bool calibr = Settings.read_commpas_callibration(setings_i, sh) == 0;
 	if (calibr == false) {
-		cout << "! ! ! ! Comppas not Calibrated ! ! ! !\n";
+		cout << "! ! ! ! Compas not Calibrated ! ! ! !\n";
+		myDisplay.textDisplay("Compas not Calibrated\n");
 		return false;
 	}
 
 	bool mot_cal = Settings.read_commpas_motors_correction(base) == 0;
-	if (!mot_cal)
-		cout << "! ! ! ! Comppas motors not Calibrated ! ! ! !\n";
+	if (!mot_cal) {
+		cout << "! ! ! ! Compas motors not Calibrated ! ! ! !\n";
+		myDisplay.textDisplay("Compas motors not Calibrated\n");
+	}
 	calibr &= mot_cal;
 
 	if (calibr) {
