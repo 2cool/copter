@@ -58,7 +58,7 @@
 using namespace std;
 
 //static const string wlan_fpv = "wlx8c18d960bdda";  //RTL8188EU
-static const string wlan_fpv = "wlx20e6170cacf8";//MT7601U
+static const string wlan_fpv = "wlx1cbfce0162cc";//MT7601U
 
 std::string exec(const std::string cmd) {
 	//printf(cmd.c_str());
@@ -332,7 +332,7 @@ sudo dhclient ra0
 
 
 //const static string connect2camera = "ifconfig "+wlan_fpv+" up && wpa_supplicant -B -i"+wlan_fpv+" -c /etc/camera.conf -Dwext && dhclient "+ wlan_fpv;
-const static string connect2camera = "ifconfig wlx20e6170cacf8 down && ifconfig wlx20e6170cacf8 up && wpa_supplicant -B -iwlx20e6170cacf8 -c /etc/camera.conf -Dwext && dhclient wlx20e6170cacf8";
+const static string connect2camera = "ifconfig wlx1cbfce0162cc down && ifconfig wlx1cbfce0162cc up && wpa_supplicant -B -iwlx1cbfce0162cc -c /etc/camera.conf -Dwext && dhclient wlx1cbfce0162cc";
 
 
 void sleep3s() {
@@ -371,7 +371,7 @@ int main(int argc, char* argv[])
 			
 	do {
 		static bool print = true;
-		string ret=exec("nice -n -20   ifconfig wlx20e6170cacf8 | grep 192.168.42"); 
+		string ret=exec("nice -n -20   ifconfig wlx1cbfce0162cc | grep 192.168.42"); 
 		if (ret.length() < 10) {
 			if (print) {
 				shmPTR->status |= 0x8000;

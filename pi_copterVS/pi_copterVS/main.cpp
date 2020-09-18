@@ -1,6 +1,6 @@
 
  
-#define PROG_VERSION "ver 3.191025\n"
+#define PROG_VERSION "ver: 3.200916\n"
 #define SIM800_F
 
 
@@ -22,6 +22,9 @@
 #include  <stdio.h>
 #include  <stdlib.h>
 #include <sys/types.h>
+
+
+#include "ssd1306.h"
 
 #include "define.h"
 
@@ -226,7 +229,7 @@ void watch_dog() {
 
 		if (network_manager_running) {
 #ifndef DEBUG
-			string cam =  exec("ifconfig wlx20e6170cacf8 | grep 192.168.42");
+			string cam =  exec("ifconfig wlx1cbfce0162cc | grep 192.168.42");
 			string wifi = exec("ifconfig wlx983f9f1908da | grep 192.168.1");
 			if (cam.length() > 5 && wifi.length() > 5) {
 				string ret = exec("systemctl | grep NetworkManager.service");
@@ -239,9 +242,9 @@ void watch_dog() {
 							iwconfig wlx983f9f1908da txpower 30 && \
 							wpa_supplicant -B -iwlx983f9f1908da -Dnl80211 -c /etc/wifi.conf && \
 							dhclient wlx983f9f1908da && \
-							ifconfig wlx20e6170cacf8 up && \
-							wpa_supplicant -B -iwlx20e6170cacf8 -c /etc/camera.conf -Dnl80211 && \
-							dhclient wlx20e6170cacf8");
+							ifconfig wlx1cbfce0162cc up && \
+							wpa_supplicant -B -iwlx1cbfce0162cc -c /etc/camera.conf -Dnl80211 && \
+							dhclient wlx1cbfce0162cc");
 					delay(3000);
 				}
 				network_manager_running = false;
@@ -455,6 +458,9 @@ int main(int argc, char* argv[]) {
 	
 	Debug.n_debug = 0;
 
+	myDisplay.setWordWrap(TRUE);
+	myDisplay.setDisplayMode(SSD1306::Mode::SCROLL);
+
 	if (argc >= 2) {
 		int tt = string(argv[1]).compare("-help");
 		if (tt == 0) {
@@ -484,9 +490,12 @@ int main(int argc, char* argv[]) {
 			}
 #ifdef DEBUG
 			cout << "___________!!!DEBUG!!!___________\n";
+
+			myDisplay.textDisplay("!!!DEBUG!!!\t");
 #endif
 #ifdef FLY_EMULATOR
 			cout << "___________!!!FLY_EMULATOR!!!___________\n";
+			myDisplay.textDisplay("!!!FLY_EMULATOR!!!");
 #endif
 
 
@@ -507,7 +516,9 @@ int main(int argc, char* argv[]) {
 
 
 	//---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 	cout << PROG_VERSION << endl;
+	myDisplay.textDisplay(PROG_VERSION);
 
 	cout << argv[0] << "\n"<< argv[1] << " " << argv[2] << " " << argv[3] << " " << argv[4] << " " << argv[5] << " " << argv[6] << " " << argv[7]<< " "<< argv[8] <<endl;
 	
@@ -531,6 +542,7 @@ int main(int argc, char* argv[]) {
 	mega_i2c.init();
 
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	
 	if (init(counter) == 0) {
 		shmPTR->reboot = 0;
 
@@ -547,6 +559,7 @@ int main(int argc, char* argv[]) {
 	}
 	else {
 		cout << "INITIALIZATION ERROR!!!\n";
+		myDisplay.textDisplay("INITIALIZATION ERROR!!!\n");
 	}
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -569,12 +582,14 @@ int main(int argc, char* argv[]) {
 		switch (shmPTR->reboot) {
 		case 1:
 			Settings.write_all();
+			myDisplay.textDisplay("---reboot---\n");
 #ifndef DEBUG
 			system("reboot");
 #endif
 			break;
 		case 2:
 			Settings.write_all();
+			myDisplay.textDisplay("---shutdown now---\n");
 			system("shutdown now");
 			break;
 
@@ -593,6 +608,7 @@ int main(int argc, char* argv[]) {
 #endif
 
 	//system("cpufreq-set -u 1370000 -d 480000");
+	myDisplay.textDisplay("---THE END---");
 	return 0;
 
 }

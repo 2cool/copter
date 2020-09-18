@@ -32,6 +32,7 @@ THG out of Perimetr high
 #define CALIBRATION__TIMEOUT 60e3
 #endif
 
+#include "ssd1306.h"
 #include "define.h"
 #include "WProgram.h"
 
@@ -691,6 +692,7 @@ bool AutopilotClass::is_all_OK(bool print){
 		if (print) {
 			cout << "\n!!!calibrating!!! to end:" << CALIBRATION__TIMEOUT - (int)_ct << " sec." << "\t" << _ct << endl;
 			mega_i2c.beep_code(B_MS611_ERROR);
+			myDisplay.textDisplay("calibrating... ");
 		}
 		return false;
 	}
@@ -712,6 +714,7 @@ bool AutopilotClass::is_all_OK(bool print){
 				Telemetry.addMessage(e_LOW_VOLTAGE);
 				cout << " LOW VOLTAGE" << "\t" << _ct << endl;
 				mega_i2c.beep_code(B_LOW_VOLTAGE);
+				myDisplay.textDisplay("low voltage, ");
 			}
 #ifndef DEBUG
 			return false;
@@ -723,6 +726,7 @@ bool AutopilotClass::is_all_OK(bool print){
 				cout << " GPS error" << "\t" << _ct << endl;
 				mega_i2c.beep_code(B_GPS_ACCURACY_E);
 				Telemetry.addMessage(e_GPS_ERROR);
+				myDisplay.textDisplay("gps error, ");
 			}
 #ifndef DEBUG
 			return false;
@@ -748,8 +752,10 @@ bool AutopilotClass::is_all_OK(bool print){
 			}
 
 		}
-		if (print)
+		if (print) {
 			cout << " calibr FALSE" << "\t" << _ct << endl;
+			myDisplay.textDisplay("calibr FALSE, ");
+		}
 	}
 	return false;
 }
@@ -776,6 +782,7 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 		if (abs(Mpu.get_pitch() > 10 || abs(Mpu.get_roll() > 10 || abs(Mpu.gyroPitch) > 20 || abs(Mpu.gyroRoll) > 20 || abs(Mpu.gyroYaw) > 20))) {
 			cout << " WRONG POSSITION" << "\t" << _ct << endl;
 			mega_i2c.beep_code(B_ACC_ERROR);
+			myDisplay.textDisplay("WRONG POSSITION, ");
 			return false;
 		}
 

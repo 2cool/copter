@@ -95,6 +95,7 @@
     <ClCompile Include="Prog.cpp" />
     <ClCompile Include="mi2c.cpp" />
     <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="ssd1306.cpp" />
     <ClCompile Include="Stabilization.cpp" />
     <ClCompile Include="Telemetry.cpp" />
     <ClCompile Include="WProgram.cpp" />
@@ -103,6 +104,7 @@
     <ClInclude Include="AP_PID.h" />
     <ClInclude Include="Autopilot.h" />
     <ClInclude Include="Balance.h" />
+    <ClInclude Include="charmap.h" />
     <ClInclude Include="commander.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="define.h" />
@@ -129,6 +131,7 @@
     <ClInclude Include="Prog.h" />
     <ClInclude Include="mi2c.h" />
     <ClInclude Include="Settings.h" />
+    <ClInclude Include="ssd1306.h" />
     <ClInclude Include="Stabilization.h" />
     <ClInclude Include="Telemetry.h" />
     <ClInclude Include="WProgram.h" />
