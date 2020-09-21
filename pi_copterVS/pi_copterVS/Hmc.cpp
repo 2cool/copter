@@ -141,7 +141,7 @@ void HmcClass::start_motor_compas_calibr(){
 #define test_throttle 0.6f
 void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 	if (millis_() > startTime){
-		if (baseI < tests_amount){
+		if (baseI < tests_amount && ( motor_index == 0 || Balance.gf(motor_index) > 0)){
 			if (Balance.gf(motor_index) == 0 || Balance.gf(motor_index) == test_throttle) {
 				current += Telemetry.get_current(motor_index);
 				_base[0] += fmx;
@@ -177,12 +177,13 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 				}
 			}
 			else{
-
-				_base[3] = _base[0];
-				_base[4] = _base[1];
-				_base[5] = _base[2];
+				if (motor_index == 0) {
+					_base[3] = _base[0];
+					_base[4] = _base[1];
+					_base[5] = _base[2];
+				}
 				
-				printf("\n\n--- OFF # %i %f %f %f current=%f\n", motor_index, _base[0] / 1000, _base[1] / 1000, _base[2] / 1000, current / 1000);
+				printf("\n\n--- OFF # %i %f %f %f current=%f\n", motor_index, _base[3] / tests_amount, _base[4] / tests_amount, _base[5] / tests_amount, current / tests_amount);
 				startTime = millis_() + 3e3;
 				throttle = test_throttle;
 				Autopilot.motors_do_on(true, "CMT");

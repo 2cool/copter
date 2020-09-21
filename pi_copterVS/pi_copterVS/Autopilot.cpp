@@ -792,6 +792,7 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 		control_bits = MOTORS_ON;
 #else
 		control_bits |= MOTORS_ON;
+		myDisplay.textDisplay("MOTORS ON,");
 #endif
 		GPS.loc.setHomeLoc();
 		Mpu.set_XYZ_to_Zero();  // все берем из мпу. при  старте x y z = 0;
@@ -818,7 +819,7 @@ bool AutopilotClass::motors_do_on(const bool start, const string msg){//////////
 		cout << "Lat,lon,alt: " << GPS.loc.lon_ << ", " << GPS.loc.lat_ << ", " << GPS.loc.altitude << endl;
 		Telemetry.addMessage(i_OFF_MOTORS);
 		off_throttle(true, msg);
-
+		myDisplay.textDisplay("MOTORS OFF,");
 		cout << "OK" << "\t"<< _ct <<endl;
 
 		//if (camera_mode) {//----------------------------------

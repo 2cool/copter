@@ -291,8 +291,8 @@ bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с к
 		char buf[6];
 
 		buf[1] = 8;
-		((uint16_t*)buf)[2] = (uint16_t)(pitch);
-		((uint16_t*)buf)[1] = (uint16_t)roll;
+		((uint16_t*)buf)[2] = (uint16_t)roll;
+		((uint16_t*)buf)[1] = (uint16_t)pitch;
 		const int fd = open_i2c_();
 		if (fd == -1 || write(fd, buf + 1, 5) == -1) {
 			Telemetry.addMessage(e_ARDUINO_RW_ERROR);

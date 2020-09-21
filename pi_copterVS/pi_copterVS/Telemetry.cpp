@@ -245,9 +245,9 @@ int TelemetryClass::check_time_left_if_go_to_home(){
 #endif
 
 int TelemetryClass::update_voltage() {
-	
+
 #ifdef FULL_FW
-	Emu.battery(m_current,voltage);
+	Emu.battery(m_current, voltage);
 #else
 
 	if (mega_i2c.getiiiiv((char*)data) == -1) {
@@ -256,7 +256,8 @@ int TelemetryClass::update_voltage() {
 	}
 
 
-	const float hall_effect_sensor_max_cur[4] = { 36,37,43,34 };
+	//const float hall_effect_sensor_max_cur[4] = { 36,37,43,34 };
+	const float hall_effect_sensor_max_cur[4] = { 39,38,36,46 };
 	static float data_at_zero[4] = { 3255,3255,3255,3255 };
 	static float cur_k[4] = { 0.011,0.011,0.011,0.011 };
 	if (Autopilot.motors_onState() == false) {
@@ -283,8 +284,9 @@ int TelemetryClass::update_voltage() {
 	   */
 
 	   //Debug.dump((motor>=0)?m_current[motor]:-1, powerI-restI,0,0);
-
-	   //Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);
+	//if (m_current[0] > 1  || m_current[1] > 1 || m_current[2] > 1 || m_current[3] > 1 )
+	 //  Debug.dump(m_current[0], m_current[1], m_current[2], m_current[3]);
+	//   Debug.dump(m_current[0]+ m_current[1]+ m_current[2]+ m_current[3],0,0,0);
 
 #endif
 
