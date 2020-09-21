@@ -1,0 +1,20 @@
+CXX=g++
+CXXFLAGS= -Wall -O2 -mfpu=neon -std=gnu++11 -pthread
+
+PROG=../wifi_p
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+all: $(PROG).o
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(PROG) \
+main.o
+
+
+$(PROG).o:  \
+main.o
+
+
+clean:
+	rm -rf *.o *~ *.mod
+	rm -rf $(PROG)

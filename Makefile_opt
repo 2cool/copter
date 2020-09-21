@@ -1,0 +1,73 @@
+CXX=g++
+CXXFLAGS= -Wall -O3 -march=armv7-a -ftree-vectorize -mfloat-abi=hard  -mfpu=neon -std=gnu++11 -pthread
+
+PROG=../pi_copter
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+all: $(PROG).o
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(PROG) \
+AP_PID.o \
+Autopilot.o \
+Balance.o \
+commander.o \
+debug.o \
+Direction.o \
+GeoDot.o \
+GPS.o \
+Hmc.o \
+I2Cdev.o \
+inv_mpu_dmp_motion_driver.o \
+inv_mpu.o \
+KalmanFilter.o \
+Location.o \
+Log.o \
+MadgwickAHRS.o \
+main.o \
+mi2c.o \
+mpu.o \
+MPU6050.o \
+mpu_umulator.o \
+MS5611.o \
+Prog.o \
+Settings.o \
+ssd1306.o \
+Stabilization.o \
+Telemetry.o \
+WProgram.o
+
+$(PROG).o:  \
+AP_PID.o \
+Autopilot.o \
+Balance.o \
+commander.o \
+debug.o \
+Direction.o \
+GeoDot.o \
+GPS.o \
+Hmc.o \
+I2Cdev.o \
+inv_mpu_dmp_motion_driver.o \
+inv_mpu.o \
+KalmanFilter.o \
+Location.o \
+Log.o \
+MadgwickAHRS.o \
+main.o \
+mi2c.o \
+mpu.o \
+MPU6050.o \
+mpu_umulator.o \
+MS5611.o \
+Prog.o \
+Settings.o \
+ssd1306.o \
+Stabilization.o \
+Telemetry.o \
+WProgram.o
+
+
+clean:
+	rm -rf *.o *~ *.mod
+	rm -rf $(PROG)
