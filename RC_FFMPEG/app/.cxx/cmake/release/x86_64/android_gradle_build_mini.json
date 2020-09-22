@@ -1,19 +1,19 @@
 {
   "buildFiles": [
-    "C:\\Android\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
-    "C:\\Android\\ndk\\21.0.6113669\\build\\cmake\\platforms.cmake",
-    "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\CMakeLists.txt"
+    "C:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\ndk\\21.0.6113669\\build\\cmake\\platforms.cmake",
+    "C:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+    "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "C:\\Android\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86_64\" clean"
+    "C:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86_64\" clean"
   ],
-  "buildTargetsCommand": "C:\\Android\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommand": "C:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
     "native-lib-Release-x86_64": {
       "artifactName": "native-lib",
-      "buildCommand": "C:\\Android\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86_64\" native-lib",
+      "buildCommand": "C:\\Users\\Igor\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\.cxx\\cmake\\release\\x86_64\" native-lib",
       "abi": "x86_64",
-      "output": "C:\\Users\\tcool\\copter\\RC_FFMPEG\\app\\build\\intermediates\\cmake\\release\\obj\\x86_64\\libnative-lib.so",
+      "output": "C:\\Users\\Igor\\copter\\RC_FFMPEG\\app\\build\\intermediates\\cmake\\release\\obj\\x86_64\\libnative-lib.so",
       "runtimeFiles": []
     }
   }

@@ -5,7 +5,7 @@
 #include "debug.h"
 #include "Log.h"
 #include "GPS.h"
-
+#include "ssd1306.h"
 
 #define NORM_CT 10000
 
@@ -393,6 +393,7 @@ bool MS5611Class::init() {
 
 	if (fd4S == -1 || writeReg(fd4S,RESET) == -1) {
 		cout << "Failed to writeReg(RESET)\n";
+		myDisplay.textDisplay("MS5611 ERROR\n");
 		return false;
 	}
 
@@ -401,6 +402,7 @@ bool MS5611Class::init() {
 		C[i] = PROM_read(fd4S, 0xA2 + (i * 2));
 		if (C[i] == 0) {
 			cout << "Failed PROM_read\n";
+			myDisplay.textDisplay("MS5611 ERROR\n");
 			return false;
 		}
 	}

@@ -387,7 +387,7 @@ bool BalanceClass::loop()
 #endif
 #endif
 
-		
+//	f_[0] = f_[1] = f_[2] = f_[3] = 0;
 	if (speed_up && (speed_up_control(f_) || throttle <= MIN_THROTTLE_2_DONT_RESET_STAB_PIDS))
 		PID_reset();
 	else

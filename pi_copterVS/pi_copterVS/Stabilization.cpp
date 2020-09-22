@@ -32,13 +32,13 @@ void StabilizationClass::init(){
 
 	dist2speed_XY =  0.55f;
 	set_acc_xy_pid_kp( 3);
-	set_acc_xy_pid_kI( 0.06);
+	set_acc_xy_pid_kI(0.5f);// 0.06);
 	xy_kD = 1.8;
 	set_acc_xy_pid_imax(Balance.get_max_angle());
 
 	
 	def_max_speedXY=current_max_speed_xy = 10;
-	min_stab_XY_speed = 10;
+	min_stab_XY_speed = 1.3;
 	//-------------------------------------------
 
 	min_stab_Z_speed = 3;
@@ -221,6 +221,16 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		x_error += ((Mpu.get_Est_SpeedX() - need_speedX) - x_error) * XY_FILTER;
 		y_error += ((Mpu.get_Est_SpeedY() - need_speedY) - y_error) * XY_FILTER;
 
+		if (abs((x_error )) > 1.3f) {
+			if (pids[ACC_X_PID].get_integrator() * x_error < 0)
+				pids[ACC_X_PID].set_integrator(0);
+		}
+
+		if (abs(y_error ) > 1.3f) {
+			if (pids[ACC_Y_PID].get_integrator() * y_error < 0)
+				pids[ACC_Y_PID].set_integrator(0);
+		}
+		//Debug.dump(pids[ACC_X_PID].get_integrator(), pids[ACC_Y_PID].get_integrator(), 0, 0);
 		const float w_pitch = -(pids[ACC_X_PID].get_pid(x_error, Mpu.get_dt())) - Mpu.get_Est_accX() * xy_kD;
 		const float w_roll = pids[ACC_Y_PID].get_pid(y_error, Mpu.get_dt()) + Mpu.get_Est_accY() * xy_kD;
 

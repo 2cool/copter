@@ -56,7 +56,8 @@ bool HmcClass::init()
 //	}
 
 #endif	
-
+	if (!ok)
+		myDisplay.textDisplay("HMC ERROR\n");
 	return ok;
 }
 
@@ -116,7 +117,7 @@ void HmcClass::log_sens() {
 
 int baseI = 0;
 bool motors_is_on_ = false;
-double _base[6],current;
+double _base[6],current[2];
 void HmcClass::start_motor_compas_calibr(){
 	if (do_compass_motors_calibr == false && Autopilot.motors_is_on()==false){
 		cout << "START MOTOR COMPAS CAL\n"; 
@@ -128,8 +129,8 @@ void HmcClass::start_motor_compas_calibr(){
 		startTime = millis_() + 5e3;
 		motor_index = 0;
 		baseI = 0;
-		current = 0;
-		_base[0] = _base[1] = _base[2] = current = 0;
+		current[0] = 0;
+		_base[0] = _base[1] = _base[2] = current[0] = 0;
 		throttle = 0.35;
 
 	}
@@ -143,7 +144,7 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 	if (millis_() > startTime){
 		if (baseI < tests_amount && ( motor_index == 0 || Balance.gf(motor_index) > 0)){
 			if (Balance.gf(motor_index) == 0 || Balance.gf(motor_index) == test_throttle) {
-				current += Telemetry.get_current(motor_index);
+				current[0] += Telemetry.get_current(motor_index);
 				_base[0] += fmx;
 				_base[1] += fmy;
 				_base[2] += fmz;
@@ -155,13 +156,13 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 				Autopilot.motors_do_on(false, "CMT");
 				motors_is_on_ = false;
 				int index = motor_index * 3;
-
-				printf("+++ ON  #%i %f %f %f current=%f\n",motor_index, _base[0]/ tests_amount, _base[1]/ tests_amount, _base[2]/ tests_amount,current/ tests_amount);
+				printf("\n\n--- OFF # %i %f %f %f current=%f\n", motor_index, _base[3] / tests_amount, _base[4] / tests_amount, _base[5] / tests_amount, current[1] / tests_amount);
+				printf("+++ ON  #%i %f %f %f current=%f\n",motor_index, _base[0]/ tests_amount, _base[1]/ tests_amount, _base[2]/ tests_amount,current[0]/ tests_amount);
 		
 
-				base[index] =   (float)(((_base[0] - _base[3]) / current));
-				base[index+1] = (float)(((_base[1] - _base[4]) / current));
-				base[index+2] = (float)(((_base[2] - _base[5]) / current));
+				base[index] =   (float)(((_base[0] - _base[3]) / current[0]));
+				base[index+1] = (float)(((_base[1] - _base[4]) / current[0]));
+				base[index+2] = (float)(((_base[2] - _base[5]) / current[0]));
 
 				printf("bases  # %i %f %f %f\n", motor_index, base[index], base[index + 1], base[index + 2]);
 
@@ -181,16 +182,16 @@ void HmcClass::motTest(const float fmx, const float fmy, const float fmz){
 					_base[3] = _base[0];
 					_base[4] = _base[1];
 					_base[5] = _base[2];
+					current[1] = current[0];
 				}
 				
-				printf("\n\n--- OFF # %i %f %f %f current=%f\n", motor_index, _base[3] / tests_amount, _base[4] / tests_amount, _base[5] / tests_amount, current / tests_amount);
 				startTime = millis_() + 3e3;
 				throttle = test_throttle;
 				Autopilot.motors_do_on(true, "CMT");
 				motors_is_on_ = true;
 			}
 			baseI = 0;
-			_base[0] = _base[1] = _base[2] = current=0;
+			_base[0] = _base[1] = _base[2] = current[0]=0;
 		}
 	}
 	

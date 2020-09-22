@@ -113,6 +113,9 @@ int init(int cnt) {////--------------------------------------------- INITIALIZAT
 
 	Settings.read_all();
 	ok &= Hmc.calibrated_;
+	if (!Hmc.calibrated_)
+		myDisplay.textDisplay("HMC NOT CALIBR\n");
+
 	for (int i = 0; i < 3; i++) {
 		MS5611.loop();
 		usleep(20000);
@@ -531,7 +534,7 @@ int main(int argc, char* argv[]) {
 	cout << PROG_VERSION << endl;
 	myDisplay.textDisplay(PROG_VERSION);
 
-	cout << argv[0] << "\n"<< argv[1] << " " << argv[2] << " " << argv[3] << " " << argv[4] << " " << argv[5] << " " << argv[6] << " " << argv[7]<< " "<< argv[8] <<endl;
+	cout << argv[0] << "\n"<< argv[1] << " " << argv[2] << " " << argv[3] << " " << argv[4]  <<endl;
 	
 	if (signal(SIGINT, handler) == SIG_ERR) {
 		return EXIT_FAILURE;
@@ -553,9 +556,26 @@ int main(int argc, char* argv[]) {
 	mega_i2c.init();
 
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+		if (0 != exec("ifconfig wlx983f9f1908da").find("wlx983f9f1908da")) {
+			cout << "WIFI NOT FOUND\n";
+			myDisplay.textDisplay("WIFI NOT FOUND\n");
+			return 0;
+		}
+
+		if (0 != exec("ifconfig wlx1cbfce0162cc").find("wlx1cbfce0162cc")) {
+			cout << "CAM WIFI NOT FOUNE\n";
+			myDisplay.textDisplay("CAM WIFI NOT FOUND\n");
+			return 0;
+		}
 	
 	if (init(counter) == 0) {
 		shmPTR->reboot = 0;
+
+	
+		//string wifi = exec("ifconfig wlx983f9f1908da | grep 192.168.1");
+
+
 		myDisplay.textDisplay("connecting to AP and camera");
 		thread tl(watch_dog);
 		tl.detach();

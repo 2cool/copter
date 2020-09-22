@@ -7,7 +7,7 @@
 #include "Autopilot.h"
 #include "debug.h"
 #include "Log.h"
-
+#include "ssd1306.h"
 
 bool GPSClass::init()
 {	
@@ -17,6 +17,7 @@ bool GPSClass::init()
 #endif
 	if (loc.init() == -1) {
 		cout << "GPS ERROR\n";
+		myDisplay.textDisplay("GPS ERROR\n");
 		return false;
 	}
 	cout << "GPS INIT\n";

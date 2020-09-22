@@ -25,7 +25,7 @@
 #include "debug.h"
 #include "mpu_umulator.h"
 #include "Log.h"
-
+#include "ssd1306.h"
 #define BALANCE_DELAY 120
 #define MAX_FLY_TIME 1800
 #define BAT_ZERO 300.0f
@@ -297,7 +297,7 @@ int TelemetryClass::update_voltage() {
 bool TelemetryClass::testBatteryVoltage() {
 	static int32_t old_time = millis_();
 	if (update_voltage() == -1) {
-
+		myDisplay.textDisplay("BATTERY ERROR\n");
 		return false;
 	}
 	//const double time_nowd = Mpu.timed;

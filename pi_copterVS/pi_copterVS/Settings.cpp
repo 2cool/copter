@@ -8,7 +8,7 @@
 #include "Balance.h"
 #include "Stabilization.h"
 #include "commander.h"
-
+#include "ssd1306.h"
 template <class T> int writeAnything(int ee, const T& value)
 {
 	const byte* p = (const byte*)(const void*)&value;
@@ -193,6 +193,8 @@ int SettingsClass::read_all() {
 	if (f == NULL)
 	{
 		cout << "No settings file!\n";
+		myDisplay.textDisplay("NO SETTINGS FILE!\N");
+		Hmc.calibration(false);
 		return -1;
 	}
 	char buf[1000];

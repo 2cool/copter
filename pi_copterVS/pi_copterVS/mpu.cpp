@@ -10,7 +10,7 @@
 #include "GPS.h"
 #include "Log.h"
 #include "MadgwickAHRS.h"
-
+#include "ssd1306.h"
 /*
 
 пользоватся только гироскопом если акселерометр показивает меньший угол. (но временно) и акселерометр и гироскоп должни бить отфильтровані
@@ -197,6 +197,8 @@ bool MpuClass::init()
 	bool ok = true;
 
 #endif
+	if (!ok)
+		myDisplay.textDisplay("MPU ERROR\n");
 	return ok;
 }
 //-----------------------------------------------------

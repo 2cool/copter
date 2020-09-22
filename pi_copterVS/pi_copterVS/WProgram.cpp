@@ -1,7 +1,7 @@
 #include <sys/types.h>
 #include "WProgram.h"
 #include "define.h"
-
+#include "ssd1306.h"
 #include <sys/shm.h>
 #include <sys/ipc.h>
 #include "mpu.h"
@@ -56,6 +56,7 @@ int init_shmPTR() {
 	ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
 		if (ShmID < 0) {
 			cout << "***main shmget error (server) ***" << "\t"<<millis_() << endl;
+			myDisplay.textDisplay("main shmget error\n");
 			return 1;
 		}
 		shmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
