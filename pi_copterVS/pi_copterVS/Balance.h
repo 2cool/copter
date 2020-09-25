@@ -16,6 +16,7 @@
 #include "MPU6050.h"
 #include "Autopilot.h"
 #include "AP_PID.h"
+#include "ANG_PID.h"
 
 /*
     ^
@@ -36,7 +37,7 @@ class BalanceClass
 	 void PID_reset();
 	 void log();
 	 int64_t old_time;
-	 void set_pitch_roll_pids(const float kp, const float ki, const float imax);
+
 	float throttle;
 	//float pitch_roll_stabKP, pitch_roll_rateKP, yaw_rateKP,yaw_stabKP,pitch_roll_rateKI,pitch_roll_rateIMAX,yaw_rateKI,yaw_rateIMAX;
 	//float getThrottle();
@@ -49,6 +50,7 @@ class BalanceClass
 	bool speed_up_control(float n[]);
 	bool alt_over_place;
  public:
+	 void max_ang(const float max_ang, float& angX, float& angY);
 	 void set_alt_over_place() { alt_over_place = true; }
 	 void set_place_over_alt() { alt_over_place = false; }
 	 bool get_alt_over_place() { return alt_over_place; }
@@ -87,12 +89,11 @@ void set(const float  *ar,int n=0);
 	void set_off_th_();
 	float pitch2rollK;
 #define BALANCE_PIDS 3
-	AP_PID pids[BALANCE_PIDS];
+	AP_PID yaw_pid;
+	ANG_PID pid;
 private:
 
-#define PID_PITCH_RATE 0
-#define PID_ROLL_RATE 1
-#define PID_YAW_RATE 2
+
 
 
 

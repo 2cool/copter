@@ -51,8 +51,6 @@ using namespace std;
 //void pinMode(int i1, int i2){}
 #define INPUT 0
 #define OUTPUT 0
-#define LOW 0
-#define HIGH 1
 #define Serial2 Serial
 #define Serial1 Serial
 int32_t millis_();

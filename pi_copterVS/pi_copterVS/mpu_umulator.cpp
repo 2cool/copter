@@ -290,7 +290,7 @@ void EmuClass::update(const float fm_[4], double dt) {
 
 		float windZ = -speed[Z] +  sin(pitch)* (speed[X]-awindX) - sin(roll) * (speed[Y]-awindY);
 		//cout << windZ << endl; 
-		float windX = -speed[X];
+		float windX = -speed[X] ;
 		float windY = -speed[Y];
 		float wk = 1+(abs(pos[Z])) / 100;
 		for (int i = 0; i < 4; i++) {

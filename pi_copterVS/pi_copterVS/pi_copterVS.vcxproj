@@ -71,6 +71,7 @@
     <MultiProcNumber>4</MultiProcNumber>
   </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="ANG_PID.cpp" />
     <ClCompile Include="AP_PID.cpp" />
     <ClCompile Include="Autopilot.cpp" />
     <ClCompile Include="Balance.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="WProgram.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ANG_PID.h" />
     <ClInclude Include="AP_PID.h" />
     <ClInclude Include="Autopilot.h" />
     <ClInclude Include="Balance.h" />

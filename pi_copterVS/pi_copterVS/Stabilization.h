@@ -11,16 +11,12 @@
 #endif
 
 
-
 #include "AP_PID.h"
+#include "ANG_PID.h"
 #include "define.h"
 #include "mpu.h"
 class StabilizationClass{
 
-
-#define ACC_X_PID 0
-#define ACC_Y_PID 1
-#define ACC_Z_PID 2
 
 private:
 	
@@ -38,15 +34,12 @@ private:
 	float z_kD;
 
 #define STAB_PIDS 3
-	AP_PID pids[STAB_PIDS];
+	ANG_PID pid_hor;
+	AP_PID pid_ver;
 	float max_z_integrator;
 
 	float needXR, needYR, needXV, needYV;
-
-	void set_acc_xy_pid_kp(const float f){ pids[ACC_X_PID].kP(f);	pids[ACC_Y_PID].kP(f); }
-	void set_acc_xy_pid_kI(const float f){ pids[ACC_X_PID].kI(f);	pids[ACC_Y_PID].kI(f); }
-	void set_acc_xy_speed_kD(const float f,const float fCut){ pids[ACC_X_PID].kD(f, fCut);	pids[ACC_Y_PID].kD(f, fCut); }
-	void set_acc_xy_pid_imax(const float f){ pids[ACC_X_PID].imax(-f,f);	pids[ACC_Y_PID].imax(-f,f); }
+	   
 	float def_max_speedXY, min_stab_XY_speed, current_max_speed_xy;
 	float def_max_speedZ_P, def_max_speedZ_M,current_max_speedZ_P,current_max_speedZ_M, min_stab_Z_speed;
 public:
