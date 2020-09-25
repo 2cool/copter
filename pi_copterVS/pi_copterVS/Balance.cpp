@@ -54,7 +54,7 @@ void BalanceClass::init()
 
 	old_time = micros_();
 
-	pid.kP(0.016);
+	pid.kP(0.0016);
 	pid.set_kI_hight(0.00065);
 	pid.set_kI_low(0.00002);
 	pid.set_kI_max(0.05,MAX_DELTA-0.05);
@@ -118,14 +118,11 @@ void BalanceClass::set(const float *ar, int n){
 			pid.set_kI_hight(t);
 			Settings.set(ar[i++], pitch_roll_kD);
 			
-			t = pid.get_kI_hight();
+			t = pid.get_kI_max_hight();
 			Settings.set(ar[i++], t);
-			pid.set_kI_hight(t);
+			pid.set_kI_max_hight(t);
 
 			
-
-			
-
 			t = yaw_pid.kP();
 			Settings.set(ar[i++], t);
 			yaw_pid.kP(t);
@@ -348,9 +345,12 @@ bool BalanceClass::loop()
 		f_[0] = f_constrain((throttle - output[_ROLL] - output[_PITCH] + m_yaw_output), STOP_THROTTLE_, FULL_THROTTLE_);
 
 
-		float* i = new float[4];
-		i = pid.get_integrator();
-		Debug.dump(i[2], i[3], i[0], i[1]);
+
+
+
+
+
+		//float* i = new float[4];i = pid.get_integrator();Debug.dump(i[0], i[2], i[1], i[3]);
 
 	//	Debug.dump(c_roll,  c_pitch, 0, 0);
 
@@ -393,7 +393,6 @@ bool BalanceClass::loop()
 		PID_reset();
 	else
 		speed_up = false;
-
 
 	mega_i2c.throttle(f_);  //670 micros
 	log();

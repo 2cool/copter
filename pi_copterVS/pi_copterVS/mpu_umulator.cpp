@@ -292,6 +292,13 @@ void EmuClass::update(const float fm_[4], double dt) {
 		//cout << windZ << endl; 
 		float windX = -speed[X] ;
 		float windY = -speed[Y];
+
+		if (pos[Z] > 0.1) {
+			//windX -= 8;
+			//windY = 8;
+		}
+
+
 		float wk = 1+(abs(pos[Z])) / 100;
 		for (int i = 0; i < 4; i++) {
 			w[Z][i] = w[Z][i] + windZ;

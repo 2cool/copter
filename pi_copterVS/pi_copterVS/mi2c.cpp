@@ -330,6 +330,8 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 	}
 
 	//--------------------------------------------------------------------------
+
+	#ifdef START_INET
 	static int32_t last_ring_time = 0;
 	if (last_ring_time > 0 && last_ring_time + 10e3 < millis_()) {
 		last_ring_time = 0;
@@ -342,6 +344,7 @@ int Megai2c::get_gps(SEND_I2C *gps_d) {
 		last_ring_time = millis_();
 		///stop servises, stop ppp? read sms and do. start ppp and services again
 	}
+#endif
 	//--------------------------------------------------------------------------
 	motors_overload = (bit_field & OVERLOAD);
 	if (motors_overload) {

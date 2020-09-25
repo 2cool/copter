@@ -13,13 +13,13 @@ public:
 	///
 	void	reset_integrators(const bool l, const bool h);
 	float* get_integrator();
-
+	void  set_integrator(const float *i);
 	void	kP(const float v) { _kp = v; }
 	void	set_kI(const float l, const float h) { _ki[LOW] = l; _ki[HIGHT] = h; }
 	void    set_kI_max(const float l, const float h) { _imax[LOW] = l; _imax[HIGHT] = h; }
 
-	float    get_kI_max_low() { _imax[LOW]; }
-	float    get_kI_max_hight() { _imax[HIGHT]; }
+	float    get_kI_max_low() { return _imax[LOW]; }
+	float    get_kI_max_hight() { return _imax[HIGHT]; }
 
 	void    set_kI_max_low(const float l) { _imax[LOW] = l; }
 	void    set_kI_max_hight(const float h) { _imax[HIGHT] = h; }
@@ -28,8 +28,8 @@ public:
 	void    imax_hight_auto_reset(const float ang) { auto_reset_v = ang; };
 	float	get_kI_hight() { return _ki[HIGHT]; }
 	float	get_kI_low() { return _ki[LOW]; }
-	float	set_kI_hight(const float a) { _ki[HIGHT]=a; }
-	float	set_kI_low(const float a) { _ki[LOW] = a; }
+	void	set_kI_hight(const float a) { _ki[HIGHT]=a; }
+	void	set_kI_low(const float a) { _ki[LOW] = a; }
 
 private:
 	float				auto_reset_v;

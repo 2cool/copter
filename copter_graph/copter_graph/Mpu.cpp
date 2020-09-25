@@ -309,9 +309,9 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 	gyroRoll = *(float*)&buf[j]; j += 4;
 	gyroYaw = *(float*)&buf[j]; j += 4;
 
-#define ACC_CF 0.007
+#define ACC_CF 0.1
 	static double ACCX = 0, ACCY = 0, ACCZ = 0;
-	const float f = 1;// (filter ? ACC_CF : 1);
+	const float f =  (filter ? ACC_CF : 1);
 	if (j <= len) {
 		const float tacc = *(float*)&buf[j];
 		j += 4;
@@ -344,13 +344,13 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 		estX = *(float*)&buf[j]; j += 4;
 	}
 	if (j <= len) {
-		est_speedX = *(float*)&buf[j]; j += 4;
+		est_speedX += (*(float*)&buf[j] - est_speedX) * f; j += 4;
 	}
 	if (j <= len) {
 		estY = *(float*)&buf[j]; j += 4;
 	}
 	if (j <= len) {
-		est_speedY = *(float*)&buf[j]; j += 4;
+		est_speedY += (*(float*)&buf[j] - est_speedY) * f; j += 4;
 	}
 
 
@@ -382,7 +382,7 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 
 
 
-
+	/*
 	if (start_f && filter) {
 
 
@@ -441,7 +441,7 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 		w_accY = kf[1]->state()(2);
 
 
-	}
+	}*/
 
 	if (rotate == false) {
 		accX = (-cosYaw * w_accX - sinYaw * w_accY); //relative to world

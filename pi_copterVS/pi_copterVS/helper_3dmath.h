@@ -116,7 +116,7 @@ public:
 	}
 
 	float getMagnitude() {
-		return sqrt(x*x + y*y + z*z);
+		return (float)sqrt(x*x + y*y + z*z);
 	}
 
 	void normalize() {

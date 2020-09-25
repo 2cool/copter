@@ -29,6 +29,12 @@ void	ANG_PID::reset_integrators(const bool l, const bool h) {
 	if (h)
 		_integrator[HIGHT + _X] = _integrator[HIGHT + _Y] = 0; }
 
+void  ANG_PID::set_integrator(const float* i) {
+	_integrator[0] = i[0];
+	_integrator[1] = i[1];
+	_integrator[2] = i[2];
+	_integrator[3] = i[3];
+}
 float * ANG_PID::get_integrator() {
 	float* i = new float[4];
 	i[0] = _integrator[0];
@@ -45,14 +51,14 @@ float 	*ANG_PID::get_pid(const float errorX, const float errorY, const float del
 		output[1] += errorY * _kp;
 
 
-		if ((_ki[LOW] != 0) && (delta_time > 0)) {//?
+		if (_ki[LOW] != 0) {//?
 			_integrator[LOW + _X] += (errorX * _ki[LOW]) * delta_time;
-			_integrator[LOW + _Y] += (errorX * _ki[LOW]) * delta_time;
+			_integrator[LOW + _Y] += (errorY * _ki[LOW]) * delta_time;
 			to_max_ang(_imax[LOW], _integrator[LOW + _X], _integrator[LOW + _Y]);
 		}
-		if ((_ki[HIGHT] != 0) && (delta_time > 0)) {//?
+		if (_ki[HIGHT] != 0) {//?
 			_integrator[HIGHT + _X] += (errorX * _ki[HIGHT]) * delta_time;
-			_integrator[HIGHT + _Y] += (errorX * _ki[HIGHT]) * delta_time;
+			_integrator[HIGHT + _Y] += (errorY * _ki[HIGHT]) * delta_time;
 			to_max_ang(_imax[HIGHT], _integrator[HIGHT + _X], _integrator[HIGHT + _Y]);
 
 			if (auto_reset_v > 0) { 

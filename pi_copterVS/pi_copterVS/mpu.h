@@ -55,6 +55,7 @@ class MpuClass
 	float pitch, roll;
 	float est_alt, est_speedZ,est_accZ,est_accY,est_accX;
 	float estX, estY, est_speedX, est_speedY;
+	float est_LF_HOR_speed, est_LF_HOR_ACC;
 
 
 	float yaw,yaw_offset;
@@ -69,6 +70,9 @@ private:
 	void rotateCCW(float&x, float&y);
 
  public:
+	 float get_est_LF_hor_speed() { return est_LF_HOR_speed; }
+	 float get_est_LF_hor_acc() { return est_LF_HOR_ACC; }
+
 	 inline float get_dt() { return mpu_dt; }
 	 inline float est_speed() { return sqrt(estX * estX + estY * estY); }
 	 void getXYRelative2Zero(double&x, double&y) { x -= x_at_zero; y -= y_at_zero; }

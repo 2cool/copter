@@ -105,7 +105,7 @@ float newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.05, newR4xy = 1;
 bool MpuClass::init()
 {
 	yaw_correction_angle = 19 * GRAD2RAD;
-
+	est_LF_HOR_speed = est_LF_HOR_ACC = 0;
 	tiltPower_CF = 0.05;
 	alt_at_zero = x_at_zero = y_at_zero = 0;
 	base_x = base_y = base_z = 0;
@@ -391,7 +391,7 @@ void MpuClass::test_vibration(float x, float y, float z){
 //------------------------------------------------------------------------------------
 void MpuClass::gyro_calibr() {
 	if (Autopilot.motors_is_on() == false) {
-
+		static bool printed = false;
 		if (time < 30E6L || acc_callibr_time > time) {
 
 			AHRS.setBeta(0.1);
@@ -405,10 +405,14 @@ void MpuClass::gyro_calibr() {
 			agpitch = giroifk * ((float)cal_g_pitch / (float)cal_g_cnt);
 			agroll = giroifk * ((float)cal_g_roll / (float)cal_g_cnt);
 			agyaw = giroifk * ((float)cal_g_yaw / (float)cal_g_cnt);
-		}
-		else {
-			AHRS.setBeta(0.01);
-			cal_g_cnt = 0;
+		}else {
+			if (printed == false) {
+				printed = true;
+				cout << "gyro calibr: p " << agpitch << ", r " << agroll << ", y " << agyaw<<endl;
+				myDisplay.textDisplay("CALIBR DONE\n");
+				AHRS.setBeta(0.01);
+				cal_g_cnt = 0;
+			}
 		}
 	}
 }
@@ -666,6 +670,10 @@ void MpuClass::test_Est_XY() {
 		estY += MAX_LEN;
 		kf[Y]->base(-MAX_LEN);
 	}
+	const float speed_h = (float)sqrt(est_speedY * est_speedY + est_speedX * est_speedX);
+	const float accH= (float)sqrt(est_accY * est_accY + est_accX * est_accX);
+	est_LF_HOR_speed += (speed_h - est_LF_HOR_speed) * 0.1;
+	est_LF_HOR_ACC += (accH - est_LF_HOR_ACC) * 0.1;
 	
 	//double t[] = { estX, est_speedX, estY, est_speedY };
 	//Debug.load(0, Mpu.w_accX, Mpu.w_accY);

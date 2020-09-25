@@ -1,2 +1,2 @@
-ninja: Entering directory `C:\Users\Igor\copter\RC_FFMPEG\app\.cxx\cmake\debug\armeabi-v7a'
+ninja: Entering directory `C:\Users\tcool\copter\RC_FFMPEG\app\.cxx\cmake\debug\armeabi-v7a'
 ninja: no work to do.

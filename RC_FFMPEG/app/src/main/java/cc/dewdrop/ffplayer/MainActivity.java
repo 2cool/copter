@@ -454,7 +454,7 @@ double angK=0.3;
             old_time=now;
             pitch-=angK*0.5*RAD2GRAD*event.values[1]*dt;
             roll+=angK*0.5*RAD2GRAD*event.values[0]*dt;
-            yaw_+=0.1*RAD2GRAD*event.values[2]*dt;
+            yaw_+=0.5*RAD2GRAD*event.values[2]*dt;
             // Commander.yaw-=event.values[2]*dt;
              //Log.i("MATHr","roll="+(roll)+", pitch="+(pitch));
            // Log.i("GYRO","gyro_work "+Double.toString(f));
