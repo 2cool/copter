@@ -88,7 +88,7 @@ void set(const float  *ar,int n=0);
 
 	void set_off_th_();
 	float pitch2rollK;
-#define BALANCE_PIDS 3
+
 	AP_PID yaw_pid;
 	ANG_PID pid;
 private:

@@ -19,40 +19,32 @@
 
 float Z_FILTER = 0.3;
 float XY_FILTER = 0.76;
-void StabilizationClass::setMaxAng() {
+void StabilizationClass::setMaxAngels() {
 	const float ah = Balance.get_max_angle() * 0.666f;
 	const float al = Balance.get_max_angle() - ah;
 	pid_hor.set_kI_max(al, ah);
-	pid_hor.imax_hight_auto_reset(ah);
+	pid_hor.hi_2_error_max_diff(Balance.get_max_angle()*0.5f);
 }
 void StabilizationClass::setMinMaxI_Thr() {
 	pid_ver.imax(Balance.get_min_throttle()*cos(Balance.get_max_angle()*GRAD2RAD)-HOVER_THROTHLE, Balance.get_max_throttle() - HOVER_THROTHLE);
 }
 void StabilizationClass::init(){
 
-	
-
 	dist2speed_XY =  0.55f;
 	pid_hor.kP(3);
 	pid_hor.set_kI(0.1, 1);
-	
 	xy_kD = 1.8;
-	setMaxAng();
-
-
+	setMaxAngels();
 	def_max_speedXY=current_max_speed_xy = 10;
 	min_stab_XY_speed =  1.3;
 	//-------------------------------------------
-
 	min_stab_Z_speed = 3;
 	def_max_speedZ_P = current_max_speedZ_P =  5;
 	def_max_speedZ_M = current_max_speedZ_M = -5;
 	//--------------------------------------------------------------------------
-
 	alt2speedZ = 0.3;
 	pid_ver.kP( 0.06 );
 	pid_ver.kI( 0.015 );
-
 	z_kD=0.024;
 	setMinMaxI_Thr();
 	

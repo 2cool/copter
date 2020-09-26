@@ -51,7 +51,7 @@ public:
 	float get_max_speedXY_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_XY, min_stab_XY_speed); }
 	float get_max_speedZ_M_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_Z, -def_max_speedZ_M); }
 	float get_max_speedZ_P_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_Z, def_max_speedZ_P); }
-	void setMaxAng();
+	void setMaxAngels();
 	void setMinMaxI_Thr();
 	void setNeedPos2Home();
 	void add2NeedPos(float speedX, float speedY, float dt);

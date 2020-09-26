@@ -235,14 +235,16 @@ void watch_dog() {
 #ifndef DEBUG
 			static uint8_t ap_ok = 0;
 			static uint8_t camera_ok = 0;
-			string cam =  exec("ifconfig wlx1cbfce0162cc | grep 192.168.42");
-			ap_ok += cam.length() > 5;
-			if (ap_ok == 1)
-				myDisplay.textDisplay("AP-ok, ");
-			string wifi = exec("ifconfig wlx983f9f1908da | grep 192.168.1");
-			camera_ok += wifi.length() > 5;
+			const string cam =  exec("ifconfig wlx1cbfce0162cc | grep 192.168.42");
+			camera_ok += cam.length() > 5;
 			if (camera_ok == 1)
 				myDisplay.textDisplay("cam-ok, ");
+			
+
+			const string wifi = exec("ifconfig wlx983f9f1908da | grep 192.168.1");
+			ap_ok += wifi.length() > 5;
+			if (ap_ok == 1)
+				myDisplay.textDisplay("AP-ok, ");
 			
 			if (camera_ok && ap_ok) {
 				string ret = exec("systemctl | grep NetworkManager.service");

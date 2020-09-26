@@ -17,23 +17,16 @@ static const float f_constrain(const float v, const float min, const float max){
 
 float BalanceClass::set_max_throthle_without_limit(const float angl) { 
 	max_angle = angl; 
-	Stabilization.setMaxAng(); 
+	Stabilization.setMaxAngels(); 
 }
 
 
 void BalanceClass::max_ang(const float ang, float& angX, float& angY) {
-	angX = constrain(angX, -ang, ang);
-	angY = constrain(angY, -ang, ang);
-	const float maxAngle07 = ang * 0.7f;
-	if (fabs(angX) > maxAngle07 || fabs(angY) > maxAngle07) {
-		float k = (float)(RAD2GRAD * acos(cos(angX * GRAD2RAD) * cos(angY * GRAD2RAD)));
-		if (k <= 0)
-			k = ang;
-		if (k > ang) {
-			k = ang / k;
-			angX *= k;
-			angY *= k;
-		}
+	float k = sqrt(angX * angX + angY * angY);
+	if (k > ang) {
+		k = ang / k;
+		angX *= k;
+		angY *= k;
 	}
 }
 
@@ -49,29 +42,19 @@ void BalanceClass::init()
 	c_pitch = c_roll = 0;
 	Stabilization.init();
 	throttle = 0;
-	
 	propeller_lost[0]= propeller_lost[1] = propeller_lost[2] = propeller_lost[3] = false;
-
 	old_time = micros_();
-
 	pid.kP(0.0016);
 	pid.set_kI_hight(0.00065);
 	pid.set_kI_low(0.00002);
 	pid.set_kI_max(0.05,MAX_DELTA-0.05);
-	pid.imax_hight_auto_reset(MAX_DELTA - 0.05);
-
+	pid.hi_2_error_max_diff(MAX_DELTA - 0.05);
 	pitch_roll_kD = 0.00065;
-
-	
-
 	yaw_pid.kP(0.004f);  
 	yaw_pid.kI(0.004f);
 	yaw_pid.imax(-MAX_YAW_DELTA, MAX_YAW_DELTA);
 	yaw_kD =  0.004;
-
 	delay(1500);
-
-	
 //	Mpu.initYaw(Hmc.heading*RAD2GRAD);
 
 	
@@ -96,7 +79,6 @@ string BalanceClass::get_set(){
 		yaw_pid.kI() << "," << \
 		yaw_kD << "," << \
 		yaw_pid.imax() << "," << \
-		
 		max_angle;
 	
 	string ret = convert.str();
@@ -117,32 +99,23 @@ void BalanceClass::set(const float *ar, int n){
 			Settings.set(ar[i++], t);
 			pid.set_kI_hight(t);
 			Settings.set(ar[i++], pitch_roll_kD);
-			
 			t = pid.get_kI_max_hight();
 			Settings.set(ar[i++], t);
 			pid.set_kI_max_hight(t);
-
-			
 			t = yaw_pid.kP();
 			Settings.set(ar[i++], t);
 			yaw_pid.kP(t);
-			
 			t = yaw_pid.kI();
 			Settings.set(ar[i++], t);
 			yaw_pid.kI(t);
-
 			Settings.set(ar[i++], yaw_kD);
-
 			t = yaw_pid.imax();
 			Settings.set(ar[i++], t);
 			yaw_pid.imax(-t,t);
-			
-
-			
 			t = max_angle;
 			Settings.set(ar[i++], t);
 			max_angle = constrain(t, 15, 45);
-			Stabilization.setMaxAng();
+			Stabilization.setMaxAngels();
 		}
 	}
 	cout << "balance set:\n";
@@ -160,16 +133,11 @@ float BalanceClass::powerK(){
 void BalanceClass::log() {
 	if (Log.writeTelemetry) {
 		Log.block_start(LOG::BAL);
-
 		Log.write_bank_cnt();
 		Log.loadMem((uint8_t*)f_, 16, false);
 		Log.loadInt16t((int)c_roll * 16);
 		Log.loadInt16t((int)c_pitch * 16);
 		Log.loadInt16t((int)Autopilot.get_yaw() * 16);
-
-		//при лагах в св€зи c_pitch,c_roll обнул€ютс€.
-
-
 		Log.block_end();
 		Log.end();
 	}
@@ -221,32 +189,15 @@ bool BalanceClass::speed_up_control(float n[]) {
 			}
 		}
 	}
-
-	//Debug.dump(n[0], n[1], n[2], n[3]);
-	//n[0] = n[1] = n[2] = n[3] = 0;
-	//if (ret && ret!=0b1111)
-	//	cout << ret << endl;
 	return speed_up;
 }
 
-
-
-
-
-
-
-
-
 #define MAX_D_ANGLE_SPEED 180
 #define MAX_D_YAW_SPEED 180
-//#define MAX_POWER_K_IF_MAX_ANGLE_30 1.12
-
 
 bool speed_up = true;
 bool BalanceClass::loop()
 {
-
-	
 	if (Autopilot.motors_is_on()) { 
 	
 		const float pK = powerK();
@@ -284,8 +235,6 @@ bool BalanceClass::loop()
 			t_max_angle = max_angle;
 		}
 
-		//Debug.load(0, true_throttle, throttle);
-		//Debug.dump();
 		if (Autopilot.xy_stabState()) {
 			Stabilization.XY(c_pitch, c_roll);
 		}
@@ -297,18 +246,8 @@ bool BalanceClass::loop()
 		max_ang(t_max_angle, c_pitch, c_roll);
 
 		const float pitch_error = wrap_180(Mpu.get_pitch() - c_pitch);
-		//t *= abs(t);
-		//const float pitch_stab_output = f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED); 
-		
 		const float roll_error = wrap_180(Mpu.get_roll() - c_roll);
-		//t *= abs(t);
-
-		//const float roll_stab_output = f_constrain(t, -MAX_D_ANGLE_SPEED, MAX_D_ANGLE_SPEED);
-
 		const float yaw_error =  (Autopilot.if_strong_wind() && Autopilot.go2homeState()) ? 0 :  wrap_180(-Autopilot.get_yaw() - Mpu.get_yaw());
-
-		//Debug.dump(pitch_stab_output, roll_stab_output, 0, 0);
-
 
 		const int64_t _ct = micros_();
 		double dt = (_ct - old_time) * 1e-6;
@@ -317,8 +256,8 @@ bool BalanceClass::loop()
 #define _PITCH 0
 #define _ROLL 1
 		float *output = pid.get_pid(pitch_error, roll_error, Mpu.get_dt());
-		output[_PITCH] = pK*(output[_PITCH]+ Mpu.gyroPitch * pitch_roll_kD);
-		output[_ROLL] = pK * (output[_ROLL] + Mpu.gyroRoll * pitch_roll_kD);
+		output[_PITCH] = pK * (output[_PITCH]+ Mpu.gyroPitch * pitch_roll_kD);
+		output[_ROLL]  = pK * (output[_ROLL] + Mpu.gyroRoll  * pitch_roll_kD);
 
 		//float pitch_output = pK * (pids[PID_PITCH_RATE].get_pid(pitch_error, dt) + Mpu.gyroPitch*pitch_roll_kD);
 		output[_PITCH] = constrain(output[_PITCH], -MAX_DELTA, MAX_DELTA);

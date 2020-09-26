@@ -25,7 +25,7 @@ public:
 	void    set_kI_max_hight(const float h) { _imax[HIGHT] = h; }
 
 	float	kP() { return _kp; }
-	void    imax_hight_auto_reset(const float ang) { auto_reset_v = ang; };
+	void    hi_2_error_max_diff(const float ang) { auto_reset_v = ang; };
 	float	get_kI_hight() { return _ki[HIGHT]; }
 	float	get_kI_low() { return _ki[LOW]; }
 	void	set_kI_hight(const float a) { _ki[HIGHT]=a; }
