@@ -135,8 +135,10 @@ public class DrawView extends View {
 
             cam_p_c.gimbal_pitch_add(0,0,Commander.fpv_zoom);//update
             if (motors_on[0].is_pressed()==motors_on[1].is_pressed()) {
-                motors_on[0].set(MainActivity.motorsOnF());
-                motors_on[1].set(MainActivity.motorsOnF());
+                if (MainActivity.magnetometerWork || !MainActivity.motorsOnF()) {
+                    motors_on[0].set(MainActivity.motorsOnF());
+                    motors_on[1].set(MainActivity.motorsOnF());
+                }
 
 
             }

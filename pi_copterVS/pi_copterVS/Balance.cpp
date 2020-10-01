@@ -45,10 +45,10 @@ void BalanceClass::init()
 	propeller_lost[0]= propeller_lost[1] = propeller_lost[2] = propeller_lost[3] = false;
 	old_time = micros_();
 	pid.kP(0.0016);
-	pid.set_kI_hight(0.00065);
-	pid.set_kI_low(0.00002);
-	pid.set_kI_max(0.05,MAX_DELTA-0.05);
-	pid.hi_2_error_max_diff(MAX_DELTA - 0.05);
+	pid.set_kI(0.00065);
+
+	pid.set_kI_max(MAX_DELTA);
+	pid.hi_2_error_max_diff(MAX_DELTA);
 	pitch_roll_kD = 0.00065;
 	yaw_pid.kP(0.004f);  
 	yaw_pid.kI(0.004f);
@@ -72,9 +72,9 @@ string BalanceClass::get_set(){
 	
 	convert << \
 		pid.kP() << "," << \
-		pid.get_kI_hight() << "," << \
+		pid.get_kI() << "," << \
 		pitch_roll_kD << "," << \
-		pid.get_kI_max_hight() << "," << \
+		pid.get_kI_max() << "," << \
 		yaw_pid.kP() << "," << \
 		yaw_pid.kI() << "," << \
 		yaw_kD << "," << \
@@ -95,13 +95,13 @@ void BalanceClass::set(const float *ar, int n){
 			t = pid.kP();
 			Settings.set(ar[i++], t);
 			pid.kP(t);
-			t = pid.get_kI_hight();
+			t = pid.get_kI();
 			Settings.set(ar[i++], t);
-			pid.set_kI_hight(t);
+			pid.set_kI(t);
 			Settings.set(ar[i++], pitch_roll_kD);
-			t = pid.get_kI_max_hight();
+			t = pid.get_kI_max();
 			Settings.set(ar[i++], t);
-			pid.set_kI_max_hight(t);
+			pid.set_kI_max(t);
 			t = yaw_pid.kP();
 			Settings.set(ar[i++], t);
 			yaw_pid.kP(t);
@@ -143,7 +143,7 @@ void BalanceClass::log() {
 	}
 }
 void BalanceClass::PID_reset() {
-	pid.reset_integrators(true, true);
+	pid.reset_integrators();
 
 	yaw_pid.reset_I();
 	c_pitch = c_roll = 0;

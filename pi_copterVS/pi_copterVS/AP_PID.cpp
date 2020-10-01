@@ -3,6 +3,7 @@
  
 AP_PID::AP_PID()
 {
+	_integrator = 0;
 }
 
 void   AP_PID::set_integrator(const float i) { 

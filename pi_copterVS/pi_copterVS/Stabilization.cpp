@@ -19,11 +19,17 @@
 
 float Z_FILTER = 0.3;
 float XY_FILTER = 0.76;
+
+
+
+
+float wind_i_X, wind_i_Y;
+float wind_i_max;
 void StabilizationClass::setMaxAngels() {
-	const float ah = Balance.get_max_angle() * 0.666f;
-	const float al = Balance.get_max_angle() - ah;
-	pid_hor.set_kI_max(al, ah);
-	pid_hor.hi_2_error_max_diff(Balance.get_max_angle()*0.5f);
+	wind_i_max = Balance.get_max_angle() * 0.666f;
+	const float al = Balance.get_max_angle() - wind_i_max;
+	pid_hor.set_kI_max(al);
+	pid_hor.hi_2_error_max_diff(Balance.get_max_angle());
 }
 void StabilizationClass::setMinMaxI_Thr() {
 	pid_ver.imax(Balance.get_min_throttle()*cos(Balance.get_max_angle()*GRAD2RAD)-HOVER_THROTHLE, Balance.get_max_throttle() - HOVER_THROTHLE);
@@ -32,7 +38,7 @@ void StabilizationClass::init(){
 
 	dist2speed_XY =  0.55f;
 	pid_hor.kP(3);
-	pid_hor.set_kI(0.1, 1);
+	pid_hor.set_kI(1);
 	xy_kD = 1.8;
 	setMaxAngels();
 	def_max_speedXY=current_max_speed_xy = 10;
@@ -192,7 +198,14 @@ float StabilizationClass::get_dist2goal(){
 	double dy = Mpu.get_Est_Y() - needYV;
 	return (float)sqrt(dx*dx + dy * dy);
 }
-
+void to_max_ang(const float ang, float& angX, float& angY) {
+	float k = sqrt(angX * angX + angY * angY);
+	if (k > ang) {
+		k = ang / k;
+		angX *= k;
+		angY *= k;
+	}
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //float old_gps_bearing = 0, cos_bear = 1,  sin_bear = 0;
 void StabilizationClass::XY(float &pitch, float&roll){//dont work 
@@ -220,25 +233,19 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 #define _ROLL 1
 
 		float *world_ang = pid_hor.get_pid(x_error, y_error, Mpu.get_dt());
-enum PID { _X = 0, _Y = 2, LOW = 0, HIGHT = 1 };
+
 
 		if (Mpu.get_est_LF_hor_speed() < 1 && Mpu.get_est_LF_hor_acc() < 0.5) {
-			
-			float *i=pid_hor.get_integrator();
-			float t = i[HIGHT + _X] * 0.01;
-			i[LOW + _X] += t;
-			i[HIGHT + _X] -= t;
-
-			t = i[HIGHT + _Y] * 0.01;
-			i[LOW + _Y] += t;
-			i[HIGHT + _Y] -= t;
-			
-			pid_hor.set_integrator(i);
+			const float owx = wind_i_X;
+			const float owy = wind_i_Y;
+			wind_i_X += pid_hor.get_integratorX() * 0.01;
+			wind_i_Y += pid_hor.get_integratorY() * 0.01;
+			to_max_ang(wind_i_max, wind_i_X, wind_i_Y);
+			world_ang[_PITCH] -= wind_i_X - owx;
+			world_ang[_ROLL] -= wind_i_Y - owy;
 		}
-
-		//float* i = new float[4];i = pid_hor.get_integrator();Debug.dump(i[LOW+_X], i[LOW+_Y], i[HIGHT+_X], i[HIGHT+_Y]);
-		world_ang[_PITCH] += Mpu.get_Est_accX() * xy_kD;
-		world_ang[_ROLL] += Mpu.get_Est_accY() * xy_kD;
+		world_ang[_PITCH] += (Mpu.get_Est_accX() * xy_kD) + wind_i_X;
+		world_ang[_ROLL] +=  (Mpu.get_Est_accY() * xy_kD) + wind_i_Y;
 
 		//----------------------------------------------------------------преобр. в относительную систему координат
 		pitch = (float)(-Mpu.cosYaw* world_ang[_PITCH] - Mpu.sinYaw* world_ang[_ROLL]);
