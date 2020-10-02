@@ -238,8 +238,8 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		if (Mpu.get_est_LF_hor_speed() < 1 && Mpu.get_est_LF_hor_acc() < 0.5) {
 			const float owx = wind_i_X;
 			const float owy = wind_i_Y;
-			wind_i_X += pid_hor.get_integratorX() * 0.01;
-			wind_i_Y += pid_hor.get_integratorY() * 0.01;
+			wind_i_X += pid_hor.get_integratorX() * 0.002;
+			wind_i_Y += pid_hor.get_integratorY() * 0.002;
 			to_max_ang(wind_i_max, wind_i_X, wind_i_Y);
 			world_ang[_PITCH] -= wind_i_X - owx;
 			world_ang[_ROLL] -= wind_i_Y - owy;
@@ -247,7 +247,7 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		world_ang[_PITCH] += (Mpu.get_Est_accX() * xy_kD) + wind_i_X;
 		world_ang[_ROLL] +=  (Mpu.get_Est_accY() * xy_kD) + wind_i_Y;
 
-		//----------------------------------------------------------------преобр. в относительную систему координат
+		//----------------------------------------------------------------from world to local X Y
 		pitch = (float)(-Mpu.cosYaw* world_ang[_PITCH] - Mpu.sinYaw* world_ang[_ROLL]);
 		roll = (float)(Mpu.cosYaw* world_ang[_ROLL] - Mpu.sinYaw* world_ang[_PITCH]);
 
