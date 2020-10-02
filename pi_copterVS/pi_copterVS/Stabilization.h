@@ -43,6 +43,7 @@ private:
 	float def_max_speedXY, min_stab_XY_speed, current_max_speed_xy;
 	float def_max_speedZ_P, def_max_speedZ_M,current_max_speedZ_P,current_max_speedZ_M, min_stab_Z_speed;
 public:
+	void to_max_ang(const float ang, float& angX, float& angY);
 	void set_max_speed_hor(float& s, bool only_test = false);
 	void set_max_sped_ver(float &ps, float &ns, bool only_test = false);
 	float get_def_max_speedXY() { return def_max_speedXY; }

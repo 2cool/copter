@@ -1,4 +1,5 @@
 #pragma once
+#include "math.h"
 class ANG_PID
 {
 
@@ -18,18 +19,13 @@ public:
 	void	kP(const float v) { _kp = v; }
 	void	set_kI(const float v) { _ki=v; }
 	void    set_kI_max(const float v) { _imax = v;  }
-
 	float    get_kI_max() { return _imax; }
-
-
-	void    set_kI_max(const float v) { _imax = v; }
-
 	float	kP() { return _kp; }
 	void    hi_2_error_max_diff(const float ang) { auto_reset_v = ang; };
 
 	float	get_kI() { return _ki; }
 	void	set_kI_low(const float a) { _ki = a; }
-
+	void	to_max_ang(const float ang, float& angX, float& angY);
 private:
 	float				auto_reset_v;
 	float				_kp;

@@ -90,8 +90,8 @@ void set_wifi_30_() {
 
 
 
-#define WIND_X 0
-#define WIND_Y 0
+#define WIND_X 6
+#define WIND_Y 7
 #define WIND_Z 0
 
 int init(int cnt) {////--------------------------------------------- INITIALIZATION ------------------------------

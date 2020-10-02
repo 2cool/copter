@@ -1,15 +1,11 @@
 #include "ANG_PID.h"
-
-#include "math.h"
 #define RAD2GRAD 57.295779513082320876798154814105
 #define GRAD2RAD 0.01745329251994329576923690768489
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
 
-
-
-
-void to_max_ang(const float ang, float& angX, float& angY) {
+//-------------
+void ANG_PID::to_max_ang(const float ang, float& angX, float& angY) {
 	float k = sqrt(angX * angX + angY * angY);
 	if (k > ang) {
 		k = ang / k;
@@ -17,8 +13,6 @@ void to_max_ang(const float ang, float& angX, float& angY) {
 		angY *= k;
 	}
 }
-//-------------
-
 ANG_PID::ANG_PID()
 {
 	reset_integrators();

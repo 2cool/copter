@@ -4,12 +4,12 @@
 
 #include "glob_header.h" 
 #include "WProgram.h"
-
+#include "math.h"
 
 //#define OFF_MOTOR_IF_LOST_CONNECTION  
 //#define OFF_TIMELAG
 //-----------------------------------------------------------------
-//#define FLY_EMULATOR
+#define FLY_EMULATOR
 //----------------------------------------------------------------
 //#define YAW_OFF
 //#define XY_SAFE_AREA 200
@@ -155,8 +155,6 @@
 #define m_PROGRAM	   "PRG"
 #define m_FPV			"FPV"
 enum { B_CONNECTION_LOST = 1, B_MS611_ERROR, B_ACC_ERROR, B_LOW_VOLTAGE, B_GPS_ACCURACY_E, B_MPU_TOO_LONG, B_GPS_TOO_LONG , B_BARROMETR_ERR,B_I2C_ERR, B_COMMAND_RECEIVED};
-
-
 
 struct SEND_I2C {
 
