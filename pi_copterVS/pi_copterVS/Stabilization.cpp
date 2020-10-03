@@ -249,8 +249,9 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 			world_ang[_ROLL] -= (wind_i_Y - owy);
 			//Debug.dump(wind_i_X, wind_i_Y, 0, 0);
 		}
-		const float mkdX = (x_error == 0)?1:(1 / abs(x_error)*5);
-		const float mkdY = (y_error == 0)?1:(1 / abs(y_error)*5);
+		const float mkdX = (x_error == 0)?1:(1 / (abs(x_error)*5));
+		const float mkdY = (y_error == 0)?1:(1 / (abs(y_error)*5));
+		///Debug.dump(fmin(1, mkdX), fmin(1, mkdY), x_error, y_error);
 
 		world_ang[_PITCH] += (Mpu.get_Est_accX() * xy_kD)*fmin(1,mkdX) + wind_i_X;
 		world_ang[_ROLL] +=  (Mpu.get_Est_accY() * xy_kD)*fmin(1,mkdY) + wind_i_Y;
