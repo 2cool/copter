@@ -44,12 +44,12 @@ void BalanceClass::init()
 	throttle = 0;
 	propeller_lost[0]= propeller_lost[1] = propeller_lost[2] = propeller_lost[3] = false;
 	old_time = micros_();
-	pid.kP(0.00153);
-	pid.set_kI(0.00042);
+	pid.kP(0.002);
+	pid.set_kI(0.0001);
 
 	pid.set_kI_max(MAX_DELTA);
 	pid.hi_2_error_max_diff(MAX_DELTA);
-	pitch_roll_kD = 0.0004;
+	pitch_roll_kD = 0.0006;
 	yaw_pid.kP(0.004f);  
 	yaw_pid.kI(0.004f);
 	yaw_pid.imax(-MAX_YAW_DELTA, MAX_YAW_DELTA);

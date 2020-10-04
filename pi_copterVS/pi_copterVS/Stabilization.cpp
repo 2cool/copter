@@ -48,7 +48,7 @@ void StabilizationClass::init(){
 	dist2speed_XY =  0.2f;
 	pid_hor.kP(3);
 	pid_hor.set_kI(1);
-	xy_kD = 5.6;// 1.8;
+	xy_kD = 5;// 1.8;
 	setMaxAngels();
 	def_max_speedXY=current_max_speed_xy = 10;
 	min_stab_XY_speed =  1.3;
