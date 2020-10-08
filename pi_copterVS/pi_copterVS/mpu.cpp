@@ -432,7 +432,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	static uint cnt2l = 0;
 	if (mpu_dt > 0.03 && cnt2l++) {
 		cout << "MPU DT too long "  << mpu_dt << ", time " << (int)millis_() << endl;
-		mega_i2c.beep_code(B_MPU_TOO_LONG);
+		mega_i2c.beep_code(B_TOO_LONG);
 		Telemetry.addMessage(e_MPU_TOO_LONG);
 	}
 	if (mpu_dt > 0.03)
@@ -672,8 +672,13 @@ void MpuClass::test_Est_XY() {
 	}
 	const float speed_h = (float)sqrt(est_speedY * est_speedY + est_speedX * est_speedX);
 	const float accH= (float)sqrt(est_accY * est_accY + est_accX * est_accX);
-	est_LF_HOR_speed += (speed_h - est_LF_HOR_speed) * 0.1;
-	est_LF_HOR_ACC += (accH - est_LF_HOR_ACC) * 0.1;
+	est_LF_HOR_speed += (speed_h - est_LF_HOR_speed) * 0.1f;
+	est_LF_HOR_ACC += (accH - est_LF_HOR_ACC) * 0.1f;
+
+	est_LF_VER_speed += (est_speedZ - est_LF_VER_speed) * 0.1f;
+	est_LF_VER_ACC += (est_accZ - est_LF_VER_ACC) * 0.1f;
+
+
 	
 	//double t[] = { estX, est_speedX, estY, est_speedY };
 	//Debug.load(0, Mpu.w_accX, Mpu.w_accY);

@@ -271,8 +271,8 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 							_timeout__LAG = 2e3;
 						if (timelag > _timeout__LAG) {
 							//Commander.data_reset();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-							//cout << "time lag=" << timelag << " " << "\t" << millis_() << endl;
-							mega_i2c.beep_code(B_MPU_TOO_LONG);
+							cout << "data recived time lag=" << timelag << " " << "\t" << millis_() << endl;
+							mega_i2c.beep_code(B_TOO_LONG);
 						}
 					}
 #endif
@@ -300,13 +300,13 @@ void AutopilotClass::loop(){////////////////////////////////////////////////////
 		}
 	}
 	else {
-		if (shmPTR->connected) { 
+		/*if (shmPTR->connected) { 
 			int32_t timelag = _ct - last_time_data__recived;
 			if (timelag > 100 && timelag < 1000) {
-				//cout << "time lag=" << timelag << " " << "\t" << millis_() << endl;
-				//mega_i2c.beep_code(B_MPU_TOO_LONG);
+				cout << "time lag=" << timelag << " " << "\t" << millis_() << endl;
+				mega_i2c.beep_code(B_MPU_TOO_LONG);
 			}
-		}
+		}*/
 	}
 
 	if (_ct < CALIBRATION__TIMEOUT || Mpu.acc_callibr_time > micros_()) {

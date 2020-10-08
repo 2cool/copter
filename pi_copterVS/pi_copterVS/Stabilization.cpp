@@ -27,9 +27,9 @@ float wind_i_X, wind_i_Y;
 float wind_i_max;
 
 void StabilizationClass::setMaxAngels() {
-	const float mi = Balance.get_max_angle() * 0.666f;
-	wind_i_max = Balance.get_max_angle() - mi;
-	pid_hor.set_kI_max(mi);
+
+	wind_i_max = Balance.get_max_angle() * 0.42f;
+	pid_hor.set_kI_max(Balance.get_max_angle());
 	pid_hor.hi_2_error_max_diff(Balance.get_max_angle());
 }
 void StabilizationClass::setMinMaxI_Thr() {
@@ -209,7 +209,30 @@ float StabilizationClass::get_dist2goal(){
 	double dy = Mpu.get_Est_Y() - needYV;
 	return (float)sqrt(dx*dx + dy * dy);
 }
+#define _PITCH 0
+#define _ROLL 1
+void StabilizationClass::calculate_wind_i(float world_ang[]) {
+	if (
+		Mpu.get_est_LF_hor_speed() < 1 && 
+		Mpu.get_est_LF_hor_acc() < 0.5f && 
+		abs(Mpu.get_est_LF_ver_speed()) < 1 && 
+		abs(Mpu.get_est_LF_ver_acc()) < 0.5f) 
+	{
+		const float owx = wind_i_X;
+		const float owy = wind_i_Y;
+		wind_i_X += (world_ang[_PITCH]) * windRC;
+		wind_i_Y += (world_ang[_ROLL]) * windRC;
+		to_max_ang(wind_i_max, wind_i_X, wind_i_Y);
+		world_ang[_PITCH] -= (wind_i_X - owx);
+		world_ang[_ROLL] -= (wind_i_Y - owy);
+		//Debug.dump(wind_i_X, wind_i_Y, 0, 0);
+		const float wind_i = sqrt(wind_i_X * wind_i_X + wind_i_Y * wind_i_Y);
+		pid_hor.set_kI_max(Balance.get_max_angle() - wind_i);
+		pid_hor.hi_2_error_max_diff(Balance.get_max_angle() - wind_i);
 
+		
+	}
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //float old_gps_bearing = 0, cos_bear = 1,  sin_bear = 0;
 void StabilizationClass::XY(float &pitch, float&roll){//dont work 
@@ -232,33 +255,20 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		x_error += ((Mpu.get_Est_SpeedX() - need_speedX) - x_error) * XY_FILTER;
 		y_error += ((Mpu.get_Est_SpeedY() - need_speedY) - y_error) * XY_FILTER;
 
-
-#define _PITCH 0
-#define _ROLL 1
-
 		float *world_ang = pid_hor.get_pid(x_error, y_error, Mpu.get_dt());
-
-
-		if (Mpu.get_est_LF_hor_speed() < 1 && Mpu.get_est_LF_hor_acc() < 0.5f) {
-			const float owx = wind_i_X;
-			const float owy = wind_i_Y;
-			wind_i_X += (world_ang[X]) * windRC;
-			wind_i_Y += (world_ang[Y]) * windRC;
-			to_max_ang(wind_i_max, wind_i_X, wind_i_Y);
-			world_ang[_PITCH] -= (wind_i_X - owx);
-			world_ang[_ROLL] -= (wind_i_Y - owy);
-			//Debug.dump(wind_i_X, wind_i_Y, 0, 0);
-		}
+		
+		calculate_wind_i(world_ang);
+		//Debug.dump(wind_i_X,wind_i_Y, pid_hor.get_kI_max(), 1+Mpu.get_est_LF_ver_acc()/9.8f);
 		const float mkdX = (x_error == 0)?1:(1 / (abs(x_error)*5));
 		const float mkdY = (y_error == 0)?1:(1 / (abs(y_error)*5));
 		///Debug.dump(fmin(1, mkdX), fmin(1, mkdY), x_error, y_error);
-
-		world_ang[_PITCH] += (Mpu.get_Est_accX() * xy_kD)*fmin(1,mkdX) + wind_i_X;
-		world_ang[_ROLL] +=  (Mpu.get_Est_accY() * xy_kD)*fmin(1,mkdY) + wind_i_Y;
-
+		world_ang[_PITCH] += (Mpu.get_Est_accX() * xy_kD) * fmin(1, mkdX) + wind_i_X;
+		world_ang[_ROLL] += (Mpu.get_Est_accY() * xy_kD) * fmin(1, mkdY) + wind_i_Y;
 		//----------------------------------------------------------------from world to local X Y
-		pitch = (float)(-Mpu.cosYaw* world_ang[_PITCH] - Mpu.sinYaw* world_ang[_ROLL]);
-		roll = (float)(Mpu.cosYaw* world_ang[_ROLL] - Mpu.sinYaw* world_ang[_PITCH]);
+		float acczK = 1 + Mpu.get_Est_accZ() / 9.8f;
+		acczK = constrain(acczK, 0.7f, 1.6f);
+		pitch = (float)(-Mpu.cosYaw * world_ang[_PITCH] - Mpu.sinYaw * world_ang[_ROLL]) / acczK;
+		roll = (float)(Mpu.cosYaw * world_ang[_ROLL] - Mpu.sinYaw * world_ang[_PITCH]) / acczK;
 
 
 }

@@ -19,7 +19,7 @@ class StabilizationClass{
 
 
 private:
-	
+	void calculate_wind_i(float world_ang[]);
 	void max_speed_limiter(float &x, float &y);
 	void dist2speed(float &x, float &y);
 	void speed2dist(float &x, float &y);

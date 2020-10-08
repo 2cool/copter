@@ -257,6 +257,7 @@ void Megai2c::throttle(const float _n[]) {
 }
 
 void Megai2c::set_led_color(uint8_t n, uint8_t r, uint8_t g, uint8_t b) {
+	/*
 	char buf[4];
 	buf[0] = 3 + (n << 3);
 	buf[1] = *(char*)&r;
@@ -269,8 +270,10 @@ void Megai2c::set_led_color(uint8_t n, uint8_t r, uint8_t g, uint8_t b) {
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
 	close(fd);
+	*/
 }
 void Megai2c::sim800_reset() {
+	/*
 	char chBuf[] = { 1,16 };
 	shmPTR->sim800_reset_time = millis_();
 	const int fd = open_i2c_();
@@ -280,6 +283,7 @@ void Megai2c::sim800_reset() {
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
 	close(fd);
+	*/
 }
 //0.35555555555555555555555555555556 = 1град
 bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с коптером пра опред обст
@@ -412,6 +416,7 @@ const uint8_t collors[][8][3] = {
 };
 	
 void Megai2c::set_led_mode(uint8_t n, uint8_t briht, bool pulse) {
+
 	static uint32_t old_led_mode = 0;
 	static uint8_t pulse_f0 = 1;
 	static int cur_led_n = 8;
