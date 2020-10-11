@@ -206,13 +206,13 @@ DWORD WINAPI myThread(LPVOID lpParameter)
 			string val = s.substr(++eq);
 
 			if (name.find("newR")==0) {
-				mpu.newR = stod(val);
-				cout << name.c_str() << " = "<< mpu.newR << endl;
+				Mpu.newR = stod(val);
+				cout << name.c_str() << " = "<< Mpu.newR << endl;
 				
 			}
 			else if (name.find("newQ") == 0) {
-				mpu.newQ = stod(val);
-				cout << name.c_str() << " = " << mpu.newQ << endl;
+				Mpu.newQ = stod(val);
+				cout << name.c_str() << " = " << Mpu.newQ << endl;
 			}
 			redraw = true;
 			redraw_log();

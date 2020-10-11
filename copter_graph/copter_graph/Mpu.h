@@ -6,13 +6,17 @@
 enum { mPITCH, mROLL, mrPITCH, mrROLL, mYAW, mGYRO_PITCH, mGYRO_ROLL, mGYRO_YAW, mACCX, mACCY, mACCZ,mMAXACC ,mEX,mEY,mALL_E };
 #define M_PI  3.14159265358979323846f
 #define RAD2GRAD  57.29578
-class Mpu
+class MPU_CLASS
 {
 public:
+	float est_LF_X_speed,est_LF_Y_speed, est_LF_X_ACC, est_LF_Y_ACC, est_LF_VER_speed, est_LF_VER_ACC;
 	double newR = 1;// 0.1;
 	double newQ = 0.05;// 0.001;
 
-
+	float get_est_LF_hor_speed() { return sqrt(est_LF_X_speed* est_LF_X_speed + est_LF_Y_speed* est_LF_Y_speed); }
+	float get_est_LF_hor_acc() { return sqrt(est_LF_X_ACC* est_LF_X_ACC+ est_LF_Y_ACC* est_LF_Y_ACC); }
+	float get_est_LF_ver_speed() { return est_LF_VER_speed; }
+	float get_est_LF_ver_acc() { return est_LF_VER_ACC; }
 
 	void loadmax_min(const int n, const double val, bool simetric = false);
 
@@ -110,4 +114,4 @@ public:
 
 	
 };
-extern Mpu mpu;
+extern MPU_CLASS Mpu;

@@ -1,6 +1,6 @@
 
  
-#define PROG_VERSION "ver: 3.201010\n"
+#define PROG_VERSION "ver: 3.201011\n"
 #define SIM800_F
 
 
@@ -90,8 +90,8 @@ void set_wifi_30_() {
 
 
 
-#define WIND_X 10
-#define WIND_Y 10
+#define WIND_X 15
+#define WIND_Y 15
 #define WIND_Z 0
 
 int init(int cnt) {////--------------------------------------------- INITIALIZATION ------------------------------

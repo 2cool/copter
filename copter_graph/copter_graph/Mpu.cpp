@@ -127,7 +127,7 @@ const float n006 = 0.061035156f;
 //4g
 const float n122 = 1.220740379e-4;
 double qw, qx, qy, qz,g_yaw;
-void Mpu::toEulerianAngle(const Quaternion_& q, float& roll, float& pitch, float& yaw)
+void MPU_CLASS::toEulerianAngle(const Quaternion_& q, float& roll, float& pitch, float& yaw)
 {
 	// roll (x-axis rotation)
 	double sinr = +2.0 * (q.w * q.x + q.y * q.z);
@@ -147,7 +147,7 @@ void Mpu::toEulerianAngle(const Quaternion_& q, float& roll, float& pitch, float
 	double cosy = +1.0 - 2.0 * (q.y * q.y + q.z * q.z);
 	yaw = atan2(siny, cosy);
 }
-void Mpu::toEulerianAngle()
+void MPU_CLASS::toEulerianAngle()
 {
 	// roll (x-axis rotation)
 	double sinr = +2.0 * (qw * qx + qy * qz);
@@ -168,7 +168,7 @@ void Mpu::toEulerianAngle()
 	g_yaw = RAD2GRAD * atan2(siny, cosy);
 }
 
-void Mpu::loadmax_min(const int mn, const double val, bool simetric) {
+void MPU_CLASS::loadmax_min(const int mn, const double val, bool simetric) {
 
 
 
@@ -210,7 +210,7 @@ using namespace std;
 
 
 
-void Mpu::Madgwic() {
+void MPU_CLASS::Madgwic() {
 	const float giroifk = 0.06103515625f;//2000
 	const float accifk = 0.00048828125f;//16
 
@@ -255,7 +255,7 @@ void Mpu::Madgwic() {
 
 
 
-void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool rotate) {
+void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool rotate) {
 
 
 	len += j;
@@ -309,7 +309,7 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 	gyroRoll = *(float*)&buf[j]; j += 4;
 	gyroYaw = *(float*)&buf[j]; j += 4;
 
-#define ACC_CF 0.1
+#define ACC_CF 1
 	static double ACCX = 0, ACCY = 0, ACCZ = 0;
 	const float f =  (filter ? ACC_CF : 1);
 	if (j <= len) {
@@ -500,10 +500,29 @@ void Mpu::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool ro
 	roll = nroll;
 	*/
 
+	est_LF_X_speed += (est_speedX - est_LF_X_speed) * 0.1;
+	est_LF_Y_speed += (est_speedY - est_LF_Y_speed) * 0.1;
+
+	est_LF_X_ACC += (accX - est_LF_X_ACC) * 0.1;
+	est_LF_Y_ACC += (accY - est_LF_Y_ACC) * 0.1;
+
+
+	est_LF_VER_speed += (est_speedZ - est_LF_VER_speed) * 0.1;
+	est_LF_VER_ACC += (accZ - est_LF_VER_ACC) * 0.1f;
+
+	if (filter) {
+		accX = accY = get_est_LF_hor_acc();
+		est_speedY = est_speedX = get_est_LF_hor_speed();
+		accZ = est_LF_VER_ACC;
+		est_speedZ = est_LF_VER_speed;
+	}
+
+
+
 }
 
 
-void Mpu::init() {
+void MPU_CLASS::init() {
 	// Discrete LTI projectile motion, measuring position only
 	A <<1, 0.005, 0,0, 1, 0.005,0, 0, 1;
 	H << 1, 0, 0;
@@ -530,4 +549,4 @@ void Mpu::init() {
 
 
 
-Mpu mpu;
+MPU_CLASS Mpu;

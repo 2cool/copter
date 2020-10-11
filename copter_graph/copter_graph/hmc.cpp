@@ -121,10 +121,10 @@ void Hmc::parser_sens(byte buf[], int n, int cont_bits, bool filter, bool rotate
 	fmz += (tfmz - fmz) * FC;
 
 
-	float cosPitch = cos(mpu.pitch*GRAD2RAD);
-	float sinRoll = sin(mpu.roll * GRAD2RAD);
-	float cosRoll = cos(mpu.roll * GRAD2RAD);
-	float sinPitch = sin(mpu.pitch * GRAD2RAD);
+	float cosPitch = cos(Mpu.pitch*GRAD2RAD);
+	float sinRoll = sin(Mpu.roll * GRAD2RAD);
+	float cosRoll = cos(Mpu.roll * GRAD2RAD);
+	float sinPitch = sin(Mpu.pitch * GRAD2RAD);
 
 	float Xh = fmx * cosPitch - fmz * sinPitch;
 	float Yh = fmx * sinRoll * sinPitch + fmy * cosRoll - fmz * sinRoll * cosPitch;

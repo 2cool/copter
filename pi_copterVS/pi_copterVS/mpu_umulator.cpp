@@ -10,12 +10,12 @@
 
 #define MOTOR_FORCE 0.5
 
-//#define NOISE_ON
+#define NOISE_ON
 
 //#define TEST_4_FULL_VOLTAGE
 
 
-float frand() { return (float)(rand()) / (float)RAND_MAX; }
+float _rand() { return (float)((double)(rand()) / (double)RAND_MAX); }
 
 //#define BAT_ZERO 370 //80 процентов разряд
 #define BAT_100P 422
@@ -104,10 +104,10 @@ void EmuClass::init_wind(float x, float y, float z) {
 	maxWind[Y] = y;
 	maxWind[Z] = z;
 	for (int i = 0; i < 3; i++) {
-		rand_L[i] = (maxWind[i] * frand());
+		rand_L[i] = (maxWind[i] * _rand());
 		for (int j = 0; j < 4; j++) {
-			rand_M[i][j] = (maxWind[i] * 0.25) - 0.5*(maxWind[i] * frand());
-			rand_H[i][j] = (maxWind[i] * 0.125) - 0.25*(maxWind[i] * frand());
+			rand_M[i][j] = (maxWind[i] * 0.25) - 0.5*(maxWind[i] * _rand());
+			rand_H[i][j] = (maxWind[i] * 0.125) - 0.25*(maxWind[i] * _rand());
 		}
 	}
 }
@@ -120,19 +120,19 @@ void get_wind(float w[][4]) {
 	if (rand_w_cnt&MMASK == MMASK) {
 		for (int i=0; i<3;i++)
 			for (int m = 0; m < 4; m++) {
-				rand_M[i][m]=(maxWind[i]*0.25) - 0.5*(maxWind[i] * frand());
+				rand_M[i][m]=(maxWind[i]*0.25) - 0.5*(maxWind[i] * _rand());
 			}
 	}
 	if (rand_w_cnt&HMASK == HMASK) {
 		for (int i = 0; i<3; i++)
 			for (int m = 0; m < 4; m++) {
-				rand_H[i][m] = (maxWind[i] * 0.125) - 0.25*(maxWind[i] * frand());
+				rand_H[i][m] = (maxWind[i] * 0.125) - 0.25*(maxWind[i] * _rand());
 			}
 	}
 
 	if (rand_w_cnt&LMASK == LMASK) {
 		for (int i = 0; i<3; i++)
-			rand_L[i] = (maxWind[i] *frand());
+			rand_L[i] = (maxWind[i] *_rand());
 	}
 
 
@@ -405,10 +405,12 @@ void EmuClass::update(const float fm_[4], double dt) {
 	acc[Y] = (acc[Y] * force)   + wacc[Y];
 	acc[Z] = (acc[Z] * force)  - GRAVITY_G + wacc[Z];
 
-#ifdef NOISE_ON1
-	acc[Z] += 2.5 - 5.0*(frand());
-	acc[X] += 1.0 - 2.0*(frand());
-	acc[Y] += 1.0 - 2.0*(frand());
+#ifdef NOISE_ON
+	if (Autopilot.motors_is_on()) {
+		acc[Z] += 1.0 - 2.0 * (_rand());
+		acc[X] += 1.0 - 2.0 * (_rand());
+		acc[Y] += 1.0 - 2.0 * (_rand());
+	}
 #endif
 
 

@@ -17,8 +17,8 @@
 #include "Log.h"
 #include "Settings.h"
 
-float Z_FILTER = 0.3;
-float XY_FILTER = 0.76;
+float Z_FILTER = 0.3f;
+float XY_FILTER = 0.76f;
 
 
 
@@ -33,7 +33,7 @@ void StabilizationClass::setMaxAngels() {
 	pid_hor.hi_2_error_max_diff(Balance.get_max_angle());
 }
 void StabilizationClass::setMinMaxI_Thr() {
-	pid_ver.imax(Balance.get_min_throttle()*cos(Balance.get_max_angle()*GRAD2RAD)-HOVER_THROTHLE, Balance.get_max_throttle() - HOVER_THROTHLE);
+	pid_ver.imax(Balance.get_min_throttle()*(float)cos(Balance.get_max_angle()*GRAD2RAD)-HOVER_THROTHLE, Balance.get_max_throttle() - HOVER_THROTHLE);
 }
 void StabilizationClass::to_max_ang(const float ang, float& angX, float& angY) {
 	float k = sqrt(angX * angX + angY * angY);
@@ -51,19 +51,19 @@ void StabilizationClass::init(){
 	xy_kD = 5;// 1.8;
 	setMaxAngels();
 	def_max_speedXY=current_max_speed_xy = 10;
-	min_stab_XY_speed =  1.3;
+	min_stab_XY_speed =  1.3f;
 	//-------------------------------------------
-	min_stab_Z_speed = 1.3;
+	min_stab_Z_speed = 1.3f;
 	def_max_speedZ_P = current_max_speedZ_P =  5;
 	def_max_speedZ_M = current_max_speedZ_M = -5;
 	//--------------------------------------------------------------------------
-	alt2speedZ = 0.3;
-	pid_ver.kP( 0.06 );
-	pid_ver.kI( 0.015 );
-	z_kD=0.024;
+	alt2speedZ = 0.3f;
+	pid_ver.kP( 0.06f );
+	pid_ver.kI( 0.015f );
+	z_kD=0.024f;
 	setMinMaxI_Thr();
 	wind_i_X = wind_i_Y = 0;
-	windRC = 0.001;
+	windRC = 0.001f;
 	
 	//----------------------------------------------------------------------------
 	y_error=x_error=z_error=0;
@@ -130,7 +130,7 @@ void StabilizationClass::fromLoc2Pos(long lat, long lon, double&x, double&y) {
 }
 void StabilizationClass::setNeedLoc(long lat, long lon, double&x, double&y) {
 	fromLoc2Pos(lat, lon, x, y);
-	setNeedPos(x, y);
+	setNeedPos((float)x, (float)y);
 	
 }
 void StabilizationClass::set_max_speed_hor(float &s, bool only_test) {
@@ -173,12 +173,12 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 	if (speedX == 0) {
 		if (f_stop_x == false) {
 			f_stop_x = true;
-			needXR = needXV = Mpu.get_Est_X();
+			needXR = needXV = (float)Mpu.get_Est_X();
 		}
 	}
 	else {
 		if (f_stop_x) {
-			needXR = needXV = Mpu.get_Est_X();
+			needXR = needXV = (float)Mpu.get_Est_X();
 			f_stop_x = false;
 		}
 		float distX = speedX, distY = speedY;
@@ -189,13 +189,13 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 	if (speedY == 0) {
 		if (f_stop_y == false) {
 			f_stop_y = true;
-			needYV = needYR = Mpu.get_Est_Y();
+			needYV = needYR = (float)Mpu.get_Est_Y();
 		}
 	}
 	else {
 		if (f_stop_y) {
 			f_stop_y = false;
-			needYV = needYR = Mpu.get_Est_Y();
+			needYV = needYR = (float)Mpu.get_Est_Y();
 		}
 		float distX = speedX, distY = speedY;
 		speed2dist(distX, distY);
@@ -213,10 +213,11 @@ float StabilizationClass::get_dist2goal(){
 #define _ROLL 1
 void StabilizationClass::calculate_wind_i(float world_ang[]) {
 	if (
-		Mpu.get_est_LF_hor_speed() < 1 && 
-		Mpu.get_est_LF_hor_acc() < 0.5f && 
-		abs(Mpu.get_est_LF_ver_speed()) < 1 && 
-		abs(Mpu.get_est_LF_ver_acc()) < 0.5f) 
+		Balance.get_throttle()>0.40f &&
+		Mpu.get_est_LF_hor_abs_speed() < 1.3f && 
+		Mpu.get_est_LF_hor_abs_acc() < 0.5f && 
+		Mpu.get_est_LF_ver_abs_speed() < 1.3f && 
+		Mpu.get_est_LF_ver_abs_acc() < 0.5f) 
 	{
 		const float owx = wind_i_X;
 		const float owy = wind_i_Y;
@@ -239,21 +240,21 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		float need_speedX, need_speedY;
 		float tx, ty;
 		if (Autopilot.progState() && Prog.intersactionFlag) {
-			need_speedX = Prog.need_speedX;
-			need_speedY = Prog.need_speedY;
+			need_speedX = (float)Prog.need_speedX;
+			need_speedY = (float)Prog.need_speedY;
 		}
 		else {
-			tx = Mpu.get_Est_X();
+			tx = (float)Mpu.get_Est_X();
 			need_speedX = (needXV - tx);
-			ty = Mpu.get_Est_Y();
+			ty = (float)Mpu.get_Est_Y();
 			need_speedY = (needYV - ty);
 			
 		}// a=v*v/(2s)
 
 		dist2speed(need_speedX, need_speedY);
 
-		x_error += ((Mpu.get_Est_SpeedX() - need_speedX) - x_error) * XY_FILTER;
-		y_error += ((Mpu.get_Est_SpeedY() - need_speedY) - y_error) * XY_FILTER;
+		x_error += (((float)Mpu.get_Est_SpeedX() - need_speedX) - x_error) * XY_FILTER;
+		y_error += (((float)Mpu.get_Est_SpeedY() - need_speedY) - y_error) * XY_FILTER;
 
 		float *world_ang = pid_hor.get_pid(x_error, y_error, Mpu.get_dt());
 		
@@ -262,13 +263,13 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		const float mkdX = (x_error == 0)?1:(1 / (abs(x_error)*5));
 		const float mkdY = (y_error == 0)?1:(1 / (abs(y_error)*5));
 		///Debug.dump(fmin(1, mkdX), fmin(1, mkdY), x_error, y_error);
-		world_ang[_PITCH] += (Mpu.get_Est_accX() * xy_kD) * fmin(1, mkdX) + wind_i_X;
-		world_ang[_ROLL] += (Mpu.get_Est_accY() * xy_kD) * fmin(1, mkdY) + wind_i_Y;
+		world_ang[_PITCH] += ((float)Mpu.get_Est_accX() * xy_kD) * fmin(1.0f, mkdX) + wind_i_X;
+		world_ang[_ROLL] += ((float)Mpu.get_Est_accY() * xy_kD) * fmin(1.0f, mkdY) + wind_i_Y;
 		//----------------------------------------------------------------from world to local X Y
-		float acczK = 1 + Mpu.get_Est_accZ() / 9.8f;
+		float acczK = 1 + (float)Mpu.get_Est_accZ() / 9.8f;
 		acczK = constrain(acczK, 0.7f, 1.6f);
-		pitch = (float)(-Mpu.cosYaw * world_ang[_PITCH] - Mpu.sinYaw * world_ang[_ROLL]) / acczK;
-		roll = (float)(Mpu.cosYaw * world_ang[_ROLL] - Mpu.sinYaw * world_ang[_PITCH]) / acczK;
+		pitch = (-(float)Mpu.cosYaw * world_ang[_PITCH] - Mpu.sinYaw * world_ang[_ROLL]) / acczK;
+		roll = ((float)Mpu.cosYaw * world_ang[_ROLL] - Mpu.sinYaw * world_ang[_PITCH]) / acczK;
 
 
 }
@@ -279,7 +280,7 @@ float StabilizationClass::Z(){
 
 	//-------------stab
 
-	const float need_speedZ = getSpeed_Z(Autopilot.fly_at_altitude() - Mpu.get_Est_Alt());
+	const float need_speedZ = getSpeed_Z(Autopilot.fly_at_altitude() - (float)Mpu.get_Est_Alt());
 	z_error += ( (need_speedZ - Mpu.get_Est_SpeedZ()) - z_error) * Z_FILTER;
 
 	//mc_z += (need_accZ - Mpu.get_Est_accZ() - mc_z) * Z_FILTER;
@@ -341,15 +342,15 @@ void StabilizationClass::setZ(const float  *ar) {
 		Autopilot.set_sensZ(def_max_speedZ_P, def_max_speedZ_M);
 
 		min_stab_Z_speed = ar[i++];
-		min_stab_Z_speed = constrain(min_stab_Z_speed, 1.3, def_max_speedZ_P);
+		min_stab_Z_speed = constrain(min_stab_Z_speed, 1.3f, def_max_speedZ_P);
 
 
 
 		Settings.set(ar[i++], Z_FILTER);
 		if (Z_FILTER > 1)
 			Z_FILTER = 1;
-		else if (Z_FILTER < 0.01)
-			Z_FILTER = 0.01;
+		else if (Z_FILTER < 0.01f)
+			Z_FILTER = 0.01f;
 	}
 
 	cout << "Stabilization Z set:\n";
@@ -394,13 +395,13 @@ void StabilizationClass::setXY(const float  *ar){
 		def_max_speedXY = constrain(def_max_speedXY, 1, 15);
 		Autopilot.set_sensXY(def_max_speedXY);
 		min_stab_XY_speed = ar[i++];
-		if (min_stab_XY_speed < 1.3)min_stab_XY_speed = 1.3;
+		if (min_stab_XY_speed < 1.3)min_stab_XY_speed = 1.3f;
 		if (min_stab_XY_speed > def_max_speedXY)min_stab_XY_speed = def_max_speedXY;
 		Settings.set(ar[i++], XY_FILTER);
 		if (XY_FILTER > 1)
 			XY_FILTER = 1;
-		else if (XY_FILTER < 0.01)
-			XY_FILTER = 0.01;
+		else if (XY_FILTER < 0.01f)
+			XY_FILTER = 0.01f;
 
 	}
 	for (uint8_t ii = 0; ii < i; ii++) {

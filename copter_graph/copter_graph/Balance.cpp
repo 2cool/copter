@@ -1,12 +1,76 @@
 #include "stdafx.h"
 #include "Balance.h"
 #include "PID.h";
+#include "Mpu.h"
+
+float wind_i_X=0, wind_i_Y=0, wind_i_max=15, windRC=0.1f;
+
+#define _PITCH 0
+#define _ROLL 1
+
+void to_max_ang(const float ang, float& angX, float& angY) {
+	float k = sqrt(angX * angX + angY * angY);
+	if (k > ang) {
+		k = ang / k;
+		angX *= k;
+		angY *= k;
+	}
+}
+void Balance::calculate_wind_i(float world_ang[]) {
+
+	if (
+
+		Mpu.get_est_LF_hor_acc() < 0.5f &&
+
+		abs(Mpu.get_est_LF_ver_acc()) < 0.5f)
+	{
+		
+		//wind_i_X += (world_ang[_PITCH] - wind_i_X) * 0.0001;
+	//	wind_i_Y += (world_ang[_ROLL] - wind_i_Y) *  0.0001;
+	//	to_max_ang(wind_i_max, wind_i_X, wind_i_Y);
+
+	}
+
+	if (thr >= 0.35) {
+		if (
+			Mpu.get_est_LF_hor_speed() < 0.6f &&
+			Mpu.get_est_LF_hor_acc() < 0.5f &&
+			abs(Mpu.get_est_LF_ver_speed()) < 0.6f &&
+			abs(Mpu.get_est_LF_ver_acc()) < 0.5f)
+		{
+
+			const float owx = wind_i_X;
+			const float owy = wind_i_Y;
+			wind_i_X += (world_ang[_PITCH] - wind_i_X) * windRC;
+			wind_i_Y += (world_ang[_ROLL] - wind_i_Y) * windRC;
+			to_max_ang(wind_i_max, wind_i_X, wind_i_Y);
+
+			//world_ang[_PITCH] -= (wind_i_X - owx);
+			//world_ang[_ROLL] -= (wind_i_Y - owy);
+			//Debug.dump(wind_i_X, wind_i_Y, 0, 0);
+			//const float wind_i = sqrt(wind_i_X * wind_i_X + wind_i_Y * wind_i_Y);
+			//pid_hor.set_kI_max(Balance.get_max_angle() - wind_i);
+			//pid_hor.hi_2_error_max_diff(Balance.get_max_angle() - wind_i);
+
+
+		}
+	}
+	else {
+		wind_i_X = wind_i_Y = 0;
+	}
+}
+
+
+
 int Balance::decode(char buffer[], int &i, bool rotate) {
 	i += 9;
 	f[bcPITCH]=*(float*)(&buffer[i]);
 	i += 4;
 	f[bcROLL] = *(float*)(&buffer[i]);
 	i+= 4;
+
+
+
 	f[bTHROTHLE] = *(float*)(&buffer[i]);
 	i += 4;
 	int n=*(int*)(&buffer[i]);
@@ -96,25 +160,25 @@ void XY(float& pitch, float& roll) {//dont work
 	float need_speedX, need_speedY;
 	float tx, ty;
 	//if ((control_bits_& XY_STAB & 1) == 9){
-	tx = mpu.estX - mpu.start_pos[mEX];
+	tx = Mpu.estX - Mpu.start_pos[mEX];
 		need_speedX = (tx - 0);
-		ty = mpu.estY-mpu. start_pos[mEY];
+		ty = Mpu.estY-Mpu. start_pos[mEY];
 		need_speedY = (ty - 0);
 
 	//}//вичислять нужное ускорение по форумуле a=v*v/(2s)
 	dist2speed(need_speedX, need_speedY);
-	d_speedX += ((need_speedX +mpu.est_speedX) - d_speedX) * 1;
-	d_speedY += ((need_speedY +mpu.est_speedY) - d_speedY) * 1;
+	d_speedX += ((need_speedX +Mpu.est_speedX) - d_speedX) * 1;
+	d_speedY += ((need_speedY +Mpu.est_speedY) - d_speedY) * 1;
 
 
-	const float w_pitch = -(pidx.get_pid(d_speedX, mpu.dt));
-	const float w_roll = pidy.get_pid(d_speedY, mpu.dt);
+	const float w_pitch = -(pidx.get_pid(d_speedX, Mpu.dt));
+	const float w_roll = pidy.get_pid(d_speedY, Mpu.dt);
 
 	
 
 	//----------------------------------------------------------------преобр. в относительную систему координат
-	pitch = (float)(mpu.cosYaw * w_pitch - mpu.sinYaw * w_roll);
-	roll = (float)(mpu.cosYaw * w_roll + mpu.sinYaw * w_pitch);
+	pitch = (float)(Mpu.cosYaw * w_pitch - Mpu.sinYaw * w_roll);
+	roll = (float)(Mpu.cosYaw * w_roll + Mpu.sinYaw * w_pitch);
 
 
 	//pitch = w_pitch;
@@ -141,7 +205,7 @@ void XY(float& pitch, float& roll) {//dont work
 
 
 
-void Balance::parser(byte buf[], int i, uint32_t cb) {
+void Balance::parser(byte buf[], int i, uint32_t cb, bool filtr , bool rot) {
 	control_bits_ = cb;
 
 	int bank_counter = *(uint32_t*)&buf[i];// load_int32(buf, i);
@@ -157,9 +221,24 @@ void Balance::parser(byte buf[], int i, uint32_t cb) {
 	ap_roll = 1.0 / 16 * (double)(*(int16_t*)&buf[i]);
 	i += 2;
 	ap_pitch = 1.0 / 16 * (double)(*(int16_t*)&buf[i]); ;
-														  
 	i += 2;
 	ap_yaw = 1.0 / 16 * (double)(*(int16_t*)&buf[i]); ;
+
+	if ((cb & MOTORS_ON) && (cb & XY_STAB)) {
+		float t[2];
+		t[0] = ap_pitch;
+		t[1] = ap_roll;
+
+		calculate_wind_i(t);
+		if (filtr) {
+			ap_pitch = wind_i_X;
+			ap_roll = wind_i_Y;
+		}
+	}
+
+
+														  
+	
 
 
 
@@ -168,6 +247,9 @@ void Balance::parser(byte buf[], int i, uint32_t cb) {
 	if (control_bits_ & 1) {
 float pitch, roll;
 	XY(pitch, roll);
+
+
+
 	//ap_pitch = ap_roll;
 	//ap_roll = roll;
 

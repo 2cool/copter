@@ -105,7 +105,9 @@ float newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.05, newR4xy = 1;
 bool MpuClass::init()
 {
 	yaw_correction_angle = 19 * GRAD2RAD;
-	est_LF_HOR_speed = est_LF_HOR_ACC = 0;
+
+	est_LF_X_speed=est_LF_Y_speed=est_LF_X_ACC=est_LF_Y_ACC=est_LF_VER_speed=est_LF_VER_ACC=0;
+	
 	tiltPower_CF = 0.05;
 	alt_at_zero = x_at_zero = y_at_zero = 0;
 	base_x = base_y = base_z = 0;
@@ -670,13 +672,14 @@ void MpuClass::test_Est_XY() {
 		estY += MAX_LEN;
 		kf[Y]->base(-MAX_LEN);
 	}
-	const float speed_h = (float)sqrt(est_speedY * est_speedY + est_speedX * est_speedX);
-	const float accH= (float)sqrt(est_accY * est_accY + est_accX * est_accX);
-	est_LF_HOR_speed += (speed_h - est_LF_HOR_speed) * 0.1f;
-	est_LF_HOR_ACC += (accH - est_LF_HOR_ACC) * 0.1f;
 
-	est_LF_VER_speed += (est_speedZ - est_LF_VER_speed) * 0.1f;
-	est_LF_VER_ACC += (est_accZ - est_LF_VER_ACC) * 0.1f;
+#define LF 0.1f
+	est_LF_X_speed += (est_speedX - est_LF_X_speed) * LF;
+	est_LF_Y_speed += (est_speedY - est_LF_Y_speed) * LF;
+	est_LF_X_ACC += (accX - est_LF_X_ACC) * LF;
+	est_LF_Y_ACC += (accY - est_LF_Y_ACC) * LF;
+	est_LF_VER_speed += (est_speedZ - est_LF_VER_speed) * LF;
+	est_LF_VER_ACC += (accZ - est_LF_VER_ACC) * LF;
 
 
 	

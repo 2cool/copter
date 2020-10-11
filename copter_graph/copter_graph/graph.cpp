@@ -247,7 +247,7 @@ int Graph::parser(byte buf[]) {
 			if (len == 5)
 				press.parser(buf,i, flags[FILTER]);
 			else
-				mpu.parser(buf, i, len, control_bits, flags[FILTER],flags[ROTATE]);
+				Mpu.parser(buf, i, len, control_bits, flags[FILTER],flags[ROTATE]);
 			break;
 		}
 		case MS5611_SENS: {
@@ -260,14 +260,14 @@ int Graph::parser(byte buf[]) {
 
 			static double dalt = 0;
 			static int cnt = 0;
-			if (cnt == 0 && gps_log.acurH < 6 &&  gps_log.z<400 && mpu.est_alt < 300 && mpu.est_alt>-3) {
+			if (cnt == 0 && gps_log.acurH < 6 &&  gps_log.z<400 && Mpu.est_alt < 300 && Mpu.est_alt>-3) {
 				cnt++;
-				dalt = gps_log.z - mpu.est_alt;
+				dalt = gps_log.z - Mpu.est_alt;
 				if (gps_log.z < 40)
 					dalt += 100;
 			}
-			if (cnt && floor(gps_log.r_lon) == 33 && floor(gps_log.r_lat) == 47 && mpu.est_alt<300 && mpu.est_alt>-3) {
-				std::string str = " " + std::to_string(gps_log.r_lon) + "," + std::to_string(gps_log.r_lat) + "," + std::to_string(mpu.est_alt+dalt/*gps_log.z*/) + " ";
+			if (cnt && floor(gps_log.r_lon) == 33 && floor(gps_log.r_lat) == 47 && Mpu.est_alt<300 && Mpu.est_alt>-3) {
+				std::string str = " " + std::to_string(gps_log.r_lon) + "," + std::to_string(gps_log.r_lat) + "," + std::to_string(Mpu.est_alt+dalt/*gps_log.z*/) + " ";
 				fwrite(str.c_str(), str.length(), 1, klm_);
 			}
 
@@ -301,7 +301,7 @@ int Graph::parser(byte buf[]) {
 			break;
 		}
 		case BAL: {
-			bal.parser(buf, i, control_bits);
+			bal.parser(buf, i, control_bits, flags[FILTER], flags[ROTATE]);
 			break;
 		}
 		case COMM: {
@@ -380,7 +380,7 @@ int Graph::decode_Log() {
 	*/
 	bal.init();
 	press.init();
-	mpu.init();
+	Mpu.init();
 	gps_log.init();
 
 
@@ -453,27 +453,27 @@ int Graph::decode_Log() {
 		
 		//sensors_data[n].sd[GPS_Z] = gps_log.z;
 
-		sensors_data[n].sd[TIME] = mpu.time;
-		sensors_data[n].sd[DT] = mpu.dt;
-		sensors_data[n].sd[PITCH] = mpu.pitch;
-		sensors_data[n].sd[ROLL] = mpu.roll;
-		sensors_data[n].sd[YAW] = mpu.yaw;
+		sensors_data[n].sd[TIME] = Mpu.time;
+		sensors_data[n].sd[DT] = Mpu.dt;
+		sensors_data[n].sd[PITCH] = Mpu.pitch;
+		sensors_data[n].sd[ROLL] = Mpu.roll;
+		sensors_data[n].sd[YAW] = Mpu.yaw;
 		sensors_data[n].sd[GPS_YAW] = gps_log.yaw;
-		sensors_data[n].sd[ACCX] = mpu.accX;
-		sensors_data[n].sd[ACCY] = mpu.accY;
-		sensors_data[n].sd[ACCZ] = mpu.accZ;
-		sensors_data[n].sd[GYRO_PITCH] = mpu.gyroPitch;
-		sensors_data[n].sd[GYRO_ROLL] = mpu.gyroRoll;
-		sensors_data[n].sd[GYRO_YAW] = mpu.gyroYaw;
+		sensors_data[n].sd[ACCX] = Mpu.accX;
+		sensors_data[n].sd[ACCY] = Mpu.accY;
+		sensors_data[n].sd[ACCZ] = Mpu.accZ;
+		sensors_data[n].sd[GYRO_PITCH] = Mpu.gyroPitch;
+		sensors_data[n].sd[GYRO_ROLL] = Mpu.gyroRoll;
+		sensors_data[n].sd[GYRO_YAW] = Mpu.gyroYaw;
 
 
 
-		sensors_data[n].sd[SX] = mpu.estX;
-		sensors_data[n].sd[SY] = mpu.estY;
+		sensors_data[n].sd[SX] = Mpu.estX;
+		sensors_data[n].sd[SY] = Mpu.estY;
 
 
-		sensors_data[n].sd[SPEED_X] = mpu.est_speedX;
-		sensors_data[n].sd[SPEED_Y] = mpu.est_speedY;
+		sensors_data[n].sd[SPEED_X] = Mpu.est_speedX;
+		sensors_data[n].sd[SPEED_Y] = Mpu.est_speedY;
 
 
 		sensors_data[n].sd[GSX] = gps_log.gx;
@@ -524,8 +524,8 @@ int Graph::decode_Log() {
 	
 		
 
-		sensors_data[n].sd[SZ] =  mpu.est_alt;
-		sensors_data[n].sd[SPEED_Z] = mpu.est_speedZ;
+		sensors_data[n].sd[SZ] =  Mpu.est_alt;
+		sensors_data[n].sd[SPEED_Z] = Mpu.est_speedZ;
 
 
 		static float zero_alt = 0;
@@ -1016,14 +1016,14 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 
 	//(mpu._max[mEX]-mpu._min[mEX])
 	//distX_start
-	mpu._max[mEX] = 10;
-	mpu._min[mEX] = -10;
-	mpu._max[mEY] = 10;
-	mpu._min[mEY] = -10;
-	draw(g, rect, mpu._max[mEX], mpu._min[mEX], SX);
-	draw(g, rect, mpu._max[mEY], mpu._min[mEY], SY);
-	draw(g, rect, mpu._max[mEX] , mpu._min[mEX] , GSX);
-	draw(g, rect, mpu._max[mEY] , mpu._min[mEY] , GSY);
+	Mpu._max[mEX] = 10;
+	Mpu._min[mEX] = -10;
+	Mpu._max[mEY] = 10;
+	Mpu._min[mEY] = -10;
+	draw(g, rect, Mpu._max[mEX], Mpu._min[mEX], SX);
+	draw(g, rect, Mpu._max[mEY], Mpu._min[mEY], SY);
+	draw(g, rect, Mpu._max[mEX] , Mpu._min[mEX] , GSX);
+	draw(g, rect, Mpu._max[mEY] , Mpu._min[mEY] , GSY);
 
 	draw(g, rect, 15, -15, SPEED_X);
 	draw(g, rect, 15, -15, SPEED_Y);
@@ -1036,7 +1036,7 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 
 
 
-	draw(g, rect, mpu._max[mGYRO_PITCH], mpu._min[mGYRO_PITCH], GYRO_PITCH);
+	draw(g, rect, Mpu._max[mGYRO_PITCH], Mpu._min[mGYRO_PITCH], GYRO_PITCH);
 	draw(g, rect, 10, 0, MI0);
 	draw(g, rect, 10, 0, MI1);
 	draw(g, rect, 10, 0, MI2);

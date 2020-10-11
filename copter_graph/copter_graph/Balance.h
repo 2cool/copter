@@ -17,13 +17,13 @@ public:
 
 
 	double pid_i_X, pid_i_Y;
-
+	void calculate_wind_i(float world_ang[]);
 
 	float f[bALL];
 	float _max[bALL], _min[bALL];
 	void init();
 	int decode(char buffer[], int &i, bool rotate);
-	void parser(byte buf[], int i, uint32_t control_bits);
+	void parser(byte buf[], int i, uint32_t control_bits,bool filtr=false,bool rot=false);
 
 };
 extern Balance bal;
