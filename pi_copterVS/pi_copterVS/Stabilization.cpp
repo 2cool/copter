@@ -25,7 +25,7 @@ void StabilizationClass::setMaxAngels() {
 
 	pid_hor.set_kI_max(iMAX_hor);
 	pid_hor.set_max_output(Balance.get_max_angle());
-	pid_hor.auto_reset_i_dif(Balance.get_max_angle()-iMAX_hor);
+
 }
 void StabilizationClass::setMinMaxI_Thr() {
 	pid_ver.imax(Balance.get_min_throttle()*(float)cos(Balance.get_max_angle()*GRAD2RAD)-HOVER_THROTHLE, Balance.get_max_throttle() - HOVER_THROTHLE);
