@@ -312,7 +312,9 @@ void HmcClass::newCalibration(int16_t sh[]){
 	int print_time = millis_();
 
 	//float f[] = { 0,0,0,0 };
+	int32_t new_val_print_time = 0;
 	while (true){
+		int32_t time = millis_();
 		fcnt++;
 		int new_val = 0;
 		readBytes(devAddr, HMC5883L_RA_DATAX_H, 6, buffer);
@@ -353,24 +355,27 @@ void HmcClass::newCalibration(int16_t sh[]){
 			new_val |= 4;
 		}
 
-		GPS.loop(); //for led
+	//	GPS.loop(); //for led
 		//mega_i2c.throttle(f);
 		delay(10);
 		
 		if (new_val) {
-			string xyz = "";
-			if (new_val & 1)
-				xyz += "X ";
-			if (new_val & 2)
-				xyz += "Y ";
-			if (new_val & 4)
-				xyz += "Z ";
-			if (new_val)
-				xyz += ",";
-			myDisplay.textDisplay(xyz.c_str());
-
+			if (time - new_val_print_time > 100) {
+				new_val_print_time = time;
+				string xyz = "";
+				if (new_val & 1)
+					xyz += "X ";
+				if (new_val & 2)
+					xyz += "Y ";
+				if (new_val & 4)
+					xyz += "Z ";
+				if (new_val)
+					xyz += ",";
+				
+				myDisplay.textDisplay(xyz.c_str());
+			}
 			
-			const int32_t mill = millis_();
+			const int32_t mill = time;
 			print_time = mill + 1000;
 
 			int i = 0;

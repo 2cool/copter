@@ -44,19 +44,17 @@ void BalanceClass::init()
 	throttle = 0;
 	propeller_lost[0]= propeller_lost[1] = propeller_lost[2] = propeller_lost[3] = false;
 	old_time = micros_();
-	pid.kP(0.002);
-	pid.set_kI(0.0001);
+	pid.kP(0.00153f);
+	pid.set_kI(0.00042f);
 
 	pid.set_kI_max(MAX_DELTA);
-	pid.hi_2_error_max_diff(MAX_DELTA);
-	pitch_roll_kD = 0.0006;
+	//pid.auto_reset_i_dif(MAX_DELTA);
+	//pid.set_max_output(MAX_DELTA);
+	pitch_roll_kD = 0.000408f;
 	yaw_pid.kP(0.004f);  
 	yaw_pid.kI(0.004f);
 	yaw_pid.imax(-MAX_YAW_DELTA, MAX_YAW_DELTA);
 	yaw_kD =  0.004;
-	delay(1500);
-//	Mpu.initYaw(Hmc.heading*RAD2GRAD);
-
 	
 #ifdef DEBUG_MODE
 	printf( "Heading :%i\n", (int)Hmc.get_headingGrad());

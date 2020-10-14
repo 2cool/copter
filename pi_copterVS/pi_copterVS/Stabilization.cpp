@@ -21,16 +21,11 @@ float Z_FILTER = 0.3f;
 float XY_FILTER = 0.76f;
 
 
-
-float windRC;
-float wind_i_X, wind_i_Y;
-float wind_i_max;
-
 void StabilizationClass::setMaxAngels() {
 
-	wind_i_max = Balance.get_max_angle() * 0.42f;
-	pid_hor.set_kI_max(Balance.get_max_angle());
-	pid_hor.hi_2_error_max_diff(Balance.get_max_angle());
+	pid_hor.set_kI_max(iMAX_hor);
+	pid_hor.set_max_output(Balance.get_max_angle());
+	pid_hor.auto_reset_i_dif(Balance.get_max_angle()-iMAX_hor);
 }
 void StabilizationClass::setMinMaxI_Thr() {
 	pid_ver.imax(Balance.get_min_throttle()*(float)cos(Balance.get_max_angle()*GRAD2RAD)-HOVER_THROTHLE, Balance.get_max_throttle() - HOVER_THROTHLE);
@@ -45,10 +40,11 @@ void StabilizationClass::to_max_ang(const float ang, float& angX, float& angY) {
 }
 void StabilizationClass::init(){
 
-	dist2speed_XY =  0.2f;
-	pid_hor.kP(3);
-	pid_hor.set_kI(1);
-	xy_kD = 5;// 1.8;
+	dist2speed_XY = 0.5f;// 0.2f;
+	pid_hor.kP(10);// 3);
+	pid_hor.set_kI(5);// 1);
+	xy_kD = 3;// 1.8;
+	iMAX_hor = 15;
 	setMaxAngels();
 	def_max_speedXY=current_max_speed_xy = 10;
 	min_stab_XY_speed =  1.3f;
@@ -62,8 +58,7 @@ void StabilizationClass::init(){
 	pid_ver.kI( 0.015f );
 	z_kD=0.024f;
 	setMinMaxI_Thr();
-	wind_i_X = wind_i_Y = 0;
-	windRC = 0.001f;
+
 	
 	//----------------------------------------------------------------------------
 	y_error=x_error=z_error=0;
@@ -209,31 +204,9 @@ float StabilizationClass::get_dist2goal(){
 	double dy = Mpu.get_Est_Y() - needYV;
 	return (float)sqrt(dx*dx + dy * dy);
 }
+
 #define _PITCH 0
 #define _ROLL 1
-void StabilizationClass::calculate_wind_i(float world_ang[]) {
-	if (
-		Balance.get_throttle()>0.40f &&
-		Mpu.get_est_LF_hor_abs_speed() < 1.3f && 
-		Mpu.get_est_LF_hor_abs_acc() < 0.5f && 
-		Mpu.get_est_LF_ver_abs_speed() < 1.3f && 
-		Mpu.get_est_LF_ver_abs_acc() < 0.5f) 
-	{
-		const float owx = wind_i_X;
-		const float owy = wind_i_Y;
-		wind_i_X += (world_ang[_PITCH]) * windRC;
-		wind_i_Y += (world_ang[_ROLL]) * windRC;
-		to_max_ang(wind_i_max, wind_i_X, wind_i_Y);
-		world_ang[_PITCH] -= (wind_i_X - owx);
-		world_ang[_ROLL] -= (wind_i_Y - owy);
-		//Debug.dump(wind_i_X, wind_i_Y, 0, 0);
-		const float wind_i = sqrt(wind_i_X * wind_i_X + wind_i_Y * wind_i_Y);
-		pid_hor.set_kI_max(Balance.get_max_angle() - wind_i);
-		pid_hor.hi_2_error_max_diff(Balance.get_max_angle() - wind_i);
-
-		
-	}
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //float old_gps_bearing = 0, cos_bear = 1,  sin_bear = 0;
 void StabilizationClass::XY(float &pitch, float&roll){//dont work 
@@ -257,14 +230,12 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		y_error += (((float)Mpu.get_Est_SpeedY() - need_speedY) - y_error) * XY_FILTER;
 
 		float *world_ang = pid_hor.get_pid(x_error, y_error, Mpu.get_dt());
-		
-		calculate_wind_i(world_ang);
-		//Debug.dump(wind_i_X,wind_i_Y, pid_hor.get_kI_max(), 1+Mpu.get_est_LF_ver_acc()/9.8f);
+
 		const float mkdX = (x_error == 0)?1:(1 / (abs(x_error)*5));
 		const float mkdY = (y_error == 0)?1:(1 / (abs(y_error)*5));
 		///Debug.dump(fmin(1, mkdX), fmin(1, mkdY), x_error, y_error);
-		world_ang[_PITCH] += ((float)Mpu.get_Est_accX() * xy_kD) * fmin(1.0f, mkdX) + wind_i_X;
-		world_ang[_ROLL] += ((float)Mpu.get_Est_accY() * xy_kD) * fmin(1.0f, mkdY) + wind_i_Y;
+		world_ang[_PITCH] += ((float)Mpu.get_Est_accX() * xy_kD) * fmin(1.0f, mkdX);
+		world_ang[_ROLL] += ((float)Mpu.get_Est_accY() * xy_kD) * fmin(1.0f, mkdY);
 		//----------------------------------------------------------------from world to local X Y
 		float acczK = 1 + (float)Mpu.get_Est_accZ() / 9.8f;
 		acczK = constrain(acczK, 0.7f, 1.6f);
@@ -369,7 +340,7 @@ string StabilizationClass::get_xy_set() {
 		dist2speed_XY << "," << \
 		pid_hor.kP() << "," << \
 		pid_hor.get_kI() << "," << \
-		windRC <<","<<\
+		iMAX_hor <<","<<\
 		xy_kD <<","<<\
 		def_max_speedXY << "," << \
 		min_stab_XY_speed << "," << \
@@ -389,7 +360,7 @@ void StabilizationClass::setXY(const float  *ar){
 		t = pid_hor.get_kI();
 		Settings.set(ar[i++], t);
 		pid_hor.set_kI(t);
-		Settings.set(ar[i++], windRC);
+		Settings.set(ar[i++], iMAX_hor);
 		Settings.set(ar[i++], xy_kD);
 		Settings.set(ar[i++], def_max_speedXY);
 		def_max_speedXY = constrain(def_max_speedXY, 1, 15);
@@ -402,6 +373,7 @@ void StabilizationClass::setXY(const float  *ar){
 			XY_FILTER = 1;
 		else if (XY_FILTER < 0.01f)
 			XY_FILTER = 0.01f;
+		setMaxAngels();
 
 	}
 	for (uint8_t ii = 0; ii < i; ii++) {

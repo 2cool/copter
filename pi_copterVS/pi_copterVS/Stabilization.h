@@ -19,7 +19,7 @@ class StabilizationClass{
 
 
 private:
-	void calculate_wind_i(float world_ang[]);
+
 	void max_speed_limiter(float &x, float &y);
 	void dist2speed(float &x, float &y);
 	void speed2dist(float &x, float &y);
@@ -42,6 +42,7 @@ private:
 	   
 	float def_max_speedXY, min_stab_XY_speed, current_max_speed_xy;
 	float def_max_speedZ_P, def_max_speedZ_M,current_max_speedZ_P,current_max_speedZ_M, min_stab_Z_speed;
+	float iMAX_hor;
 public:
 	void to_max_ang(const float ang, float& angX, float& angY);
 	void set_max_speed_hor(float& s, bool only_test = false);
