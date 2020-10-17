@@ -39,7 +39,7 @@ void StabilizationClass::to_max_ang(const float ang, float& angX, float& angY) {
 void StabilizationClass::init(){
 
 	dist2speed_XY = 0.5f;// 0.2f;
-	pid_hor.kP(5);
+	pid_hor.kP(7);
 	xy_kD = 5;
 	setMaxAngels();
 	def_max_speedXY=current_max_speed_xy = 10;
