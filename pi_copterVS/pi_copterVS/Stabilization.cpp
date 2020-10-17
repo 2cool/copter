@@ -23,8 +23,6 @@ float XY_FILTER = 0.76f;
 
 void StabilizationClass::setMaxAngels() {
 
-	pid_hor.set_kI_max(iMAX_hor);
-	pid_hor.set_max_output(Balance.get_max_angle());
 
 }
 void StabilizationClass::setMinMaxI_Thr() {
@@ -41,10 +39,8 @@ void StabilizationClass::to_max_ang(const float ang, float& angX, float& angY) {
 void StabilizationClass::init(){
 
 	dist2speed_XY = 0.5f;// 0.2f;
-	pid_hor.kP(10);// 3);
-	pid_hor.set_kI(5);// 1);
-	xy_kD = 3;// 1.8;
-	iMAX_hor = 15;
+	pid_hor.kP(5);
+	xy_kD = 5;
 	setMaxAngels();
 	def_max_speedXY=current_max_speed_xy = 10;
 	min_stab_XY_speed =  1.3f;
