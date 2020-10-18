@@ -188,7 +188,7 @@ void ProgClass::loop(){
 			Autopilot.start_stop_program(false);
 		}
 	}
-	intersactionFlag = Prog.getIntersection(need_speedX, need_speedY);
+	intersactionFlag = Prog.getIntersection(need_X, need_Y);
 }
 
 
@@ -486,7 +486,7 @@ bool ProgClass::load_next(bool loadf) {
 
 	prog_data_index = wi;
 	begin_time = millis_();
-	need_speedX = need_speedY = 0;
+	need_X = need_Y = 0;
 	return true;
 
 }

@@ -44,7 +44,7 @@ class ProgClass
 	 void Do_Action();
  public:
 	 bool intersactionFlag;
-	 double need_speedX, need_speedY;
+	 double need_X, need_Y;
 	bool getIntersection(double &distX, double &distY);
 	double altitude, direction, cam_pitch;
 	 void init();

@@ -85,7 +85,7 @@ void StabilizationClass::max_speed_limiter(float &x, float &y) {
 
 	if (max_ > 0) {
 		const float speed2 = (x * x + y * y);
-		const float maxSpeed2 = current_max_speed_xy * current_max_speed_xy;
+		const float maxSpeed2 = (current_max_speed_xy+2) * (current_max_speed_xy+2);
 		if (speed2 > maxSpeed2) {
 			const float k = (float)sqrt(maxSpeed2 / speed2);
 			x *= k;
@@ -209,8 +209,8 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		float need_speedX, need_speedY;
 		float tx, ty;
 		if (Autopilot.progState() && Prog.intersactionFlag) {
-			need_speedX = (float)Prog.need_speedX;
-			need_speedY = (float)Prog.need_speedY;
+			need_speedX = (float)Prog.need_X;
+			need_speedY = (float)Prog.need_Y;
 		}
 		else {
 			tx = (float)Mpu.get_Est_X();
