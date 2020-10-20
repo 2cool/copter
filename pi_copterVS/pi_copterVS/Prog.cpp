@@ -282,7 +282,7 @@ bool ProgClass::getIntersection(double &x, double &y){
 
 	const double dist_ = Stabilization.get_dist2goal();
 
-	double r = Stabilization.getDist_XY(max_speed_xy);
+	double r = Stabilization.getDist_XY(max_speed_xy + Stabilization.get_allowance());
 	if (r > dist_){
 		//ErrorLog.println("r>dist");
 		return false;

@@ -27,7 +27,7 @@ private:
 	
 	float SPEED_Z_CF, SPEED_XY_CF;
 
-	float z_error,x_error,y_error;
+	float z_error;
 	float dist2speed_XY;
 	float alt2speedZ;
 	float xy_kD;
@@ -42,8 +42,9 @@ private:
 	   
 	float def_max_speedXY, min_stab_XY_speed, current_max_speed_xy;
 	float def_max_speedZ_P, def_max_speedZ_M,current_max_speedZ_P,current_max_speedZ_M, min_stab_Z_speed;
-	float iMAX_hor;
+	float allowance;
 public:
+	float get_allowance() { return allowance; }
 	void to_max_ang(const float ang, float& angX, float& angY);
 	void set_max_speed_hor(float& s, bool only_test = false);
 	void set_max_sped_ver(float &ps, float &ns, bool only_test = false);
@@ -53,7 +54,7 @@ public:
 	float get_max_speedXY_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_XY, min_stab_XY_speed); }
 	float get_max_speedZ_M_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_Z, -def_max_speedZ_M); }
 	float get_max_speedZ_P_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_Z, def_max_speedZ_P); }
-	void setMaxAngels();
+
 	void setMinMaxI_Thr();
 	void setNeedPos2Home();
 	void add2NeedPos(float speedX, float speedY, float dt);

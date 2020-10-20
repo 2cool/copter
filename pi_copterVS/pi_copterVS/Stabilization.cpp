@@ -18,13 +18,7 @@
 #include "Settings.h"
 
 float Z_FILTER = 0.3f;
-float XY_FILTER = 0.76f;
 
-
-void StabilizationClass::setMaxAngels() {
-
-
-}
 void StabilizationClass::setMinMaxI_Thr() {
 	pid_ver.imax(Balance.get_min_throttle()*(float)cos(Balance.get_max_angle()*GRAD2RAD)-HOVER_THROTHLE, Balance.get_max_throttle() - HOVER_THROTHLE);
 }
@@ -37,15 +31,14 @@ void StabilizationClass::to_max_ang(const float ang, float& angX, float& angY) {
 	}
 }
 void StabilizationClass::init(){
-
+	allowance = 2;
 	dist2speed_XY = 0.5f;// 0.2f;
 	pid_hor.kP(7);
 	xy_kD = 5;
-	setMaxAngels();
 	def_max_speedXY=current_max_speed_xy = 10;
-	min_stab_XY_speed =  1.3f;
+	min_stab_XY_speed =  10;
 	//-------------------------------------------
-	min_stab_Z_speed = 1.3f;
+	min_stab_Z_speed = 3;
 	def_max_speedZ_P = current_max_speedZ_P =  5;
 	def_max_speedZ_M = current_max_speedZ_M = -5;
 	//--------------------------------------------------------------------------
@@ -57,7 +50,7 @@ void StabilizationClass::init(){
 
 	
 	//----------------------------------------------------------------------------
-	y_error=x_error=z_error=0;
+	z_error=0;
 }
 void StabilizationClass::setDefaultMaxSpeeds4Return2HOME() {
 	current_max_speed_xy = def_max_speedXY;
@@ -85,7 +78,7 @@ void StabilizationClass::max_speed_limiter(float &x, float &y) {
 
 	if (max_ > 0) {
 		const float speed2 = (x * x + y * y);
-		const float maxSpeed2 = (current_max_speed_xy+2) * (current_max_speed_xy+2);
+		const float maxSpeed2 = (current_max_speed_xy + allowance) * (current_max_speed_xy + allowance);
 		if (speed2 > maxSpeed2) {
 			const float k = (float)sqrt(maxSpeed2 / speed2);
 			x *= k;
@@ -222,21 +215,17 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 
 		dist2speed(need_speedX, need_speedY);
 
-		x_error += (((float)Mpu.get_Est_SpeedX() - need_speedX) - x_error) * XY_FILTER;
-		y_error += (((float)Mpu.get_Est_SpeedY() - need_speedY) - y_error) * XY_FILTER;
+		const float x_error = (float)Mpu.get_Est_SpeedX() - need_speedX ;
+		const float y_error = (float)Mpu.get_Est_SpeedY() - need_speedY  ;
 
 		float *world_ang = pid_hor.get_pid(x_error, y_error, Mpu.get_dt());
 
-		const float mkdX = (x_error == 0)?1:(1 / (abs(x_error)*5));
-		const float mkdY = (y_error == 0)?1:(1 / (abs(y_error)*5));
 		///Debug.dump(fmin(1, mkdX), fmin(1, mkdY), x_error, y_error);
-		world_ang[_PITCH] += ((float)Mpu.get_Est_accX() * xy_kD) * fmin(1.0f, mkdX);
-		world_ang[_ROLL] += ((float)Mpu.get_Est_accY() * xy_kD) * fmin(1.0f, mkdY);
+		world_ang[_PITCH] += (float)Mpu.get_Est_accX() * xy_kD;
+		world_ang[_ROLL] += (float)Mpu.get_Est_accY() * xy_kD;
 		//----------------------------------------------------------------from world to local X Y
-		float acczK = 1 + (float)Mpu.get_Est_accZ() / 9.8f;
-		acczK = constrain(acczK, 0.7f, 1.6f);
-		pitch = (-(float)Mpu.cosYaw * world_ang[_PITCH] - Mpu.sinYaw * world_ang[_ROLL]) / acczK;
-		roll = ((float)Mpu.cosYaw * world_ang[_ROLL] - Mpu.sinYaw * world_ang[_PITCH]) / acczK;
+		pitch = (-(float)Mpu.cosYaw * world_ang[_PITCH] - Mpu.sinYaw * world_ang[_ROLL]);
+		roll = ((float)Mpu.cosYaw * world_ang[_ROLL] - Mpu.sinYaw * world_ang[_PITCH]);
 
 
 }
@@ -267,7 +256,6 @@ void StabilizationClass::resset_z(){
 	
 }
 void StabilizationClass::resset_xy_integrator(){
-	x_error = y_error = 0;
 	pid_hor.reset_integrators();
 }
 
@@ -335,12 +323,11 @@ string StabilizationClass::get_xy_set() {
 	convert << \
 		dist2speed_XY << "," << \
 		pid_hor.kP() << "," << \
-		pid_hor.get_kI() << "," << \
-		iMAX_hor <<","<<\
-		xy_kD <<","<<\
+		xy_kD << "," << \
 		def_max_speedXY << "," << \
 		min_stab_XY_speed << "," << \
-		XY_FILTER;
+		allowance;
+
 
 	string ret = convert.str();
 	return string(ret);
@@ -353,10 +340,6 @@ void StabilizationClass::setXY(const float  *ar){
 		t = pid_hor.kP();
 		Settings.set(ar[i++], t);
 		pid_hor.kP(t);
-		t = pid_hor.get_kI();
-		Settings.set(ar[i++], t);
-		pid_hor.set_kI(t);
-		Settings.set(ar[i++], iMAX_hor);
 		Settings.set(ar[i++], xy_kD);
 		Settings.set(ar[i++], def_max_speedXY);
 		def_max_speedXY = constrain(def_max_speedXY, 1, 15);
@@ -364,12 +347,8 @@ void StabilizationClass::setXY(const float  *ar){
 		min_stab_XY_speed = ar[i++];
 		if (min_stab_XY_speed < 1.3)min_stab_XY_speed = 1.3f;
 		if (min_stab_XY_speed > def_max_speedXY)min_stab_XY_speed = def_max_speedXY;
-		Settings.set(ar[i++], XY_FILTER);
-		if (XY_FILTER > 1)
-			XY_FILTER = 1;
-		else if (XY_FILTER < 0.01f)
-			XY_FILTER = 0.01f;
-		setMaxAngels();
+		Settings.set(ar[i++], allowance);
+		allowance = constrain(allowance, 0, 4);
 
 	}
 	for (uint8_t ii = 0; ii < i; ii++) {

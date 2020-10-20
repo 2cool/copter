@@ -125,12 +125,22 @@ bool GPSClass::loop(){
 				SEND_I2C posllh;
 				posllh.lat = lat;
 				posllh.lon = lon;
+				posllh.hAcc = 1;
+				posllh.vAcc = 1;
 				posllh.height = Emu.get_alt();
 
 
-				Log.block_start(LOG::GPS_SENS);
-				Log.loadSEND_I2C(&posllh);
-				Log.block_end();
+
+				if (Log.writeTelemetry) {
+					Log.block_start(LOG::GPS_SENS);
+					Log.loadSEND_I2C(&posllh);
+					Log.loadFloat((float)loc.dX);
+					Log.loadFloat((float)loc.speedX);
+					Log.loadFloat((float)loc.dY);
+					Log.loadFloat((float)loc.speedY);
+					Log.block_end();
+				}
+
 			}
 			return true;
 }

@@ -17,7 +17,6 @@ static const float f_constrain(const float v, const float min, const float max){
 
 float BalanceClass::set_max_throthle_without_limit(const float angl) { 
 	max_angle = angl; 
-	Stabilization.setMaxAngels(); 
 }
 
 
@@ -113,7 +112,6 @@ void BalanceClass::set(const float *ar, int n){
 			t = max_angle;
 			Settings.set(ar[i++], t);
 			max_angle = constrain(t, 15, 45);
-			Stabilization.setMaxAngels();
 		}
 	}
 	cout << "balance set:\n";
