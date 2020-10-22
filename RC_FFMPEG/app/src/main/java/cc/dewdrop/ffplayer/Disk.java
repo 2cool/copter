@@ -183,6 +183,89 @@ public class Disk {
 
         // autoLat=0,autoLon=0;
     }
+    public static void create_folders(){
+        File folder = new File("/sdcard/RC");
+        folder.mkdirs();
+        folder = new File("/sdcard/RC/PROGS");
+        folder.mkdir();
+    }
+
+    public static void save_settings(String name, String val){
+        try{
+            final File file = new File("/sdcard/RC/settings.txt");
+            InputStream is=new FileInputStream(file);
+            BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+            String out="";
+            while(true) {
+                String line = buf.readLine();
+                if (line != null) {
+                    String setting[] = line.split(",");
+                    if (setting[0].endsWith(name)) {
+                        setting[1] = val;
+                        line = setting[0] + "," + setting[1];
+                        Log.d("SAVEE",setting[0]+"="+setting[1]);
+                    }
+                    out += line + "\n";
+                }else
+                    break;
+            }
+            buf.close();
+            is.close();
+            FileOutputStream stream = new FileOutputStream("/sdcard/RC/settings.txt");
+            stream.write(out.getBytes());
+            stream.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+
+    public static void get_Settings(){
+        try {
+
+            File f = new File("/sdcard/RC");
+            if (f.exists()==false)
+                create_folders();
+
+
+            final File file = new File("/sdcard/RC/settings.txt");
+            if ( file.exists()==false) {
+                try {
+                    FileOutputStream stream = new FileOutputStream("/sdcard/RC/settings.txt");
+                    stream.write("yaw_correction,35\n".getBytes());
+                    stream.close();
+                }
+                catch (Exception e) {
+
+                }
+            }
+
+            InputStream is=new FileInputStream(file);
+            BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+            String line = buf.readLine();
+            while (line!=null) {
+                String par[] = line.split(",");
+                read_one_settings(par);
+                line = buf.readLine();
+            }
+
+            buf.close();
+            is.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+    public static boolean read_one_settings(String par[]){
+        if (par[0].endsWith("yaw_correction")){
+            MainActivity.yaw_correction=Float.parseFloat(par[1]);
+            Log.d("SAVEE","yaw_correction="+Float.parseFloat(par[1]));
+            return true;
+        }else
+            return false;
+    }
     public static String[] getIP(String myIP){
 
         try {
@@ -191,12 +274,8 @@ public class Disk {
             String ip=myIP.substring(0,myIP.lastIndexOf('.'));
 
             File f = new File("/sdcard/RC");
-            if (f.exists()==false) {
-                File folder = new File("/sdcard/RC");
-                folder.mkdirs();
-                folder = new File("/sdcard/RC/PROGS");
-                folder.mkdir();
-            }
+            if (f.exists()==false)
+                create_folders();
 
             final File file = new File("/sdcard/RC/ip.set");
             if ( file.exists()==false) {

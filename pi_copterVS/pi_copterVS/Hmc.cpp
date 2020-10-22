@@ -87,9 +87,9 @@ void HmcClass::set(const float buf[]){
 
 	setings_i = buf[1];
 	phone_yaw_correction = constrain(buf[2], -45, 45);
-	calibration(false);
 
-	cout << "compas " << buf[0] << ","<<buf[1]<<endl;
+
+	cout << "# "<<buf[1]<<"   copter yaw cor=" << buf[0] << "   phone_yaw_cor="<<buf[2]<<endl;
 }
 //---------------------------------------------------------
 

@@ -1,8 +1,6 @@
 
  
-#define PROG_VERSION "ver: 3.201019\n"
-#define SIM800_F
-
+#define PROG_VERSION "ver: 3.201022\n"
 
 //Additional Options  DDEBUG
 

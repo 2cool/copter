@@ -253,6 +253,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
                 MainActivity.yaw_correction=45;
             else if (MainActivity.yaw_correction<-45)
                 MainActivity.yaw_correction=-45;
+            Disk.save_settings("yaw_correction",textV[2].getText().toString());
         }
 
     }

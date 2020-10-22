@@ -322,7 +322,7 @@ public static void verifyPermissions(Activity activity){
      //   magnetometerWork = packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_COMPASS);;
 
 
-
+        Disk.get_Settings();
 
         SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);

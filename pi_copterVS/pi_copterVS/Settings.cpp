@@ -194,9 +194,10 @@ int SettingsClass::read_all() {
 	{
 		cout << "No settings file!\n";
 		myDisplay.textDisplay("NO SETTINGS FILE!\N");
-		Hmc.calibration(false);
+		
 		return -1;
 	}
+	
 	char buf[1000];
 ////	char c=fgetc(f);
 //	cout << c << endl;
@@ -207,8 +208,8 @@ int SettingsClass::read_all() {
 		
 		load_(string(buf),true);
 	}
-
 	fclose(f);
+	Hmc.calibration(false);
 
 #endif
 	return 0;
