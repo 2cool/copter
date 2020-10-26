@@ -382,7 +382,7 @@ void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, b
 
 
 
-	/*
+	
 	if (start_f && filter) {
 
 
@@ -441,7 +441,7 @@ void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, b
 		w_accY = kf[1]->state()(2);
 
 
-	}*/
+	}
 
 	if (rotate == false) {
 		accX = (-cosYaw * w_accX - sinYaw * w_accY); //relative to world
@@ -510,12 +510,12 @@ void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, b
 	est_LF_VER_speed += (est_speedZ - est_LF_VER_speed) * 0.1;
 	est_LF_VER_ACC += (accZ - est_LF_VER_ACC) * 0.1f;
 
-	if (filter) {
+	/*if (filter) {
 		accX = accY = get_est_LF_hor_acc();
 		est_speedY = est_speedX = get_est_LF_hor_speed();
 		accZ = est_LF_VER_ACC;
 		est_speedZ = est_LF_VER_speed;
-	}
+	}*/
 
 
 

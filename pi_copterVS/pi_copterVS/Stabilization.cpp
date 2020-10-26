@@ -34,6 +34,8 @@ void StabilizationClass::init(){
 	allowance = 2;
 	dist2speed_XY = 0.5f;// 0.2f;
 	pid_hor.kP(7);
+	pid_hor.set_kI(1);
+	pid_hor.set_kI_max(15);
 	xy_kD = 5;
 	def_max_speedXY=current_max_speed_xy = 10;
 	min_stab_XY_speed =  10;
@@ -206,17 +208,21 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 			need_speedY = (float)Prog.need_Y;
 		}
 		else {
-			tx = (float)Mpu.get_Est_X();
+
+			tx = (float)GPS.loc.dX;
 			need_speedX = (needXV - tx);
-			ty = (float)Mpu.get_Est_Y();
+			ty = (float)GPS.loc.dY;
 			need_speedY = (needYV - ty);
 			
 		}// a=v*v/(2s)
 
 		dist2speed(need_speedX, need_speedY);
+	
+	//	const float need_direction=atan2(need_speedY, need_speedX);
 
-		const float x_error = (float)Mpu.get_Est_SpeedX() - need_speedX ;
-		const float y_error = (float)Mpu.get_Est_SpeedY() - need_speedY  ;
+
+		const float x_error = (float)(GPS.loc.speedX - need_speedX);
+		const float y_error = (float)(GPS.loc.speedY - need_speedY);
 
 		float *world_ang = pid_hor.get_pid(x_error, y_error, Mpu.get_dt());
 
@@ -323,6 +329,8 @@ string StabilizationClass::get_xy_set() {
 	convert << \
 		dist2speed_XY << "," << \
 		pid_hor.kP() << "," << \
+		pid_hor.get_kI() <<","<<\
+		pid_hor.get_kI_max()<<","<<\
 		xy_kD << "," << \
 		def_max_speedXY << "," << \
 		min_stab_XY_speed << "," << \
@@ -340,13 +348,21 @@ void StabilizationClass::setXY(const float  *ar){
 		t = pid_hor.kP();
 		Settings.set(ar[i++], t);
 		pid_hor.kP(t);
+
+		float temp = pid_hor.get_kI();
+		Settings.set(ar[i++], temp);
+		pid_hor.set_kI(temp);
+
+		temp = ar[i++];
+		constrain(temp, 0, 15);
+		pid_hor.set_kI_max(temp);
+
 		Settings.set(ar[i++], xy_kD);
-		Settings.set(ar[i++], def_max_speedXY);
-		def_max_speedXY = constrain(def_max_speedXY, 1, 15);
+		def_max_speedXY= ar[i++];
+		def_max_speedXY = constrain(def_max_speedXY, 3, 10);
 		Autopilot.set_sensXY(def_max_speedXY);
 		min_stab_XY_speed = ar[i++];
-		if (min_stab_XY_speed < 1.3)min_stab_XY_speed = 1.3f;
-		if (min_stab_XY_speed > def_max_speedXY)min_stab_XY_speed = def_max_speedXY;
+		min_stab_XY_speed = constrain(min_stab_XY_speed, 1.3, def_max_speedXY);
 		Settings.set(ar[i++], allowance);
 		allowance = constrain(allowance, 0, 4);
 

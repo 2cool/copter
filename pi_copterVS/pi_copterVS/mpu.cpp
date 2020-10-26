@@ -280,8 +280,8 @@ bool MpuClass::loop() {
 	gyroRoll = Emu.get_gyroRoll();
 	gyroYaw = Emu.get_gyroYaw();
 	double head = Emu.get_heading();
-	double g_yaw = Emu.get_yaw();
-	yaw_offset += (wrap_PI(g_yaw - head) - yaw_offset)*0.0031f;
+	double g_yaw = Emu.get_yaw()-0*GRAD2RAD;// -yaw_correction_angle;
+//	yaw_offset += (wrap_PI(g_yaw - head) - yaw_offset)*0.0031f;
 	yaw = wrap_PI(g_yaw - yaw_offset);// +yaw_correction_angle );
 	sin_cos(pitch, sinPitch, cosPitch);
 	sin_cos(roll, sinRoll, cosRoll);
