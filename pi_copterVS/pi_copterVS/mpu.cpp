@@ -99,7 +99,7 @@ void MpuClass::log() {
 
 //-----------------------------------------------------
 
-float newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.05, newR4xy = 1;
+float newQ4z = 0.002, newR4z = 0.2, newQ4xy = 100, newR4xy = 1;
 
 //-----------------------------------------------------
 bool MpuClass::init()
