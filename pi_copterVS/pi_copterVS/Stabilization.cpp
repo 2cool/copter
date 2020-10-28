@@ -159,12 +159,12 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 	if (speedX == 0) {
 		if (f_stop_x == false) {
 			f_stop_x = true;
-			needXR = needXV = (float)Mpu.get_Est_X();
+			needXR = needXV = (float)GPS.loc.dX;
 		}
 	}
 	else {
 		if (f_stop_x) {
-			needXR = needXV = (float)Mpu.get_Est_X();
+			needXR = needXV = (float)GPS.loc.dX;
 			f_stop_x = false;
 		}
 		float distX = speedX, distY = speedY;
@@ -175,13 +175,13 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 	if (speedY == 0) {
 		if (f_stop_y == false) {
 			f_stop_y = true;
-			needYV = needYR = (float)Mpu.get_Est_Y();
+			needYV = needYR = (float)GPS.loc.dY;
 		}
 	}
 	else {
 		if (f_stop_y) {
 			f_stop_y = false;
-			needYV = needYR = (float)Mpu.get_Est_Y();
+			needYV = needYR = (float)GPS.loc.dY;
 		}
 		float distX = speedX, distY = speedY;
 		speed2dist(distX, distY);
@@ -191,8 +191,8 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 	
 }
 float StabilizationClass::get_dist2goal(){
-	double dx= Mpu.get_Est_X() - needXV;
-	double dy = Mpu.get_Est_Y() - needYV;
+	double dx= GPS.loc.dX - needXV;
+	double dy = GPS.loc.dY - needYV;
 	return (float)sqrt(dx*dx + dy * dy);
 }
 
@@ -227,8 +227,8 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 		float *world_ang = pid_hor.get_pid(x_error, y_error, Mpu.get_dt());
 
 		///Debug.dump(fmin(1, mkdX), fmin(1, mkdY), x_error, y_error);
-		world_ang[_PITCH] += (float)Mpu.get_Est_accX() * xy_kD;
-		world_ang[_ROLL] += (float)Mpu.get_Est_accY() * xy_kD;
+		world_ang[_PITCH] += (float)Mpu.w_accX * xy_kD;
+		world_ang[_ROLL] += (float)Mpu.w_accY * xy_kD;
 		//----------------------------------------------------------------from world to local X Y
 		pitch = (-(float)Mpu.cosYaw * world_ang[_PITCH] - Mpu.sinYaw * world_ang[_ROLL]);
 		roll = ((float)Mpu.cosYaw * world_ang[_ROLL] - Mpu.sinYaw * world_ang[_PITCH]);

@@ -40,7 +40,7 @@ public:
 	void updateXY();
 	//void bearing_dist(double &bearing, double & distance);
 	
-	double dX, dY, speedX, speedY,speedZ,startAlt,old_alt,direction;
+	double dX, dY, speedX, speedY,speedZ,startAlt,old_alt,direction,speed_hor;
 	double  x_from_zero_2_home, y_from_zero_2_home, dist2home;
 	//---------------
 	int32_t last_gps_data__time, last_gps_accuracy_ok;

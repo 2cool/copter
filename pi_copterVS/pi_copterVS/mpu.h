@@ -63,7 +63,7 @@ class MpuClass
 private:
 	int base_z, base_y, base_x;
 	float alt_at_zero,x_at_zero,y_at_zero;
-	void gyro_calibr();
+	void gyro_acc_calibr(const float&ax, const float &ay, const float &az);
 	void test_Est_Alt();
 	void test_Est_XY();
 	void rotateCW(float&x, float&y);
@@ -81,16 +81,16 @@ private:
 	// void set_cos_sin_dir();
 	// double dir_angle_GRAD, cosDirection, sinDirection;
 	 float yaw_correction_angle;
-	 double get_Est_X() { return (double)(estX-x_at_zero)+base_x; }
-	 double get_Est_Y() { return (double)(estY-y_at_zero)+base_y; }
-	 float get_Est_accX() { return est_accX; }
-	 float get_Est_accY() { return est_accY; }
+	 double get_Est_X_() { return (double)(estX-x_at_zero)+base_x; }
+	 double get_Est_Y_() { return (double)(estY-y_at_zero)+base_y; }
+	 float get_Est_accX_() { return est_accX; }
+	 float get_Est_accY_() { return est_accY; }
 	 float get_Est_accZ() { return est_accZ; }
 
-	 float get_Est_SpeedX() { return est_speedX; }
-	 float get_Est_SpeedY() { return est_speedY; }
+	 float get_Est_SpeedX_() { return est_speedX; }
+	 float get_Est_SpeedY_() { return est_speedY; }
 	 float get_Est_SpeedZ() { return est_speedZ; }
-	 float get_Est_SpeedXY() { return sqrt(est_speedX * est_speedX + est_speedY * est_speedY); }
+	 float get_Est_SpeedXY_() { return sqrt(est_speedX * est_speedX + est_speedY * est_speedY); }
 	 double get_Est_Alt() { return (double)(est_alt-alt_at_zero)+base_z; }
 	 void set_XYZ_to_Zero();
 
@@ -112,6 +112,7 @@ private:
 	 float get_roll();
 	 bool mpu_calibrated,gyro_calibratioan;
 	 float accZ,accY,accX,tiltPower,cosPitch,cosRoll,sinPitch,sinRoll;
+	 float accZ_c, accY_c, accX_c;
 	 float w_accX, w_accY;
 	 float  gyroPitch, gyroYaw, gyroRoll;
 	string get_set();

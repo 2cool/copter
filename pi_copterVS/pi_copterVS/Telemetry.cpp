@@ -430,7 +430,7 @@ bool TelemetryClass::update_buf() {
 	loadBUF8(i, Balance.c_pitch);
 	loadBUF8(i, Balance.c_roll);
 
-	loadBUF8(i, fmin((Mpu.get_Est_SpeedXY() * 3), 127));
+	loadBUF8(i, fmin((GPS.loc.speed_hor * 3), 127));
 	loadBUF8(i, fmin((Mpu.get_Est_SpeedZ() * 5), 127));
 	int16_t d2h = GPS.loc.dist2home;
 	loadBUF16(i, (d2h <= 0x7fff) ? d2h : 0x7fff - d2h);

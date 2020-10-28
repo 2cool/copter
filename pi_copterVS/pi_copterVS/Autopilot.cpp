@@ -468,7 +468,7 @@ bool AutopilotClass::go2HomeProc(const float dt){
 		}
 		case GO_UP_OR_NOT:{
 			const float accuracy = ACCURACY_XY + GPS.loc.accuracy_hor_pos_;
-			if (fabs(Mpu.get_Est_X()) <= accuracy && fabs(Mpu.get_Est_Y()) <= accuracy){ // if at home now
+			if (fabs(GPS.loc.dX) <= accuracy && fabs(GPS.loc.dY) <= accuracy){ // if at home now
 				f_go2homeTimer = 6; //min time for stab
 				go2homeIndex = (Mpu.get_Est_Alt() <= (FAST_DESENDING_TO_HIGH)) ? SLOW_DESENDING : START_FAST_DESENDING;
 				Stabilization.setNeedPos2Home();
@@ -493,7 +493,7 @@ bool AutopilotClass::go2HomeProc(const float dt){
 			dist2home_at_begin = GPS.loc.dist2home;
 			Stabilization.setNeedPos2Home();
 			go2homeIndex = TEST4HOME_LOC;
-			aYaw_ = -RAD2GRAD * atan2(Mpu.get_Est_Y(),Mpu.get_Est_X());// GPS.loc.dir_angle_GRAD;
+			aYaw_ = -RAD2GRAD * atan2(GPS.loc.dY, GPS.loc.dX);// GPS.loc.dir_angle_GRAD;
 
 			aYaw_ = wrap_180(aYaw_);
 			break;
@@ -501,7 +501,7 @@ bool AutopilotClass::go2HomeProc(const float dt){
 		case TEST4HOME_LOC:{//прилет на место старта
 			   
 			const float accuracy = ACCURACY_XY + GPS.loc.accuracy_hor_pos_;
-			if (fabs(Mpu.get_Est_X()) <= accuracy && fabs(Mpu.get_Est_Y()) <= accuracy){
+			if (fabs(GPS.loc.dX) <= accuracy && fabs(GPS.loc.dY) <= accuracy){
 				go2homeIndex = START_FAST_DESENDING;
 				f_go2homeTimer = 0;
 			}
@@ -645,7 +645,7 @@ bool AutopilotClass::holdLocation(const long lat, const long lon){
 		cout << "Hower at: " << GPS.loc.lat_ << " " << GPS.loc.lon_ << "\t"<< millis_() << endl;;
 
 		//Stabilization.init_XY(0, 0);
-		Stabilization.setNeedPos(Mpu.get_Est_X(), Mpu.get_Est_Y());
+		Stabilization.setNeedPos(GPS.loc.dX, GPS.loc.dY);
 
 		control_bits |= XY_STAB;
 		return true;

@@ -156,7 +156,7 @@ bool MpuClass::init()
 	kf[Y] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[Y]->init(x0);
 	//X end
-
+	accZ_c=accY_c=accX_c=0;
 	cout << "Initializing MPU6050\n";
 
 #ifndef FLY_EMULATOR
@@ -390,8 +390,10 @@ void MpuClass::test_vibration(float x, float y, float z){
 }
 
 
+
 //------------------------------------------------------------------------------------
-void MpuClass::gyro_calibr() {
+static double _ax = 0, _ay = 0, _az = 0;
+void MpuClass::gyro_acc_calibr(const float& ax, const float& ay, const float& az) {
 	if (Autopilot.motors_is_on() == false) {
 		static bool printed = false;
 		if (time < 30E6L || acc_callibr_time > time) {
@@ -399,6 +401,7 @@ void MpuClass::gyro_calibr() {
 			AHRS.setBeta(0.1);
 			if (cal_g_cnt == 0) {
 				cal_g_pitch = cal_g_roll = cal_g_yaw = 0;
+				_ax = _ay = _az = 0;
 			}
 			cal_g_pitch += g[1];
 			cal_g_roll += g[0];
@@ -407,10 +410,25 @@ void MpuClass::gyro_calibr() {
 			agpitch = giroifk * ((float)cal_g_pitch / (float)cal_g_cnt);
 			agroll = giroifk * ((float)cal_g_roll / (float)cal_g_cnt);
 			agyaw = giroifk * ((float)cal_g_yaw / (float)cal_g_cnt);
+			_ax += ax;
+			_ay += ay;
+			_az += az;
 		}else {
 			if (printed == false) {
 				printed = true;
+
+				_ax /= (double)cal_g_cnt;
+				_ay /= (double)cal_g_cnt;
+				_az /= (double)cal_g_cnt;
+
+				accZ_c = _az * cosPitch + sinPitch * _ax;
+				accZ_c = 9.8f * (accZ_c * cosRoll + sinRoll * _ay - 1);
+				accX_c = 9.8f * (_ax * cosPitch - _az * sinPitch);
+				accY_c = 9.8f * (-_ay * cosRoll + _az * sinRoll);
+
+
 				cout << "gyro calibr: p " << agpitch << ", r " << agroll << ", y " << agyaw<<endl;
+				cout << "acc calibr: x " << accX_c << ", y " << accY_c << ", z " << accZ_c << endl;
 				myDisplay.textDisplay("CALIBR DONE\n");
 				AHRS.setBeta(0.01);
 				cal_g_cnt = 0;
@@ -450,7 +468,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	float az = accifk * (float)a[2];
 
 	AHRS.MadgwickAHRSupdate(q, GRAD2RAD * gyroRoll, GRAD2RAD * gyroPitch, GRAD2RAD * gyroYaw, ax, ay, az,  Hmc.fmx, Hmc.fmy, Hmc.fmz, mpu_dt);
-	gyro_calibr();
+	
 
 	toEulerianAngle(q, roll, pitch, yaw);
 
@@ -466,17 +484,23 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	sin_cos(roll, sinRoll, cosRoll);
 
 	tiltPower += (constrain(cosPitch*cosRoll, 0.5f, 1) - tiltPower)*tiltPower_CF;
-	
-	accZ = az*cosPitch + sinPitch*ax;
-	accZ = 9.8f*(accZ*cosRoll + sinRoll*ay - 1);
 
+	gyro_acc_calibr(ax,ay,az);
+
+
+	accZ =  az*cosPitch + sinPitch*ax;
+	accZ = 9.8f*(accZ*cosRoll + sinRoll*ay - 1);
 	accX = 9.8f*(ax*cosPitch - az*sinPitch);
 	accY = 9.8f*(-ay*cosRoll + az*sinRoll);
+
+	accX -= accX_c;
+	accY -= accY_c;
+	accZ -= accZ_c;
 
 	test_vibration(accX, accY, accZ);
 
 	test_Est_Alt();
-	test_Est_XY();
+	//test_Est_XY();
 
 	shmPTR->pitch = pitch *= RAD2GRAD;
 	shmPTR->roll = roll *= RAD2GRAD;

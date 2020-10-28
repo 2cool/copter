@@ -104,6 +104,7 @@ void LocationClass::xy(){
 	//update z
 	double tsz = (altitude - old_alt)*rdt;
 	direction = atan2(speedY, speedX);
+	speed_hor = sqrt(speedX * speedX + speedY * speedY);
 	
 	if (abs(tsz) > SPEED_ERROR) {
 		bugs++;
@@ -313,7 +314,7 @@ int LocationClass::init(){
 	dt = 0.1;
 	rdt = 10;
 	speedX = speedY = speedZ = 0;
-	direction = 0;
+	direction = speed_hor = 0;
 	cout << "loc init\n";
 	return 0;
 	dX = dY = old_alt = 0;
