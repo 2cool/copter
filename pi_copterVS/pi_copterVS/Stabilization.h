@@ -90,7 +90,9 @@ public:
 
 	
 	float Z();
-	void XY(float &xF, float&yF);
+
+	void Hor_position(float& xF, float& yF);
+	void Hor_speed(float &xF, float&yF);
 
 	void init();
 	string get_z_set();

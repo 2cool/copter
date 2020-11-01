@@ -99,7 +99,7 @@ void MpuClass::log() {
 
 //-----------------------------------------------------
 
-float newQ4z = 0.002, newR4z = 0.2, newQ4xy = 100, newR4xy = 1;
+float newQ4z = 0.002, newR4z = 0.2, newQ4xy = 0.1, newR4xy = 1;
 
 //-----------------------------------------------------
 bool MpuClass::init()
@@ -500,7 +500,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	test_vibration(accX, accY, accZ);
 
 	test_Est_Alt();
-	//test_Est_XY();
+	test_Est_XY();
 
 	shmPTR->pitch = pitch *= RAD2GRAD;
 	shmPTR->roll = roll *= RAD2GRAD;

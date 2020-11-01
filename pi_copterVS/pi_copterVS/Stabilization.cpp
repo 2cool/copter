@@ -150,6 +150,7 @@ void StabilizationClass::set_max_sped_ver(float &maxP, float &maxM, bool only_te
 	}
 }
 void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
+
 	current_max_speed_xy = (speedX == 0 && speedY == 0) ? min_stab_XY_speed : sqrt(speedX * speedX + speedY * speedY);
 	if (current_max_speed_xy > def_max_speedXY)
 		current_max_speed_xy = def_max_speedXY;
@@ -159,12 +160,12 @@ void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 	if (speedX == 0) {
 		if (f_stop_x == false) {
 			f_stop_x = true;
-			needXR = needXV = (float)GPS.loc.dX;
+			needXR = needXV;// = (float)GPS.loc.dX;
 		}
 	}
 	else {
 		if (f_stop_x) {
-			needXR = needXV = (float)GPS.loc.dX;
+			needXR = needXV;// = (float)GPS.loc.dX;
 			f_stop_x = false;
 		}
 		float distX = speedX, distY = speedY;
@@ -198,9 +199,38 @@ float StabilizationClass::get_dist2goal(){
 
 #define _PITCH 0
 #define _ROLL 1
+
+float hor_pos_k = 0.5f;
+float hor_speed_k = 2;
+void StabilizationClass::Hor_position(float& pitch, float& roll) {
+	float pos_angX = (Mpu.get_Est_X_() - needXV) * hor_pos_k;
+	pos_angX *= abs(pos_angX);
+
+	float pos_angY = (Mpu.get_Est_Y_() - needYV)* hor_pos_k;
+	pos_angY *= abs(pos_angY);
+	to_max_ang(35, pos_angX, pos_angY);
+
+	float speed_angX = Mpu.get_Est_SpeedX_() * hor_speed_k;
+	speed_angX *= abs(speed_angX);
+
+	float speed_angY = Mpu.get_Est_SpeedY_() * hor_speed_k;
+	speed_angY *= abs(speed_angY);
+
+	to_max_ang(35, speed_angX, speed_angY);
+
+	Debug.dump(pos_angX, speed_angX, pos_angY, speed_angY);
+	pos_angX += speed_angX;
+	pos_angY += speed_angY;
+
+
+	pitch = (-(float)Mpu.cosYaw * pos_angX - Mpu.sinYaw * pos_angY);
+	roll = ((float)Mpu.cosYaw * pos_angY - Mpu.sinYaw * pos_angX);
+
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //float old_gps_bearing = 0, cos_bear = 1,  sin_bear = 0;
-void StabilizationClass::XY(float &pitch, float&roll){//dont work 
+void StabilizationClass::Hor_speed(float &pitch, float&roll){//dont work 
 		float need_speedX, need_speedY;
 		float tx, ty;
 		if (Autopilot.progState() && Prog.intersactionFlag) {
@@ -215,6 +245,18 @@ void StabilizationClass::XY(float &pitch, float&roll){//dont work
 			need_speedY = (needYV - ty);
 			
 		}// a=v*v/(2s)
+
+
+
+
+
+		if (Commander.getPitch() == 0 && Commander.getRoll() == 0)
+			return Hor_position(pitch, roll);
+
+
+
+
+
 
 		dist2speed(need_speedX, need_speedY);
 	

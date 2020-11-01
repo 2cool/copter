@@ -232,7 +232,7 @@ bool BalanceClass::loop()
 		}
 
 		if (Autopilot.xy_stabState()) {
-			Stabilization.XY(c_pitch, c_roll);
+			Stabilization.Hor_speed(c_pitch, c_roll);
 		}
 		else {
 			c_pitch = Autopilot.get_Pitch();
