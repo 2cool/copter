@@ -34,7 +34,7 @@ void StabilizationClass::init(){
 	allowance = 2;
 	dist2speed_XY = 0.5f;// 0.2f;
 	hor_pos_ki = 0;
-	hor_pos_ki_max =0;
+	hor_pos_ki_max =10;
 	hor_pos_kp = 0.5f;
 	hor_speed_kd = 2;
 	hor_speed_kp = 7;
@@ -221,7 +221,7 @@ void StabilizationClass::Hor_position(float& pitch, float& roll) {
 	pos_angX += pos_ix;
 	pos_angY += pos_iy;
 
-	to_max_ang(35, pos_angX, pos_angY);
+	to_max_ang(Balance.get_max_angle(), pos_angX, pos_angY);
 
 
 
@@ -233,9 +233,9 @@ void StabilizationClass::Hor_position(float& pitch, float& roll) {
 	float speed_angY = Mpu.get_Est_SpeedY_() * hor_speed_kd;
 	speed_angY *= abs(speed_angY);
 
-	to_max_ang(35, speed_angX, speed_angY);
+	to_max_ang(Balance.get_max_angle(), speed_angX, speed_angY);
 
-	Debug.dump(pos_angX, speed_angX, pos_angY, speed_angY);
+//	Debug.dump(pos_angX, speed_angX, pos_angY, speed_angY);
 	pos_angX += speed_angX;
 	pos_angY += speed_angY;
 

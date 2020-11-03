@@ -46,7 +46,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             // Z stab
             {"alt to speed", "speed_kP","speed_kI","speed_kD","MAX_SPEED_P","MAX_SPEED_M","min_stab_speed","FILTR",_null,_null},
             // XY stab
-            {"dist to speed", "speed_kP","speed_kI","max_kI" ,"speed_kD","max_speed","min_stab_speed","allowance",_null,_null},
+            {"pos_KP","speed_KD","pos_KI","dist to speed", "speed_kP","acc_KD","max_speed","allowance",_null,_null},
             // secure
             {"high_to_lift_2_home","max_throttle","min_throttle","min_hight","lift at start","battery cap","min_hor_acur",_null,_null, _null},//,"gimbP_Z","gimbR_Z"},
             // mpu
