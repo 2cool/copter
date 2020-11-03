@@ -33,12 +33,13 @@ void StabilizationClass::to_max_ang(const float ang, float& angX, float& angY) {
 void StabilizationClass::init(){
 	allowance = 2;
 	dist2speed_XY = 0.5f;// 0.2f;
-	pid_hor.kP(7);
-	pid_hor.set_kI(1);
-	pid_hor.set_kI_max(15);
-	xy_kD = 5;
+	hor_pos_ki = 0;
+	hor_pos_ki_max =0;
+	hor_pos_kp = 0.5f;
+	hor_speed_kd = 2;
+	hor_speed_kp = 7;
+	hor_acc_kd = 5;
 	def_max_speedXY=current_max_speed_xy = 10;
-	min_stab_XY_speed =  10;
 	//-------------------------------------------
 	min_stab_Z_speed = 3;
 	def_max_speedZ_P = current_max_speedZ_P =  5;
@@ -92,16 +93,18 @@ void StabilizationClass::max_speed_limiter(float &x, float &y) {
 void StabilizationClass::setNeedPos2Home() {
 	needXR = needXV = needYR = needYV = 0;
 }
-void StabilizationClass::dist2speed(float &x, float &y) {
-	x = dist2speed_XY * x;
-	y = dist2speed_XY * y;
-	max_speed_limiter(x, y);
+void StabilizationClass::dist2speed(const  float dx, const float dy, float &speed_x, float &speed_y) {
+	speed_x = dist2speed_XY * dx;
+	speed_y = dist2speed_XY * dy;
+	max_speed_limiter(speed_x, speed_y);
 
 }
-void StabilizationClass::speed2dist(float &x, float &y) {
-	max_speed_limiter(x, y);
-	x /= dist2speed_XY;
-	y /= dist2speed_XY;
+void StabilizationClass::speed2dist(const float speed_x, const  float speed_y, float &dx, float &dy) {
+	dx = speed_x;
+	dy = speed_y;
+	max_speed_limiter(dx, dy);
+	dx /= dist2speed_XY;
+	dy /= dist2speed_XY;
 }
 
 void StabilizationClass::setNeedPos(float x, float y) {
@@ -120,7 +123,7 @@ void StabilizationClass::setNeedLoc(long lat, long lon, double&x, double&y) {
 	
 }
 void StabilizationClass::set_max_speed_hor(float &s, bool only_test) {
-	const float _max_speed_xy = (s < min_stab_XY_speed) ? min_stab_XY_speed : ( s > def_max_speedXY ? def_max_speedXY : s);
+	const float _max_speed_xy =(s > def_max_speedXY ? def_max_speedXY : s);
 	s = _max_speed_xy;
 	if (!only_test)
 		current_max_speed_xy = _max_speed_xy;
@@ -151,69 +154,83 @@ void StabilizationClass::set_max_sped_ver(float &maxP, float &maxM, bool only_te
 }
 void StabilizationClass::add2NeedPos(float speedX, float speedY, float dt) {
 
-	current_max_speed_xy = (speedX == 0 && speedY == 0) ? min_stab_XY_speed : sqrt(speedX * speedX + speedY * speedY);
-	if (current_max_speed_xy > def_max_speedXY)
-		current_max_speed_xy = def_max_speedXY;
-
+	current_max_speed_xy = def_max_speedXY;
 	static bool f_stop_x = false;
 	static bool f_stop_y = false;
 	if (speedX == 0) {
 		if (f_stop_x == false) {
 			f_stop_x = true;
-			needXR = needXV;// = (float)GPS.loc.dX;
+			needXR = needXV;
 		}
 	}
 	else {
 		if (f_stop_x) {
-			needXR = needXV;// = (float)GPS.loc.dX;
+			needXR = needXV;
 			f_stop_x = false;
 		}
-		float distX = speedX, distY = speedY;
-		speed2dist(distX, distY);
+		float distX , distY;
+		speed2dist(speedX, speedY, distX, distY);
 		needXR += speedX * dt;
 		needXV = needXR + distX;
 	}
 	if (speedY == 0) {
 		if (f_stop_y == false) {
 			f_stop_y = true;
-			needYV = needYR = (float)GPS.loc.dY;
+			needYR = needYV;
 		}
 	}
 	else {
 		if (f_stop_y) {
 			f_stop_y = false;
-			needYV = needYR = (float)GPS.loc.dY;
+			needYR = needYV;
 		}
-		float distX = speedX, distY = speedY;
-		speed2dist(distX, distY);
+		float distX , distY;
+		speed2dist(speedX, speedY, distX, distY);
 		needYR += speedY * dt;
 		needYV = needYR + distY;
 	}
 	
 }
 float StabilizationClass::get_dist2goal(){
-	double dx= GPS.loc.dX - needXV;
-	double dy = GPS.loc.dY - needYV;
+	double dx= Mpu.get_Est_X_() - needXV;
+	double dy = Mpu.get_Est_Y_() - needYV;
 	return (float)sqrt(dx*dx + dy * dy);
 }
 
 #define _PITCH 0
 #define _ROLL 1
 
-float hor_pos_k = 0.5f;
-float hor_speed_k = 2;
+static float pos_ix = 0, pos_iy = 0;
 void StabilizationClass::Hor_position(float& pitch, float& roll) {
-	float pos_angX = (Mpu.get_Est_X_() - needXV) * hor_pos_k;
+
+	const float errorx = (Mpu.get_Est_X_() - needXV);
+	const float errory = (Mpu.get_Est_Y_() - needYV);
+
+	float pos_angX = errorx * hor_pos_kp;
 	pos_angX *= abs(pos_angX);
 
-	float pos_angY = (Mpu.get_Est_Y_() - needYV)* hor_pos_k;
+	float pos_angY = errory * hor_pos_kp;
 	pos_angY *= abs(pos_angY);
+
+
+	pos_ix += errorx * hor_pos_ki * Mpu.get_dt();
+	pos_iy += errory * hor_pos_ki * Mpu.get_dt();
+
+	to_max_ang(hor_pos_ki_max, pos_ix, pos_iy);
+
+	pos_angX += pos_ix;
+	pos_angY += pos_iy;
+
 	to_max_ang(35, pos_angX, pos_angY);
 
-	float speed_angX = Mpu.get_Est_SpeedX_() * hor_speed_k;
+
+
+
+
+	float speed_angX = Mpu.get_Est_SpeedX_() * hor_speed_kd;
 	speed_angX *= abs(speed_angX);
 
-	float speed_angY = Mpu.get_Est_SpeedY_() * hor_speed_k;
+	float speed_angY = Mpu.get_Est_SpeedY_() * hor_speed_kd;
 	speed_angY *= abs(speed_angY);
 
 	to_max_ang(35, speed_angX, speed_angY);
@@ -231,50 +248,44 @@ void StabilizationClass::Hor_position(float& pitch, float& roll) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //float old_gps_bearing = 0, cos_bear = 1,  sin_bear = 0;
 void StabilizationClass::Hor_speed(float &pitch, float&roll){//dont work 
-		float need_speedX, need_speedY;
-		float tx, ty;
+		float dX,dY, need_speedX, need_speedY;
+
 		if (Autopilot.progState() && Prog.intersactionFlag) {
-			need_speedX = (float)Prog.need_X;
-			need_speedY = (float)Prog.need_Y;
+			dX = (float)Prog.need_X;
+			dY = (float)Prog.need_Y;
 		}
 		else {
-
-			tx = (float)GPS.loc.dX;
-			need_speedX = (needXV - tx);
-			ty = (float)GPS.loc.dY;
-			need_speedY = (needYV - ty);
+			dX = (needXV - (float)Mpu.get_Est_X_());
+			dY = (needYV - (float)Mpu.get_Est_Y_());
 			
 		}// a=v*v/(2s)
 
-
-
-
-
-		if (Commander.getPitch() == 0 && Commander.getRoll() == 0)
+		if (
+			needXR == needXV && needYR == needYV &&
+			!Autopilot.progState() &&
+			(!Autopilot.go2homeState() || (abs(dX) < 10 && abs(dY) < 10))
+			) {
 			return Hor_position(pitch, roll);
+		}
+		else {
 
+			dist2speed(dX, dY, need_speedX, need_speedY);
 
+			const float x_error = (float)(Mpu.get_Est_SpeedX_() - need_speedX);
+			const float y_error = (float)(Mpu.get_Est_SpeedY_() - need_speedY);
 
+			float speedX = x_error * hor_speed_kp;
+			float speedY = y_error * hor_speed_kp;
 
+			float accX = (float)Mpu.w_accX * hor_acc_kd;
+			float accY = (float)Mpu.w_accY * hor_acc_kd;
 
+			speedX += accX;
+			speedY += accY;
 
-		dist2speed(need_speedX, need_speedY);
-	
-	//	const float need_direction=atan2(need_speedY, need_speedX);
-
-
-		const float x_error = (float)(GPS.loc.speedX - need_speedX);
-		const float y_error = (float)(GPS.loc.speedY - need_speedY);
-
-		float *world_ang = pid_hor.get_pid(x_error, y_error, Mpu.get_dt());
-
-		///Debug.dump(fmin(1, mkdX), fmin(1, mkdY), x_error, y_error);
-		world_ang[_PITCH] += (float)Mpu.w_accX * xy_kD;
-		world_ang[_ROLL] += (float)Mpu.w_accY * xy_kD;
-		//----------------------------------------------------------------from world to local X Y
-		pitch = (-(float)Mpu.cosYaw * world_ang[_PITCH] - Mpu.sinYaw * world_ang[_ROLL]);
-		roll = ((float)Mpu.cosYaw * world_ang[_ROLL] - Mpu.sinYaw * world_ang[_PITCH]);
-
+			pitch = (-(float)Mpu.cosYaw * speedX - Mpu.sinYaw * speedY);
+			roll = ((float)Mpu.cosYaw * speedY - Mpu.sinYaw * speedX);
+		}
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -304,7 +315,7 @@ void StabilizationClass::resset_z(){
 	
 }
 void StabilizationClass::resset_xy_integrator(){
-	pid_hor.reset_integrators();
+	hor_pos_ki = 0;
 }
 
 
@@ -369,13 +380,14 @@ void StabilizationClass::setZ(const float  *ar) {
 string StabilizationClass::get_xy_set() {
 	ostringstream convert;
 	convert << \
+		hor_pos_kp << ","<< \
+		hor_speed_kd<<","<<\
+		hor_pos_ki <<","<<\
+
 		dist2speed_XY << "," << \
-		pid_hor.kP() << "," << \
-		pid_hor.get_kI() <<","<<\
-		pid_hor.get_kI_max()<<","<<\
-		xy_kD << "," << \
+		hor_speed_kp << "," << \
+		hor_acc_kd << "," << \
 		def_max_speedXY << "," << \
-		min_stab_XY_speed << "," << \
 		allowance;
 
 
@@ -385,29 +397,18 @@ string StabilizationClass::get_xy_set() {
 void StabilizationClass::setXY(const float  *ar){
 	uint8_t i = 0;
 	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK){
-		float t;
+		Settings.set(ar[i++], hor_pos_kp);
+		Settings.set(ar[i++], hor_speed_kd);
+		Settings.set(ar[i++], hor_pos_ki);
+
 		Settings.set(ar[i++], dist2speed_XY);
-		t = pid_hor.kP();
-		Settings.set(ar[i++], t);
-		pid_hor.kP(t);
+		Settings.set(ar[i++], hor_speed_kp);
+		Settings.set(ar[i++], hor_acc_kd);
 
-		float temp = pid_hor.get_kI();
-		Settings.set(ar[i++], temp);
-		pid_hor.set_kI(temp);
-
-		temp = ar[i++];
-		constrain(temp, 0, 15);
-		pid_hor.set_kI_max(temp);
-
-		Settings.set(ar[i++], xy_kD);
-		def_max_speedXY= ar[i++];
+		Settings.set(ar[i++], def_max_speedXY);
 		def_max_speedXY = constrain(def_max_speedXY, 3, 10);
-		Autopilot.set_sensXY(def_max_speedXY);
-		min_stab_XY_speed = ar[i++];
-		min_stab_XY_speed = constrain(min_stab_XY_speed, 1.3, def_max_speedXY);
 		Settings.set(ar[i++], allowance);
 		allowance = constrain(allowance, 0, 4);
-
 	}
 	for (uint8_t ii = 0; ii < i; ii++) {
 		cout << ar[ii] << ",";

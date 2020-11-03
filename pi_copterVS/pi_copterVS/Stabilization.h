@@ -21,26 +21,30 @@ class StabilizationClass{
 private:
 
 	void max_speed_limiter(float &x, float &y);
-	void dist2speed(float &x, float &y);
-	void speed2dist(float &x, float &y);
+	void dist2speed(const float dx, const float dy, float &speed_x, float &speed_y);
+	void speed2dist(const float speedX, const float speedY, float &dx, float &dy);
 
 	
 	float SPEED_Z_CF, SPEED_XY_CF;
+	float hor_speed_kp;
+	float hor_acc_kd;
 
+	float hor_pos_ki;
+	float hor_pos_ki_max;
+	float hor_pos_kp; 
+	float hor_speed_kd;
 	float z_error;
 	float dist2speed_XY;
 	float alt2speedZ;
-	float xy_kD;
 	float z_kD;
 
 #define STAB_PIDS 3
-	ANG_PID pid_hor;
 	AP_PID pid_ver;
 	float max_z_integrator;
 
 	float needXR, needYR, needXV, needYV;
 	   
-	float def_max_speedXY, min_stab_XY_speed, current_max_speed_xy;
+	float def_max_speedXY, current_max_speed_xy;
 	float def_max_speedZ_P, def_max_speedZ_M,current_max_speedZ_P,current_max_speedZ_M, min_stab_Z_speed;
 	float allowance;
 public:
@@ -49,9 +53,7 @@ public:
 	void set_max_speed_hor(float& s, bool only_test = false);
 	void set_max_sped_ver(float &ps, float &ns, bool only_test = false);
 	float get_def_max_speedXY() { return def_max_speedXY; }
-	float get_min_stagXY() { return min_stab_XY_speed; }
 	float get_def_max_speedZ_M() { return def_max_speedZ_M; }
-	float get_max_speedXY_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_XY, min_stab_XY_speed); }
 	float get_max_speedZ_M_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_Z, -def_max_speedZ_M); }
 	float get_max_speedZ_P_4_go_to_home() { return max(MIN_SPEED_TO_GO_TO_HOME_Z, def_max_speedZ_P); }
 
