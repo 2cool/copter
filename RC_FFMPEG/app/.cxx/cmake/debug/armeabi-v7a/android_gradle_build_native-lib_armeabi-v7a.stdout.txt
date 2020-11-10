@@ -1,2 +1,76 @@
-ninja: Entering directory `C:\Users\Igor\copter\RC_FFMPEG\app\.cxx\cmake\debug\armeabi-v7a'
-ninja: no work to do.
+ninja: Entering directory `C:\Users\tcool\copter\RC_FFMPEG\app\.cxx\cmake\debug\armeabi-v7a'
+[1/2] Building CXX object CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o
+../../../../src/main/cpp/native-lib.cpp:43:5: warning: 'av_register_all' is deprecated [-Wdeprecated-declarations]
+    av_register_all();
+    ^
+../../../../src/main/jniLibs/includes\libavformat/avformat.h:2024:1: note: 'av_register_all' has been explicitly marked deprecated here
+attribute_deprecated
+^
+../../../../src/main/jniLibs/includes\libavutil/attributes.h:94:49: note: expanded from macro 'attribute_deprecated'
+#    define attribute_deprecated __attribute__((deprecated))
+                                                ^
+../../../../src/main/cpp/native-lib.cpp:66:5: warning: 'av_register_all' is deprecated [-Wdeprecated-declarations]
+    av_register_all();
+    ^
+../../../../src/main/jniLibs/includes\libavformat/avformat.h:2024:1: note: 'av_register_all' has been explicitly marked deprecated here
+attribute_deprecated
+^
+../../../../src/main/jniLibs/includes\libavutil/attributes.h:94:49: note: expanded from macro 'attribute_deprecated'
+#    define attribute_deprecated __attribute__((deprecated))
+                                                ^
+../../../../src/main/cpp/native-lib.cpp:68:30: warning: 'av_iformat_next' is deprecated [-Wdeprecated-declarations]
+    AVInputFormat *if_temp = av_iformat_next(NULL);
+                             ^
+../../../../src/main/jniLibs/includes\libavformat/avformat.h:2061:1: note: 'av_iformat_next' has been explicitly marked deprecated here
+attribute_deprecated
+^
+../../../../src/main/jniLibs/includes\libavutil/attributes.h:94:49: note: expanded from macro 'attribute_deprecated'
+#    define attribute_deprecated __attribute__((deprecated))
+                                                ^
+../../../../src/main/cpp/native-lib.cpp:69:31: warning: 'av_oformat_next' is deprecated [-Wdeprecated-declarations]
+    AVOutputFormat *of_temp = av_oformat_next(NULL);
+                              ^
+../../../../src/main/jniLibs/includes\libavformat/avformat.h:2069:1: note: 'av_oformat_next' has been explicitly marked deprecated here
+attribute_deprecated
+^
+../../../../src/main/jniLibs/includes\libavutil/attributes.h:94:49: note: expanded from macro 'attribute_deprecated'
+#    define attribute_deprecated __attribute__((deprecated))
+                                                ^
+../../../../src/main/cpp/native-lib.cpp:86:5: warning: 'av_register_all' is deprecated [-Wdeprecated-declarations]
+    av_register_all();
+    ^
+../../../../src/main/jniLibs/includes\libavformat/avformat.h:2024:1: note: 'av_register_all' has been explicitly marked deprecated here
+attribute_deprecated
+^
+../../../../src/main/jniLibs/includes\libavutil/attributes.h:94:49: note: expanded from macro 'attribute_deprecated'
+#    define attribute_deprecated __attribute__((deprecated))
+                                                ^
+../../../../src/main/cpp/native-lib.cpp:88:23: warning: 'av_codec_next' is deprecated [-Wdeprecated-declarations]
+    AVCodec *c_temp = av_codec_next(NULL);
+                      ^
+../../../../src/main/jniLibs/includes\libavcodec/avcodec.h:4044:1: note: 'av_codec_next' has been explicitly marked deprecated here
+attribute_deprecated
+^
+../../../../src/main/jniLibs/includes\libavutil/attributes.h:94:49: note: expanded from macro 'attribute_deprecated'
+#    define attribute_deprecated __attribute__((deprecated))
+                                                ^
+../../../../src/main/cpp/native-lib.cpp:120:5: warning: 'avfilter_register_all' is deprecated [-Wdeprecated-declarations]
+    avfilter_register_all();
+    ^
+../../../../src/main/jniLibs/includes\libavfilter/avfilter.h:713:1: note: 'avfilter_register_all' has been explicitly marked deprecated here
+attribute_deprecated
+^
+../../../../src/main/jniLibs/includes\libavutil/attributes.h:94:49: note: expanded from macro 'attribute_deprecated'
+#    define attribute_deprecated __attribute__((deprecated))
+                                                ^
+../../../../src/main/cpp/native-lib.cpp:122:37: warning: 'avfilter_next' is deprecated [-Wdeprecated-declarations]
+    AVFilter *f_temp = (AVFilter *) avfilter_next(NULL);
+                                    ^
+../../../../src/main/jniLibs/includes\libavfilter/avfilter.h:734:1: note: 'avfilter_next' has been explicitly marked deprecated here
+attribute_deprecated
+^
+../../../../src/main/jniLibs/includes\libavutil/attributes.h:94:49: note: expanded from macro 'attribute_deprecated'
+#    define attribute_deprecated __attribute__((deprecated))
+                                                ^
+8 warnings generated.
+[2/2] Linking CXX shared library ..\..\..\..\build\intermediates\cmake\debug\obj\armeabi-v7a\libnative-lib.so

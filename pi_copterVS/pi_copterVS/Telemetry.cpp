@@ -231,7 +231,7 @@ int TelemetryClass::fly_time_left() {
 int TelemetryClass::check_time_left_if_go_to_home(){
 	float need_time=0;
 	if (Autopilot.motors_is_on()) {
-		need_time = 5.0f+GPS.loc.dist2home / Stabilization.get_max_speedXY_4_go_to_home();
+		need_time = 5.0f + GPS.loc.dist2home / Stabilization.get_def_max_speedXY();
 		if (Mpu.get_Est_Alt() < HIGHT_TO_LIFT_ON_TO_FLY_TO_HOME) 
 			need_time += 5.0f+(HIGHT_TO_LIFT_ON_TO_FLY_TO_HOME- Mpu.get_Est_Alt()) / Stabilization.get_max_speedZ_P_4_go_to_home();
 		need_time += 5.0f+fabs(Mpu.get_Est_Alt() / Stabilization.get_max_speedZ_M_4_go_to_home());

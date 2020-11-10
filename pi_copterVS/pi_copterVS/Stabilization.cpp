@@ -33,10 +33,10 @@ void StabilizationClass::to_max_ang(const float ang, float& angX, float& angY) {
 void StabilizationClass::init(){
 	allowance = 2;
 	dist2speed_XY = 0.5f;// 0.2f;
-	hor_pos_ki = 0;
-	hor_pos_ki_max =10;
-	hor_pos_kp = 0.5f;
-	hor_speed_kd = 2;
+
+	max_wind_ang =10;
+	hor_pos_kp = 0.3f;
+	hor_speed_kd = 1;
 	hor_speed_kp = 7;
 	hor_acc_kd = 5;
 	def_max_speedXY=current_max_speed_xy = 10;
@@ -200,32 +200,32 @@ float StabilizationClass::get_dist2goal(){
 #define _PITCH 0
 #define _ROLL 1
 
-static float pos_ix = 0, pos_iy = 0;
+static float wind_ang_x = 0, wind_ang_y = 0;
 void StabilizationClass::Hor_position(float& pitch, float& roll) {
+	
+	static float pos_angX = 0, pos_angY = 0;
 
 	const float errorx = (Mpu.get_Est_X_() - needXV);
 	const float errory = (Mpu.get_Est_Y_() - needYV);
 
-	float pos_angX = errorx * hor_pos_kp;
-	pos_angX *= abs(pos_angX);
+	
 
-	float pos_angY = errory * hor_pos_kp;
-	pos_angY *= abs(pos_angY);
-
-
-	pos_ix += errorx * hor_pos_ki * Mpu.get_dt();
-	pos_iy += errory * hor_pos_ki * Mpu.get_dt();
-
-	to_max_ang(hor_pos_ki_max, pos_ix, pos_iy);
-
-	pos_angX += pos_ix;
-	pos_angY += pos_iy;
-
-	to_max_ang(Balance.get_max_angle(), pos_angX, pos_angY);
+	if (Mpu.get_est_LF_hor_abs_speed() < 0.1) {
+		wind_ang_x += (pos_angX - wind_ang_x) * 0.001;
+		wind_ang_y += (pos_angY - wind_ang_y) * 0.001;
+		to_max_ang(max_wind_ang, wind_ang_x, wind_ang_y);
+	//	Debug.dump(wind_ang_x, wind_ang_y, errorx, errory);
+	}
 
 
 
+	pos_angX = errorx * hor_pos_kp;
+	pos_angY = errory * hor_pos_kp;
 
+	pos_angX += wind_ang_x;
+	pos_angY += wind_ang_y;
+
+	//to_max_ang(Balance.get_max_angle(), pos_angX, pos_angY);
 
 	float speed_angX = Mpu.get_Est_SpeedX_() * hor_speed_kd;
 	speed_angX *= abs(speed_angX);
@@ -233,16 +233,14 @@ void StabilizationClass::Hor_position(float& pitch, float& roll) {
 	float speed_angY = Mpu.get_Est_SpeedY_() * hor_speed_kd;
 	speed_angY *= abs(speed_angY);
 
-	to_max_ang(Balance.get_max_angle(), speed_angX, speed_angY);
+	//to_max_ang(Balance.get_max_angle(), speed_angX, speed_angY);
 
 //	Debug.dump(pos_angX, speed_angX, pos_angY, speed_angY);
 	pos_angX += speed_angX;
 	pos_angY += speed_angY;
 
-
 	pitch = (-(float)Mpu.cosYaw * pos_angX - Mpu.sinYaw * pos_angY);
 	roll = ((float)Mpu.cosYaw * pos_angY - Mpu.sinYaw * pos_angX);
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,8 +278,9 @@ void StabilizationClass::Hor_speed(float &pitch, float&roll){//dont work
 			float accX = (float)Mpu.w_accX * hor_acc_kd;
 			float accY = (float)Mpu.w_accY * hor_acc_kd;
 
-			speedX += accX;
-			speedY += accY;
+			speedX += accX+wind_ang_x;
+			speedY += accY+wind_ang_y;
+
 
 			pitch = (-(float)Mpu.cosYaw * speedX - Mpu.sinYaw * speedY);
 			roll = ((float)Mpu.cosYaw * speedY - Mpu.sinYaw * speedX);
@@ -315,7 +314,7 @@ void StabilizationClass::resset_z(){
 	
 }
 void StabilizationClass::resset_xy_integrator(){
-	hor_pos_ki = 0;
+	wind_ang_x = wind_ang_y = 0;
 }
 
 
@@ -382,7 +381,7 @@ string StabilizationClass::get_xy_set() {
 	convert << \
 		hor_pos_kp << ","<< \
 		hor_speed_kd<<","<<\
-		hor_pos_ki <<","<<\
+		max_wind_ang <<","<<\
 
 		dist2speed_XY << "," << \
 		hor_speed_kp << "," << \
@@ -399,13 +398,14 @@ void StabilizationClass::setXY(const float  *ar){
 	if (ar[SETTINGS_ARRAY_SIZE] == SETTINGS_IS_OK){
 		Settings.set(ar[i++], hor_pos_kp);
 		Settings.set(ar[i++], hor_speed_kd);
-		Settings.set(ar[i++], hor_pos_ki);
+		max_wind_ang=ar[i++];
+		def_max_speedXY = constrain(max_wind_ang, 0, 20);
 
 		Settings.set(ar[i++], dist2speed_XY);
 		Settings.set(ar[i++], hor_speed_kp);
 		Settings.set(ar[i++], hor_acc_kd);
 
-		Settings.set(ar[i++], def_max_speedXY);
+		def_max_speedXY=ar[i++];
 		def_max_speedXY = constrain(def_max_speedXY, 3, 10);
 		Settings.set(ar[i++], allowance);
 		allowance = constrain(allowance, 0, 4);

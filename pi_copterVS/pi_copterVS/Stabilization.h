@@ -29,8 +29,7 @@ private:
 	float hor_speed_kp;
 	float hor_acc_kd;
 
-	float hor_pos_ki;
-	float hor_pos_ki_max;
+	float max_wind_ang;
 	float hor_pos_kp; 
 	float hor_speed_kd;
 	float z_error;

@@ -32,8 +32,8 @@ class DebugClass
 
 	 int n_debug;
 	 void init();
-	 void dump(const long f1, long f2, long f3, long f4);
-	 void dump(const double f1, double f2, double f3, double f4);
+	 void dump(const long f1=0, long f2=0, long f3=0, long f4=0);
+	 void dump(const double f1, double f2=0, double f3=0, double f4=0);
 
 
 	 void dump(const uint8_t f1, uint8_t f2, uint8_t f3, uint8_t f4);

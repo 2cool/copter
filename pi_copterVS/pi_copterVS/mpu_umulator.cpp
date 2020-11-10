@@ -10,11 +10,16 @@
 
 #define MOTOR_FORCE 0.5
 
-//#define NOISE_ON
+#define NOISE_ON
 
 //#define TEST_4_FULL_VOLTAGE
 
-
+double cosA = 1;
+double sinA = 0;
+double cosB = 1;
+double sinB = 0;
+double cosY = 1;
+double sinY = 0;
 float _rand() { return (float)((double)(rand()) / (double)RAND_MAX); }
 
 //#define BAT_ZERO 370 //80 процентов разряд
@@ -181,6 +186,17 @@ float  EmuClass::get_gyroPitch() { return (float)(gyro[PITCH]* RAD2GRAD); }
 float  EmuClass::get_gyroRoll() { return (float)(gyro[ROLL]* RAD2GRAD); }
 float  EmuClass::get_accX() { return (float)(acc[X]); }
 float  EmuClass::get_accY() { return (float)(acc[Y]); }
+
+float EmuClass::get_loc_accX() {
+	return  (cosA * acc[X] + sinA * acc[Y]); //relative to copter xy
+}
+float EmuClass::get_loc_accY() {
+	return (cosA * acc[Y] - sinA * acc[X]);
+}
+
+
+
+
 float  EmuClass::get_accZ() {return (float)((pos[Z]<0?0:acc[Z]));}
 //f//loat  EmuClass::get_raccX() { return (float)(racc[X]); }
 //float  EmuClass::get_raccY() { return (float)(racc[Y]); }
@@ -248,12 +264,7 @@ void EmuClass::init(float wx, float wy, float wz,float y , float p , float r ) {
 }
 
 
-double cosA = 1;
-double sinA = 0;
-double cosB = 1;
-double sinB = 0;
-double cosY = 1;
-double sinY = 0;
+
 
 
 

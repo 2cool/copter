@@ -664,7 +664,7 @@ bool AutopilotClass::holdLocationStartStop(){///////////////////////////////////
 	}
 	else{
 		control_bits ^=  XY_STAB;
-		Stabilization.resset_xy_integrator();
+		//Stabilization.resset_xy_integrator();
 		//holdAltitude();
 		return true;
 	}
@@ -697,7 +697,7 @@ bool AutopilotClass::is_all_OK(bool print){
 		return false;
 	}
 #endif
-
+	/*
 	if (shmPTR->inet_ok == false &&  Commander.ppp_inet){
 		if (print) {
 			Telemetry.addMessage(e_NO_INTERNET);
@@ -707,6 +707,7 @@ bool AutopilotClass::is_all_OK(bool print){
 		return false;
 #endif
 	}
+	*/
 
 	if (Hmc.do_compass_motors_calibr || (Mpu.gyro_calibratioan && Hmc.calibrated_)) {
 		if (Telemetry.low_voltage) {

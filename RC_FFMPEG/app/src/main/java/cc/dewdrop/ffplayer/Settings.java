@@ -30,7 +30,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
     double def_change[][]={
             {0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
             {0.2,0.2,0.2,0.2,0.2,0.2,1,0.2,0.2,0.2},
-            {0.2,0.2,0.2,15,0.2,10,10,4,0.2,0.2},
+            {0.2,0.2,20,0.2,0.2,0.2,10,4,0.2,0.2},
             {0.2,0.2,0.2,0.2,0.2,0.2,1,2,1,1},
             {0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2},
             {10,10,10,10,0.2,0.2,0.2,0.2,0.2,0.2},
@@ -46,7 +46,7 @@ public class Settings extends Activity implements AdapterView.OnItemSelectedList
             // Z stab
             {"alt to speed", "speed_kP","speed_kI","speed_kD","MAX_SPEED_P","MAX_SPEED_M","min_stab_speed","FILTR",_null,_null},
             // XY stab
-            {"pos_KP","speed_KD","pos_KI","dist to speed", "speed_kP","acc_KD","max_speed","allowance",_null,_null},
+            {"pos_KP","speed_KD","max_wind_ang","dist to speed", "speed_kP","acc_KD","max_speed","allowance",_null,_null},
             // secure
             {"high_to_lift_2_home","max_throttle","min_throttle","min_hight","lift at start","battery cap","min_hor_acur",_null,_null, _null},//,"gimbP_Z","gimbR_Z"},
             // mpu

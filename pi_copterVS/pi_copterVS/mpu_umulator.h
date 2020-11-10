@@ -51,6 +51,8 @@ public:
 	float get_gyroYaw();
 	float get_gyroPitch();
 	float get_gyroRoll();
+	float get_loc_accX();
+	float get_loc_accY();
 	float get_accX();
 	float get_accZ();
 	float get_accY();

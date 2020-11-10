@@ -280,7 +280,7 @@ bool MpuClass::loop() {
 	gyroRoll = Emu.get_gyroRoll();
 	gyroYaw = Emu.get_gyroYaw();
 	double head = Emu.get_heading();
-	double g_yaw = Emu.get_yaw()-0*GRAD2RAD;// -yaw_correction_angle;
+	double g_yaw = Emu.get_yaw()-35*GRAD2RAD;// -yaw_correction_angle;
 //	yaw_offset += (wrap_PI(g_yaw - head) - yaw_offset)*0.0031f;
 	yaw = wrap_PI(g_yaw - yaw_offset);// +yaw_correction_angle );
 	sin_cos(pitch, sinPitch, cosPitch);
@@ -291,15 +291,15 @@ bool MpuClass::loop() {
 
 	cosYaw = cos(yaw);
 	sinYaw = sin(yaw);
-	double WaccX = Emu.get_accX();
-	double WaccY = Emu.get_accY();
+	//double WaccX = Emu.get_accX();
+	//double WaccY = Emu.get_accY();
 	accZ = Emu.get_accZ();
 
 	//faccZ += (accZ - faccZ)*ACC_Z_CF;
 	//Debug.dump(WaccX, WaccY, accZ,0);
 
-	accX = (cosYaw * WaccX + sinYaw * WaccY); //relative to copter xy
-	accY = (cosYaw * WaccY - sinYaw * WaccX);
+	accX = Emu.get_loc_accX();// (cosYaw * WaccX + sinYaw * WaccY); //relative to copter xy
+	accY = Emu.get_loc_accY();// (cosYaw * WaccY - sinYaw * WaccX);
 
 
 	//est_speedZ = Emu.get_speedZ();
@@ -311,7 +311,10 @@ bool MpuClass::loop() {
 	//estX = Emu.get_y();
 	test_Est_Alt();
 	test_Est_XY();
-
+	if (get_est_LF_hor_abs_speed() > 1) {
+		float angle_error = atan2(est_speedY, est_speedX) - GPS.loc.direction;
+		Debug.dump(angle_error*RAD2GRAD);
+	}
 	yaw *= RAD2GRAD;
 	pitch *= RAD2GRAD;
 	roll *= RAD2GRAD;
@@ -452,7 +455,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	static uint cnt2l = 0;
 	if (mpu_dt > 0.03 && cnt2l++) {
 		cout << "MPU DT too long "  << mpu_dt << ", time " << (int)millis_() << endl;
-		mega_i2c.beep_code(B_TOO_LONG);
+	//	mega_i2c.beep_code(B_TOO_LONG);
 		Telemetry.addMessage(e_MPU_TOO_LONG);
 	}
 	if (mpu_dt > 0.03)
@@ -501,6 +504,11 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 
 	test_Est_Alt();
 	test_Est_XY();
+
+	if (get_est_LF_hor_abs_speed() > 1) {
+		float angle_error = atan2(est_speedY, est_speedX)-GPS.loc.direction;
+		Debug.dump(angle_error);
+	}
 
 	shmPTR->pitch = pitch *= RAD2GRAD;
 	shmPTR->roll = roll *= RAD2GRAD;
@@ -697,7 +705,7 @@ void MpuClass::test_Est_XY() {
 		kf[Y]->base(-MAX_LEN);
 	}
 
-#define LF 0.1f
+#define LF 0.0031f
 	est_LF_X_speed += (est_speedX - est_LF_X_speed) * LF;
 	est_LF_Y_speed += (est_speedY - est_LF_Y_speed) * LF;
 	est_LF_X_ACC += (accX - est_LF_X_ACC) * LF;
