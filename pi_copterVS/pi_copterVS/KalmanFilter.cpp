@@ -69,6 +69,13 @@ void KalmanFilter::update() {
 	x_hat = A * x_hat + B; //B added 2cool
 
 }
+
+
+void KalmanFilter::setQ(const float newQ) {
+	Q << newQ, newQ, .0, newQ, newQ, .0, .0, .0, .0;
+
+}
+
 void KalmanFilter::update(const Eigen::VectorXf& y) {
 
 	if (!initialized)

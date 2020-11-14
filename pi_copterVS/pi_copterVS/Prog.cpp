@@ -200,8 +200,8 @@ bool ProgClass::program_is_OK(){
 		prog_data_index = 0;
 		time4step2done = 0;
 		begin_time = 0;
-		next_x = GPS.loc.dX;
-		next_y = GPS.loc.dY;
+		next_x = Mpu.get_Est_X_();
+		next_y = Mpu.get_Est_Y_();
 		alt = Mpu.get_Est_Alt();
 		uint8_t step = 1;
 		double fullTime = 0;
@@ -230,8 +230,8 @@ bool ProgClass::program_is_OK(){
 			old_alt = alt;
 
 		}
-		const double x2 = next_x - GPS.loc.dX;
-		const double y2 = next_y - GPS.loc.dY;
+		const double x2 = next_x - Mpu.get_Est_X_();
+		const double y2 = next_y - Mpu.get_Est_Y_();
 		const double dist = sqrt(x2*x2 + y2*y2);
 		if (dist >= 20 || alt  >= 20){
 			cout << "end poitn to far from star!!!" << "\t"<<millis_() << endl;
@@ -254,8 +254,8 @@ bool ProgClass::start(){
 		prog_data_index = 0;
 		time4step2done = 0;
 		begin_time = 0;
-		next_x = GPS.loc.dX;
-		next_y = GPS.loc.dY;
+		next_x = Mpu.get_Est_X_();
+		next_y = Mpu.get_Est_Y_();
 		alt = Mpu.get_Est_Alt();
 		go_next = distFlag = altFlag = do_action = true;
 		action = LED0;
@@ -282,17 +282,17 @@ bool ProgClass::getIntersection(double &x, double &y){
 
 	const double dist_ = Stabilization.get_dist2goal();
 
-	double r = Stabilization.getDist_XY(max_speed_xy + Stabilization.get_allowance());
+	double r = Stabilization.getDist_XY(max_speed_xy +Stabilization.get_allowance());
 	if (r > dist_){
 		//ErrorLog.println("r>dist");
 		return false;
 	}
 	//----------------------------
 
-	const double x2 = next_x - GPS.loc.dX;// GPS.loc.from_lat2X((double)(lat - GPS.loc.lat_));
-	const double x1 = old_x - GPS.loc.dX;// GPS.loc.from_lat2X((double)(old_lat - GPS.loc.lat_));
-	const double y2 = next_y - GPS.loc.dY;// GPS.loc.form_lon2Y((double)(lon - GPS.loc.lon_));
-	const double y1 = old_y - GPS.loc.dY;// GPS.loc.form_lon2Y((double)(old_lon - GPS.loc.lon_));
+	const double x2 = next_x - Mpu.get_Est_X_();// GPS.loc.from_lat2X((double)(lat - GPS.loc.lat_));
+	const double x1 = old_x - Mpu.get_Est_X_();// GPS.loc.from_lat2X((double)(old_lat - GPS.loc.lat_));
+	const double y2 = next_y - Mpu.get_Est_Y_();// GPS.loc.form_lon2Y((double)(lon - GPS.loc.lon_));
+	const double y1 = old_y - Mpu.get_Est_Y_();// GPS.loc.form_lon2Y((double)(old_lon - GPS.loc.lon_));
 	const double dx = x2 - x1;
 	const double dy = y2 - y1;
 	const double l2 = dx*dx + dy*dy;

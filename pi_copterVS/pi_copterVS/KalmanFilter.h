@@ -28,6 +28,8 @@ public:
 	*   P - Estimate error covariance
 	*/
 	void base(int const b);
+	void setQ(const float newQ);
+	void setR(const float newR){ R << newR; }
 	KalmanFilter(
 		const Eigen::Matrix3f& A,
 		const Eigen::Vector3f& B,

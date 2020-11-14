@@ -1,6 +1,6 @@
 
  
-#define PROG_VERSION "ver: 3.201028\n"
+#define PROG_VERSION "ver: 3.201113\n"
 
 //Additional Options  DDEBUG
 
@@ -88,8 +88,8 @@ void set_wifi_30_() {
 
 
 
-#define WIND_X 12
-#define WIND_Y 12
+#define WIND_X 7
+#define WIND_Y 9
 #define WIND_Z 0
 
 int init(int cnt) {////--------------------------------------------- INITIALIZATION ------------------------------

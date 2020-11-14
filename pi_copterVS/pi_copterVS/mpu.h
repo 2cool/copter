@@ -66,6 +66,9 @@ private:
 	void gyro_acc_calibr(const float&ax, const float &ay, const float &az);
 	void test_Est_Alt();
 	void test_Est_XY();
+	void test_Est_XY1(const float cosYaw, const float sinYaw);
+	void test_Est_XY2(const float cosYaw, const float sinYaw);
+
 	void rotateCW(float&x, float&y);
 	void rotateCCW(float&x, float&y);
 

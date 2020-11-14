@@ -1016,10 +1016,10 @@ int Graph::update(HDC hdc, RectF rect, double zoom, double pos) {///////////////
 
 	//(mpu._max[mEX]-mpu._min[mEX])
 	//distX_start
-	Mpu._max[mEX] = 10;
-	Mpu._min[mEX] = -10;
-	Mpu._max[mEY] = 10;
-	Mpu._min[mEY] = -10;
+	Mpu._max[mEX] = 500;
+	Mpu._min[mEX] = -500;
+	Mpu._max[mEY] = 500;
+	Mpu._min[mEY] = -500;
 	draw(g, rect, Mpu._max[mEX], Mpu._min[mEX], SX);
 	draw(g, rect, Mpu._max[mEY], Mpu._min[mEY], SY);
 	draw(g, rect, Mpu._max[mEX] , Mpu._min[mEX] , GSX);
