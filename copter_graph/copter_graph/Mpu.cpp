@@ -52,8 +52,8 @@ Eigen::MatrixXf R(m, m); // Measurement noise covariance
 Eigen::Matrix3f P; // Estimate error covariance
 
 
-enum {X,Y,Z};
-KalmanFilter* kf[3];
+enum {X,Y,Z,X1,Y1,X2,Y2};
+KalmanFilter* kf[7];
 
 
 #define ROLL_COMPENSATION_IN_YAW_ROTTATION 0.02
@@ -252,9 +252,67 @@ void MPU_CLASS::Madgwic() {
 
 
 //-------------------------------------------------------------
+void test1(const float w_accX, const float w_accY) {
+	static float old_accX = 0, old_accY = 0;
+	static float oldSX = 0, oldSY = 0;
+	
+
+	kf[X1]->B[2] = w_accX - old_accX;
+	old_accX = w_accX;
+	if (gps_log.gx != oldSX) {
+		oldSX = gps_log.gx;
+		Eigen::VectorXf x(m);
+		x << oldSX;
+		kf[X1]->update(x);
+	}
+	else {
+		kf[X1]->update();
+	}
+	//YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+	kf[Y1]->B[2] = w_accY - old_accY;
+	old_accY = w_accY;
+	if (gps_log.gy != oldSY) {
+		oldSY = gps_log.gy;
+		Eigen::VectorXf y(m);
+		y << oldSY;
+		kf[Y1]->update(y);
+	}
+	else {
+		kf[Y1]->update();
+	}
+}
+
+//-------------------------------------------------------------
+void test2(const float w_accX, const float w_accY) {
+	static float old_accX = 0, old_accY = 0;
+	static float oldSX = 0, oldSY = 0;
 
 
-
+	kf[X2]->B[2] = w_accX - old_accX;
+	old_accX = w_accX;
+	if (gps_log.gx != oldSX) {
+		oldSX = gps_log.gx;
+		Eigen::VectorXf x(m);
+		x << oldSX;
+		kf[X2]->update(x);
+	}
+	else {
+		kf[X2]->update();
+	}
+	//YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+	kf[Y2]->B[2] = w_accY - old_accY;
+	old_accY = w_accY;
+	if (gps_log.gy != oldSY) {
+		oldSY = gps_log.gy;
+		Eigen::VectorXf y(m);
+		y << oldSY;
+		kf[Y2]->update(y);
+	}
+	else {
+		kf[Y2]->update();
+	}
+}
+float error_comp = 0;
 void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool rotate) {
 
 
@@ -282,9 +340,11 @@ void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, b
 
 
 	kf[X]->A(3) = kf[X]->A(7) = dt;
-
 	kf[Y]->A(3) = kf[Y]->A(7) = dt;
-
+	kf[X1]->A(3) = kf[X1]->A(7) = dt;
+	kf[Y1]->A(3) = kf[Y1]->A(7) = dt;	
+	kf[X2]->A(3) = kf[X2]->A(7) = dt;
+	kf[Y2]->A(3) = kf[Y2]->A(7) = dt;
 
 
 
@@ -301,8 +361,8 @@ void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, b
 	if (yaw < 0)
 		yaw += 360;
 
-	cosYaw = cos(yaw * GRAD2RAD);
-	sinYaw = sin(yaw * GRAD2RAD);
+	cosYaw = cos((yaw+ error_comp) * GRAD2RAD);
+	sinYaw = sin((yaw+ error_comp) * GRAD2RAD);
 
 
 	gyroPitch = *(float*)&buf[j]; j += 4;
@@ -372,18 +432,19 @@ void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, b
 	if (start_f == false && gps_log.gx != 0 && gps_log.gy != 0)
 		start_f = true;
 
-
+/*
 	if (filter) {
 		
 		Madgwic();
 		if (yaw < 0)
 			yaw += 360;
 	}
-
-
-
+	*/
+	 
+	//if (time < 200 )
+	//	error_comp = -180;
 	
-	if (start_f && filter) {
+	if (start_f && filter && time>200 && time < 496) {
 
 
 		//ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
@@ -439,6 +500,61 @@ void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, b
 		est_speedY = kf[1]->state()(1);
 		estY = kf[1]->state()(0);
 		w_accY = kf[1]->state()(2);
+		//////////////////////////////////////
+
+
+		
+
+		cosYaw = cos((yaw - 45 + error_comp) * GRAD2RAD);
+		sinYaw = sin((yaw - 45 + error_comp) * GRAD2RAD);
+		float _w_accX = (-cosYaw * accX + sinYaw * accY); //relative to world
+		float _w_accY = (-cosYaw * accY - sinYaw * accX);
+		test1(_w_accX, _w_accY);
+
+		cosYaw = cos((yaw + 45 + error_comp) * GRAD2RAD);
+		sinYaw = sin((yaw + 45 + error_comp) * GRAD2RAD);
+		_w_accX = (-cosYaw * accX + sinYaw * accY); //relative to world
+		_w_accY = (-cosYaw * accY - sinYaw * accX);
+		test2(_w_accX, _w_accY);
+
+		static float  er1 = 0, er2 = 0;
+
+		//er0 += (abs(GPS.loc.speedX - est_speedX) + abs(GPS.loc.speedY - est_speedY) - er0) * 0.01;
+		
+		er1 += (abs(gps_log.gspeedX - kf[X + 3]->state()(1)) + abs(gps_log.gspeedY - kf[Y + 3]->state()(1)) - er1) * 1;
+		er2 += (abs(gps_log.gspeedX - kf[X + 5]->state()(1)) + abs(gps_log.gspeedY - kf[Y + 5]->state()(1)) - er2) * 1;
+
+			if (abs(gps_log.gspeedX) > 0.3 || abs(gps_log.gspeedY) > 0.3) {
+				if (er1 > er2)
+					error_comp += (er1 - er2) * 0.01f ;
+				else if (er1 < er2)
+					error_comp -= (er2 - er1) * 0.01f;
+	
+		
+		
+			
+				if (error_comp > 360)
+					error_comp -= 360;
+				else if (error_comp < -360)
+					error_comp += 360;
+			}
+		estX = yaw+error_comp;
+
+			//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+		
+
+
+
+
+
+
+
+
+
+
+		///////////////////////////////////
+
 
 
 	}
@@ -536,12 +652,27 @@ void MPU_CLASS::init() {
 	kf[X] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[Y] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[Z] = new KalmanFilter( A,B ,H, Q, R, P);
+
+	kf[X1] = new KalmanFilter(A, B, H, Q, R, P);
+	kf[Y1] = new KalmanFilter(A, B, H, Q, R, P);
+	kf[X2] = new KalmanFilter(A, B, H, Q, R, P);
+	kf[Y2] = new KalmanFilter(A, B, H, Q, R, P);
+
+
+
+
 	// Construct the filter
 	Eigen::Vector3f x0;
 	x0 << 0, 0, 0;
 	kf[X]->init(x0);
 	kf[Y]->init(x0);
 	kf[Z]->init(x0);
+
+	kf[X1]->init(x0);
+	kf[Y1]->init(x0);
+	kf[X2]->init(x0);
+	kf[Y2]->init(x0);
+
 	q.w = 1; q.x = q.y = q.z = 0;
 }
 
