@@ -195,7 +195,7 @@ DWORD WINAPI myThread(LPVOID lpParameter)
 {
 	char buf[1000];
 	cout << "write new variables there like\n\n";
-	cout << "newQ,newR \n";
+	cout << "newQ,newR,dAngle,dangle_RC \n";
 	cout << "-------------------------------------------\n\n";
 	while (true) {
 		cin >> buf;
@@ -213,6 +213,14 @@ DWORD WINAPI myThread(LPVOID lpParameter)
 			else if (name.find("newQ") == 0) {
 				Mpu.newQ = stod(val);
 				cout << name.c_str() << " = " << Mpu.newQ << endl;
+			}
+			else if (name.find("dAngle") == 0) {
+				Mpu.dAngle = stod(val);
+				cout << name.c_str() << " = " << Mpu.dAngle << endl;
+			}
+			else if (name.find("dangle_RC") == 0) {
+				Mpu.dangle_RC = stod(val);
+				cout << name.c_str() << " = " << Mpu.dangle_RC << endl;
 			}
 			redraw = true;
 			redraw_log();

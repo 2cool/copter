@@ -11,8 +11,9 @@ class MPU_CLASS
 public:
 	float est_LF_X_speed,est_LF_Y_speed, est_LF_X_ACC, est_LF_Y_ACC, est_LF_VER_speed, est_LF_VER_ACC;
 	double newR = 1;// 0.1;
-	double newQ = 0.05;// 0.001;
-
+	double newQ = 0.01;// 0.001;
+	float dAngle = 35;
+	float dangle_RC  = 0.003;//0.02
 	float get_est_LF_hor_speed() { return sqrt(est_LF_X_speed* est_LF_X_speed + est_LF_Y_speed* est_LF_Y_speed); }
 	float get_est_LF_hor_acc() { return sqrt(est_LF_X_ACC* est_LF_X_ACC+ est_LF_Y_ACC* est_LF_Y_ACC); }
 	float get_est_LF_ver_speed() { return est_LF_VER_speed; }

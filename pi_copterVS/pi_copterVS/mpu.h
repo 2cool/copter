@@ -71,6 +71,7 @@ private:
 
 	void rotateCW(float&x, float&y);
 	void rotateCCW(float&x, float&y);
+	void acc_gps_yaw_correciton();
 
  public:
 	 float get_est_LF_hor_abs_speed() { return sqrt(est_LF_X_speed * est_LF_X_speed + est_LF_Y_speed * est_LF_Y_speed); }

@@ -260,13 +260,13 @@ int Graph::parser(byte buf[]) {
 
 			static double dalt = 0;
 			static int cnt = 0;
-			if (cnt == 0 && gps_log.acurH < 6 &&  gps_log.z<400 && Mpu.est_alt < 300 && Mpu.est_alt>-3) {
+			if (cnt == 0 && gps_log.acurH < 6 ){//&&  gps_log.z<400 && Mpu.est_alt < 300 && Mpu.est_alt>-3) {
 				cnt++;
 				dalt = gps_log.z - Mpu.est_alt;
 				if (gps_log.z < 40)
 					dalt += 100;
 			}
-			if (cnt && floor(gps_log.r_lon) == 33 && floor(gps_log.r_lat) == 47 && Mpu.est_alt<300 && Mpu.est_alt>-3) {
+			if (cnt && floor(gps_log.r_lon) == 33 && floor(gps_log.r_lat) == 47 && Mpu.est_alt<300){// && Mpu.est_alt>-3) {
 				std::string str = " " + std::to_string(gps_log.r_lon) + "," + std::to_string(gps_log.r_lat) + "," + std::to_string(Mpu.est_alt+dalt/*gps_log.z*/) + " ";
 				fwrite(str.c_str(), str.length(), 1, klm_);
 			}

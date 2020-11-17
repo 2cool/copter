@@ -1,6 +1,6 @@
 
  
-#define PROG_VERSION "ver: 3.201113\n"
+#define PROG_VERSION "ver: 3.201117\n"
 
 //Additional Options  DDEBUG
 

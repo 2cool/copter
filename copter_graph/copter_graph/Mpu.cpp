@@ -15,6 +15,7 @@ private:
 public:
 	float possition;
 	float  speed;
+	
 	Pendulum(float m, float s, float _k,float q_) {
 		k =0.2;
 		possition = 0;
@@ -312,7 +313,7 @@ void test2(const float w_accX, const float w_accY) {
 		kf[Y2]->update();
 	}
 }
-float error_comp = 0;
+float error_comp = 90;
 void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, bool rotate) {
 
 
@@ -441,10 +442,10 @@ void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, b
 	}
 	*/
 	 
-	//if (time < 200 )
-	//	error_comp = -180;
+	if ((cont_bits&1) ==0 )
+		error_comp = 0;
 	
-	if (start_f && filter && time>200 && time < 496) {
+	if (start_f && filter && time>18 && time < 996) {
 
 
 		//ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
@@ -503,32 +504,35 @@ void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, b
 		//////////////////////////////////////
 
 
-		
 
-		cosYaw = cos((yaw - 45 + error_comp) * GRAD2RAD);
-		sinYaw = sin((yaw - 45 + error_comp) * GRAD2RAD);
+		cosYaw = cos((yaw - dAngle + error_comp) * GRAD2RAD);
+		sinYaw = sin((yaw - dAngle + error_comp) * GRAD2RAD);
 		float _w_accX = (-cosYaw * accX + sinYaw * accY); //relative to world
 		float _w_accY = (-cosYaw * accY - sinYaw * accX);
 		test1(_w_accX, _w_accY);
 
-		cosYaw = cos((yaw + 45 + error_comp) * GRAD2RAD);
-		sinYaw = sin((yaw + 45 + error_comp) * GRAD2RAD);
+		cosYaw = cos((yaw + dAngle + error_comp) * GRAD2RAD);
+		sinYaw = sin((yaw + dAngle + error_comp) * GRAD2RAD);
 		_w_accX = (-cosYaw * accX + sinYaw * accY); //relative to world
 		_w_accY = (-cosYaw * accY - sinYaw * accX);
 		test2(_w_accX, _w_accY);
 
-		static float  er1 = 0, er2 = 0;
+
 
 		//er0 += (abs(GPS.loc.speedX - est_speedX) + abs(GPS.loc.speedY - est_speedY) - er0) * 0.01;
 		
-		er1 += (abs(gps_log.gspeedX - kf[X + 3]->state()(1)) + abs(gps_log.gspeedY - kf[Y + 3]->state()(1)) - er1) * 1;
-		er2 += (abs(gps_log.gspeedX - kf[X + 5]->state()(1)) + abs(gps_log.gspeedY - kf[Y + 5]->state()(1)) - er2) * 1;
+	
 
-			if (abs(gps_log.gspeedX) > 0.3 || abs(gps_log.gspeedY) > 0.3) {
-				if (er1 > er2)
-					error_comp += (er1 - er2) * 0.01f ;
-				else if (er1 < er2)
-					error_comp -= (er2 - er1) * 0.01f;
+		static float laccx, laccy;
+		laccx += (accX - laccx) * 0.1;
+		laccy += (accY - laccy) * 0.1;
+
+		float lacc = (laccx * laccx + laccy * laccy);
+
+			if (lacc >= 1) {
+				const float er1 = ((abs(gps_log.gspeedX - kf[X + 3]->state()(1)) + abs(gps_log.gspeedY - kf[Y + 3]->state()(1))))-((abs(gps_log.gspeedX - kf[X + 5]->state()(1)) + abs(gps_log.gspeedY - kf[Y + 5]->state()(1))));
+				error_comp += (er1) * dangle_RC ;
+
 	
 		
 		
@@ -537,8 +541,13 @@ void MPU_CLASS::parser(byte buf[], int j, int len, int cont_bits, bool filter, b
 					error_comp -= 360;
 				else if (error_comp < -360)
 					error_comp += 360;
+
+				if (error_comp > 180)
+					error_comp -= 360;
+				else if (error_comp < -180)
+					error_comp += 360;
 			}
-		estX = yaw+error_comp;
+		estX = error_comp;
 
 			//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
@@ -657,8 +666,6 @@ void MPU_CLASS::init() {
 	kf[Y1] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[X2] = new KalmanFilter(A, B, H, Q, R, P);
 	kf[Y2] = new KalmanFilter(A, B, H, Q, R, P);
-
-
 
 
 	// Construct the filter

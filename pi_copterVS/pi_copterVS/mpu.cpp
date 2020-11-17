@@ -290,12 +290,32 @@ const float giroifk = 0.06103515625f;//2000
 const float accifk = 0.00048828125f;//16
 
 
+void MpuClass::acc_gps_yaw_correciton() {
+	test_Est_XY1(cos(yaw - 35 * GRAD2RAD), sin(yaw - 35 * GRAD2RAD));
+	test_Est_XY2(cos(yaw + 35 * GRAD2RAD), sin(yaw + 35 * GRAD2RAD));
+
+	static float laccx=0, laccy=0;
+	laccx += (accX - laccx) * 0.1;
+	laccy += (accY - laccy) * 0.1;
+
+	const float lacc = (laccx * laccx + laccy * laccy);
+	if (lacc >= 1) {
+		const float er = (abs(GPS.loc.speedX - kf[X + 3]->state()(1)) + abs(GPS.loc.speedY - kf[Y + 3]->state()(1))) - (abs(GPS.loc.speedX - kf[X + 5]->state()(1)) + abs(GPS.loc.speedY - kf[Y + 5]->state()(1)));
+
+		yaw_correction_angle -= (er) * 0.003f * GRAD2RAD;
+		wrap_PI(yaw_correction_angle);
+
+		//Debug.dump(yaw_correction_angle * RAD2GRAD);
+
+	}
+}
+
 
 #ifdef FLY_EMULATOR
 
-double real_pitch = 0, real_roll = 0;
+
 ///////////////////////////////////////////////////////////////////
-static float terror = 35 * GRAD2RAD;
+
 bool MpuClass::loop() {
 	static double oldmpuTime = 0;
 	time = micros_();
@@ -308,7 +328,7 @@ bool MpuClass::loop() {
 	gyroRoll = Emu.get_gyroRoll();
 	gyroYaw = Emu.get_gyroYaw();
 	double head = Emu.get_heading();
-	double g_yaw = Emu.get_yaw()-yaw_correction_angle- terror;
+	double g_yaw = Emu.get_yaw()-yaw_correction_angle;
 
 	yaw = wrap_PI(g_yaw );
 	sin_cos(pitch, sinPitch, cosPitch);
@@ -339,26 +359,7 @@ bool MpuClass::loop() {
 	//estX = Emu.get_y();
 	test_Est_Alt();
 	test_Est_XY();
-	test_Est_XY1(cos(yaw-35 * GRAD2RAD), sin(yaw-35*GRAD2RAD));
-	test_Est_XY2(cos(yaw+35 * GRAD2RAD), sin(yaw+35 * GRAD2RAD));
-
-
-	static float er0 = 0, er1 = 0, er2 = 0;
-
-	//er0 += (abs(GPS.loc.speedX - est_speedX) + abs(GPS.loc.speedY - est_speedY) - er0) * 0.01;
-
-	er1 += (abs(GPS.loc.speedX - kf[X + 3]->state()(1)) + abs(GPS.loc.speedY - kf[Y + 3]->state()(1)) - er1) * 1;
-	er2 += (abs(GPS.loc.speedX - kf[X + 5]->state()(1)) + abs(GPS.loc.speedY - kf[Y + 5]->state()(1)) - er2) * 1;
-
-//	if (er1 > 0.6 && er2 > 0.6) {
-		if (er1 > er2)
-			terror -= (er1-er2)*0.0031 * GRAD2RAD;
-		else if (er1 < er2)
-			terror += (er2-er1)*0.0031 * GRAD2RAD;
-		terror = constrain(terror, -35 * GRAD2RAD, 35 * GRAD2RAD);
-		Debug.dump(terror*RAD2GRAD);
-//	}
-
+	acc_gps_yaw_correciton();
 
 	//Debug.dump(er0,er1,er2);
 
@@ -565,12 +566,8 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 
 	test_Est_Alt();
 	test_Est_XY();
-
-	if (get_est_LF_hor_abs_speed() > 1) {
-		float angle_error = atan2(est_speedY, est_speedX)-GPS.loc.direction;
-		Debug.dump(angle_error);
-	}
-
+	acc_gps_yaw_correciton();
+	
 	shmPTR->pitch = pitch *= RAD2GRAD;
 	shmPTR->roll = roll *= RAD2GRAD;
 	shmPTR->yaw = yaw*=RAD2GRAD;
