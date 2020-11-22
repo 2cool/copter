@@ -158,6 +158,7 @@ int Megai2c::init()
 {
 	if (init_shmPTR())
 		return 0;
+#ifndef LOG_READER
 	current_led_mode = 100;
 	ring_received = false;
 	const int fd = open_i2c_();
@@ -179,6 +180,7 @@ int Megai2c::init()
 	shmPTR->sim800_reset_time = 0;
 
 	mega_i2c.settings(OVER_CURRENT, ESC_CALIBR, ESC_CALIBR, ESC_CALIBR, ESC_CALIBR);
+#endif
 	return 0;
 }
 

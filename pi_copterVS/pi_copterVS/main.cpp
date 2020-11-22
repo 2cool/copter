@@ -556,7 +556,7 @@ int main(int argc, char* argv[]) {
 	mega_i2c.init();
 
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+#ifndef LOG_READER
 		if (0 != exec("ifconfig wlx983f9f1908da").find("wlx983f9f1908da")) {
 			cout << "WIFI NOT FOUND\n";
 			myDisplay.textDisplay("WIFI NOT FOUND\n");
@@ -568,18 +568,18 @@ int main(int argc, char* argv[]) {
 			myDisplay.textDisplay("CAM WIFI NOT FOUND\n");
 			return 0;
 		}
-	
+#endif
 	if (init(counter) == 0) {
 		shmPTR->reboot = 0;
 
 	
 		//string wifi = exec("ifconfig wlx983f9f1908da | grep 192.168.1");
 
-
+#ifndef LOG_READER
 		myDisplay.textDisplay("connecting to AP and camera");
 		thread tl(watch_dog);
 		tl.detach();
-
+#endif
 		while (shmPTR->run_main){
 			if (loop()) {
 				shmPTR->main_cnt++;
@@ -592,6 +592,7 @@ int main(int argc, char* argv[]) {
 		cout << "INITIALIZATION ERROR!!!\n";
 		myDisplay.textDisplay("INITIALIZATION ERROR!!!\n");
 	}
+
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 	if (flag!=0)

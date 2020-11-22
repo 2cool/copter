@@ -55,7 +55,7 @@ using namespace std;
 #define Serial1 Serial
 int32_t millis_();
 int64_t micros_();
-
+void set_current_time(long t);
 void delay(unsigned long);
 std::string exec(const std::string s);
 

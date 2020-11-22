@@ -341,7 +341,11 @@ int writeByte(uint8_t devAddr, uint8_t regAddr, uint8_t data) {
  * @return Status of operation (true = success)
  */
 int writeWord(uint8_t devAddr, uint8_t regAddr, uint16_t data) {
+#ifndef LOG_READER
     return writeWords(devAddr, regAddr, 1, &data);
+#else
+    return 1;
+#endif
 }
 
 /** Write multiple bytes to an 8-bit device register.

@@ -6,6 +6,7 @@
 #include "Log.h"
 #include "GPS.h"
 #include "ssd1306.h"
+#include "define.h"
 
 #define NORM_CT 10000
 
@@ -178,6 +179,10 @@ bool MS5611Class::loop(){
 
 #else
 
+#ifdef LOG_READER
+	logR.loop();
+#else
+
 bool MS5611Class::loop(){
 	bool ret = false;
 	switch (bar_task)
@@ -194,7 +199,7 @@ bool MS5611Class::loop(){
 	//Mpu.ms5611_timed = Mpu.timed;
 	return ret;
 }
-
+#endif
 #endif
 
 //----------------------------------------------------

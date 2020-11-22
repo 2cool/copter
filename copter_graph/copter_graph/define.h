@@ -1,16 +1,23 @@
+#pragma once
+
+
+enum {
+	MOTORS_ON = 1, CONTROL_FALLING = 2, Z_STAB = 4, XY_STAB = 8, GO2HOME = 0x10, PROGRAM = 0x20, GIMBAL_AXIS = 0x40, FPV_RECIVED = 0x80,
+	MPU_ACC_CALIBR = 0x100, MPU_GYRO_CALIBR = 0x200, COMPASS_CALIBR = 0x400, COMPASS_MOTOR_CALIBR = 0x800, SHUTDOWN = 0x1000, GIMBAL_PLUS = 0x2000,
+	GIMBAL_MINUS = 0x4000, REBOOT = 0x8000, PROGRAM_LOADED = 0x10000, M_ON_AND_GO2HOME = 0x20000, M_ON_AND_PROG_START = 0x40000, WIFI_CAMERA_FOUND = 0x80000, INET_OK = 0x100000
+};
 
 #ifndef DEFINE_H
 #define DEFINE_H
 
-#include "glob_header.h" 
-#include "WProgram.h"
+//#include "glob_header.h" 
+//#include "WProgram.h"
 #include "math.h"
 
 //#define OFF_MOTOR_IF_LOST_CONNECTION  
 //#define OFF_TIMELAG
 //-----------------------------------------------------------------
 //#define FLY_EMULATOR
-#define LOG_READER
 //----------------------------------------------------------------
 //#define YAW_OFF
 //#define XY_SAFE_AREA 200
@@ -155,7 +162,7 @@
 #define m_UPLOAD_SETTINGS "UPS"
 #define m_PROGRAM	   "PRG"
 #define m_FPV			"FPV"
-enum { B_CONNECTION_LOST = 1, B_MS611_ERROR, B_ACC_ERROR, B_LOW_VOLTAGE, B_GPS_ACCURACY_E, B_TOO_LONG, B_GPS_TOO_LONG , B_BARROMETR_ERR,B_I2C_ERR, B_COMMAND_RECEIVED};
+enum { B_CONNECTION_LOST = 1, B_MS611_ERROR, B_ACC_ERROR, B_LOW_VOLTAGE, B_GPS_ACCURACY_E, B_TOO_LONG, B_GPS_TOO_LONG, B_BARROMETR_ERR, B_I2C_ERR, B_COMMAND_RECEIVED };
 
 struct SEND_I2C {
 
@@ -166,12 +173,10 @@ struct SEND_I2C {
 	uint8_t vAcc;
 };
 
-#ifdef LOG_READER
-#include "LogReader.h"
-#endif
-extern struct Memory *shmPTR;
+
+
+
+extern struct Memory* shmPTR;
 
 
 #endif
-
-

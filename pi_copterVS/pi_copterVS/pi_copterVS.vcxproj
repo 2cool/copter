@@ -87,6 +87,7 @@
     <ClCompile Include="KalmanFilter.cpp" />
     <ClCompile Include="Location.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="LogReader.cpp" />
     <ClCompile Include="MadgwickAHRS.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mpu.cpp" />
@@ -124,6 +125,7 @@
     <ClInclude Include="KalmanFilter.h" />
     <ClInclude Include="Location.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="LogReader.h" />
     <ClInclude Include="MadgwickAHRS.h" />
     <ClInclude Include="MotionSensor.h" />
     <ClInclude Include="mpu.h" />

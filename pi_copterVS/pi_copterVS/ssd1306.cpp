@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include "charmap.h"
 #include "ssd1306.h"
+#include "define.h"
 
 //#ifdef DEBUG
 //#define D if(1) 
@@ -31,6 +32,7 @@ void SSD1306::setAltI2C() {
 }
 int currByteCount = 0;
 void SSD1306::textDisplay(const char* message) {
+#ifndef LOG_READER
     if (!i2cInitialised)
     {
         initDisplay();
@@ -96,6 +98,7 @@ void SSD1306::textDisplay(const char* message) {
     }
 
     updateDisplayFull();
+#endif
 }
 
 void SSD1306::clearDisplay() {

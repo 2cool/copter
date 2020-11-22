@@ -6,7 +6,7 @@
 
 #include "MPU6050.h"
 #include "debug.h"
-
+#include "define.h"
 
 
 /** Default constructor, uses default I2C address.
@@ -40,6 +40,7 @@
  * the default internal clock source.
  */
 int MPU6050::initialize(uint8_t gyroRange, uint8_t accelRange, uint8_t dlpfmode) {
+#ifndef LOG_READER
 	devAddr = MPU6050_DEFAULT_ADDRESS;
 	setI2CMasterModeEnabled(false);
 	setI2CBypassEnabled(true);
@@ -58,6 +59,7 @@ int MPU6050::initialize(uint8_t gyroRange, uint8_t accelRange, uint8_t dlpfmode)
 	//setDLPFMode(MPU6050_DLPF_BW_188);
 	//setDLPFMode(MPU6050_DLPF_BW_98);
 	setDLPFMode(dlpfmode);// MPU6050_DLPF_BW_256);
+#endif
 	return 0;
 }
 

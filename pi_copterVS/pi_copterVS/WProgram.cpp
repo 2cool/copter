@@ -6,6 +6,26 @@
 #include <sys/ipc.h>
 #include "mpu.h"
 #include <chrono>
+
+
+#ifdef LOG_READER
+long log_time = 0;
+
+void set_current_time(long t) {
+	long log_time = t;
+}
+int64_t micros_() {
+	return log_time * 1000;
+}
+int32_t millis_() {
+	return log_time;
+}
+
+
+#else
+
+
+
 std::chrono::duration<long, std::milli> error_tvv{ 3070000 };
 static auto start = chrono::steady_clock::now();// -error_tvv;
 
@@ -22,6 +42,9 @@ int32_t millis_() {
 void delay(unsigned long t){
 	usleep(t*1000);
 }
+#endif
+
+
 
 std::string exec(const std::string cmd) {
 	//printf(cmd.c_str());

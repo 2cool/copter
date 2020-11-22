@@ -44,7 +44,7 @@ class MpuClass
 
 	 int16_t a[3];              // [x, y, z]            accel vector
 	 int16_t g[3];              // [x, y, z]            gyro vector
-	 int16_t c[3];
+
 	 float mpu_dt;
 	 Quaternion_ q;
 	 
