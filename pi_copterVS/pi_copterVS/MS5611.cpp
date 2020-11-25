@@ -7,6 +7,7 @@
 #include "GPS.h"
 #include "ssd1306.h"
 #include "define.h"
+#include "LogReader.h"
 
 #define NORM_CT 10000
 
@@ -179,9 +180,7 @@ bool MS5611Class::loop(){
 
 #else
 
-#ifdef LOG_READER
-	logR.loop();
-#else
+
 
 bool MS5611Class::loop(){
 	bool ret = false;
@@ -199,7 +198,7 @@ bool MS5611Class::loop(){
 	//Mpu.ms5611_timed = Mpu.timed;
 	return ret;
 }
-#endif
+
 #endif
 
 //----------------------------------------------------
@@ -215,6 +214,7 @@ void MS5611Class::error(const int n) {
 }
 
 bool MS5611Class::phase0() {
+#ifndef LOG_READER
 	bar_D[0] = bar_D[1] = bar_D[2] = 0;
 	const int fd4S = open_i2c();
 	if (fd4S == -1 || writeReg(fd4S, CONV_D2_4096) == -1) {
@@ -223,13 +223,27 @@ bool MS5611Class::phase0() {
 		return true;
 	}
 	close(fd4S);
+#endif
 	b_timeDelay = micros_() + ct;
 	bar_task = 1;
 	return true;
+
 }
 #define fc C
-bool MS5611Class::phase1()
-{
+bool MS5611Class::phase1(){
+
+#ifdef LOG_READER
+	if (micros_() > b_timeDelay) {
+		b_timeDelay = micros_() + ct;
+		bar_task = 2;
+		bar_zero = 0;
+		return true;
+	}
+	else
+		return false;
+
+#else
+
 	if (micros_()  > b_timeDelay) {
 		const int fd4S = open_i2c();
 		if (fd4S == -1 || writeReg(fd4S,bar_zero) == -1) {
@@ -273,14 +287,20 @@ bool MS5611Class::phase1()
 	}
 	else
 		return false;
+#endif
 }
 
 bool MS5611Class::phase2() {
+
 	if (micros_()  > b_timeDelay)
 	{
 		bar_task = 0;
-
 		bar_zero = 0;
+
+#ifdef LOG_READER
+		P = logR.sd.pressure;
+		i_readTemperature = logR.sd.i_readTemperature;
+#else
 		const int fd4S = open_i2c();
 		if (fd4S == -1 || writeReg(fd4S, bar_zero) == -1) {
 			error(31);
@@ -338,6 +358,10 @@ bool MS5611Class::phase2() {
 			P = tP;
 			ct = NORM_CT;
 		}
+
+#endif
+
+
 		if (altitude_ == ALT_NOT_SET) {
 			pressure = P;
 			altitude_ =  getAltitude(pressure);	
@@ -358,6 +382,7 @@ bool MS5611Class::phase2() {
 	}
 	else
 		return false;
+
 }
 
 void MS5611Class::update(){}
@@ -389,7 +414,7 @@ bool MS5611Class::init() {
 #endif
 	pressure = PRESSURE_AT_0;
 	ms5611_count = 0;
-
+#ifndef LOG_READER
 #ifndef FLY_EMULATOR
 	compensation = true;
 
@@ -413,6 +438,7 @@ bool MS5611Class::init() {
 	}
 	close(fd4S);
 
+#endif
 #endif
 	return true;
 }

@@ -166,9 +166,7 @@ struct SEND_I2C {
 	uint8_t vAcc;
 };
 
-#ifdef LOG_READER
-#include "LogReader.h"
-#endif
+
 extern struct Memory *shmPTR;
 
 

@@ -158,6 +158,7 @@ int Megai2c::init()
 {
 	if (init_shmPTR())
 		return 0;
+#ifndef FLY_EMULATOR
 #ifndef LOG_READER
 	current_led_mode = 100;
 	ring_received = false;
@@ -180,6 +181,7 @@ int Megai2c::init()
 	shmPTR->sim800_reset_time = 0;
 
 	mega_i2c.settings(OVER_CURRENT, ESC_CALIBR, ESC_CALIBR, ESC_CALIBR, ESC_CALIBR);
+#endif
 #endif
 	return 0;
 }
@@ -237,7 +239,7 @@ void Megai2c::throttle(const float _n[]) {
 	}
 
 
-
+#ifndef LOG_READER
 #ifdef FLY_EMULATOR
 	Emu.update(n, Mpu.get_dt());
 #else
@@ -255,6 +257,7 @@ void Megai2c::throttle(const float _n[]) {
 		mega_i2c.beep_code(B_I2C_ERR);
 	}
 	close(fd);
+#endif
 #endif
 }
 
@@ -289,6 +292,8 @@ void Megai2c::sim800_reset() {
 }
 //0.35555555555555555555555555555556 = 1град
 bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с коптером пра опред обст
+#ifndef FLY_EMULATOR
+#ifndef LOG_READER
 	if (pitch <= 80 && pitch >= -45 && roll > -75 && roll < 110) { 
 
 		//Serial.printf("camAng="); Serial.println(angle);
@@ -309,6 +314,8 @@ bool Megai2c::gimagl(float pitch, float roll) {  // добавить поворот вмесете с к
 		return true;
 	}
 	else
+#endif
+#endif
 		return false;
 }
 

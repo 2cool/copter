@@ -556,6 +556,7 @@ int main(int argc, char* argv[]) {
 	mega_i2c.init();
 
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#ifndef FLY_EMULATOR
 #ifndef LOG_READER
 		if (0 != exec("ifconfig wlx983f9f1908da").find("wlx983f9f1908da")) {
 			cout << "WIFI NOT FOUND\n";
@@ -568,6 +569,7 @@ int main(int argc, char* argv[]) {
 			myDisplay.textDisplay("CAM WIFI NOT FOUND\n");
 			return 0;
 		}
+#endif
 #endif
 	if (init(counter) == 0) {
 		shmPTR->reboot = 0;

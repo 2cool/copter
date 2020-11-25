@@ -3,12 +3,7 @@
 #ifndef _LOCATION_h
 #define _LOCATION_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
-#else
-	#include "WProgram.h"
-#endif
-
+#include "WProgram.h"
 #include "define.h"
 
 const unsigned char UBX_HEADER[] = { 0xB5, 0x62 };

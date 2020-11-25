@@ -26,6 +26,17 @@
 #include "mpu_umulator.h"
 #include "Log.h"
 #include "ssd1306.h"
+
+
+#ifdef LOG_READER
+#include "LogReader.h"
+#endif
+
+
+
+
+
+
 #define BALANCE_DELAY 120
 #define MAX_FLY_TIME 1800
 #define BAT_ZERO 300.0f
@@ -250,11 +261,17 @@ int TelemetryClass::update_voltage() {
 	Emu.battery(m_current, voltage);
 #else
 
+#ifdef LOG_READER
+	int ret = logR.parser(TELE);
+	if (ret)
+		memcpy((uint8_t*)data, (uint8_t*)logR.sd.data, 10);
+
+#else
 	if (mega_i2c.getiiiiv((char*)data) == -1) {
 		cout << "Failed getiiiiv\n";
 		return -1;
 	}
-
+#endif
 
 	//const float hall_effect_sensor_max_cur[4] = { 36,37,43,34 };
 	const float hall_effect_sensor_max_cur[4] = { 39,38,36,46 };

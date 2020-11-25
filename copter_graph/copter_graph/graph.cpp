@@ -231,6 +231,8 @@ int Graph::parser(byte buf[]) {
 	i += 2;
 	while (i<f_len) {
 		int b = buf[i++];
+		if (b == COMM)
+			b = b;
 		int len = load_uint8_(buf, i);
 		if (len == 0 && b == 9)
 			len = 4;

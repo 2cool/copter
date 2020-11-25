@@ -18,19 +18,13 @@
 using namespace std;
 
 
-
-
-int parser(byte buf[]);
-
-
-
-
-
-
-
-
-
 typedef unsigned char byte;
+
+LogReader::LogReader() {
+	sd.done = 0;
+	
+	
+}
 
 int load_uint8_(byte buf[], int i) {
 	int vall = buf[i];
@@ -51,24 +45,11 @@ uint64_t loaduint64t(byte buf[], int i) {
 
 }
 
-
-
-
-
-
-
-
-
-
 //string fname = "ddd";
-char* fname="/home/igor/logs/tel_log_real12304.log";
+char* fname="/home/igor/logs/tel_log_real13098.log";
 
-
-
-
-
-int i = 0, f_len = 0;
-byte* buffer;
+int i = 0;
+byte* buffer=NULL;
 long lSize = 0;
 //----------------------------------------------------
 int LogReader::readLog() {
@@ -93,53 +74,8 @@ int LogReader::readLog() {
 	result = fread(buffer, 1, lSize, pFile);
 	if (result != lSize) { fputs("Reading error", stderr); exit(3); }
 
-	/* the whole file is now loaded in the memory buffer. */
-
-	// terminate
 	fclose(pFile);
-	//free(buffer);
 
-
-
-	int t1 = load_int16_((byte*)buffer, 0);
-	int t2 = load_int16_((byte*)buffer, 2);
-
-	int log_from_telephone = 2 * (t1 == t2);
-	int i = 0;
-	int j = log_from_telephone;
-	int n = 1;
-	int f_len = 0;
-	byte* buf;
-	int b, len;
-	while (j < lSize) {
-
-		i = 0;
-		buf = (byte*)&buffer[j];
-		f_len = i + load_int16_(buf, i);
-		i += 2;
-		while (i < f_len) {
-			b = buf[i++];
-
-			len = load_uint8_(buf, i);
-			if (len == 0 && b == 9)
-				len = 4;
-			i++;
-			if (len == 0) {
-				len = load_int16_(buf, i);
-				i += 2;
-				if (len < 0)
-					len = 0;
-			}
-			i += len;
-		}
-		n++;
-		j += i;
-	}
-
-	j = log_from_telephone;
-	n = 0;
-
-	//while (j < lSize) {
 	return lSize;// decode_Log();
 }
 
@@ -147,6 +83,7 @@ void LogReader::mpu_parser() {
 	static uint64_t old_itime = 0;
 	uint64_t itime = loaduint64t(buffer, i);
 	sd.time = itime * 1000;	
+	set_current_time(itime * 1000);
 	memcpy((uint8_t*)sd.g, buffer + i+8, 6);
 	memcpy((uint8_t*)sd.a, buffer + i+8+6, 6);
 }
@@ -168,46 +105,75 @@ void LogReader::hmc_parser() {
 void LogReader::hmc_parser_base() {
 	memcpy((uint8_t*)sd.sh, buffer + i, 12);
 	memcpy((uint8_t*)sd.base, buffer + i+12, 12*4);
-	sd.yaw_correction_angle = *(int*)buffer[i + 12 + 12 * 4];
+	sd.yaw_correction_angle = RAD2GRAD * *(float*)&buffer[i + 12 + 12 * 4];
 }
 
 void LogReader::telemetry_parser() {
 	memcpy((byte*)sd.data, &buffer[i], 10);
 }
 
-void LogReader::commander_parser() {
-	sd.commander_buf_len = *(uint16_t*)buffer + i;
-	memcpy((uint8_t*)sd.commander_buf, buffer + i + 2, sd.commander_buf_len);
+void LogReader::commander_parser(int len) {
+
+	memcpy((uint8_t*)shmPTR->commander_buf, buffer + i+2, len);
+	shmPTR->connected = 1;
+	shmPTR->commander_buf_len = len;
+
+
 }
 
 enum LOG { MPU_EMU, MPU_SENS, HMC_BASE, HMC_SENS, HMC, GPS_SENS, TELE, COMM, EMU, AUTO, BAL, MS5611_SENS, XYSTAB, ZSTAB };
 
-int LogReader::parser(byte buf[]) {
-	
+void LogReader::set(const uint8_t bit) {
+	sd.done |= (1 << bit);
+}
+void LogReader::unset(const uint8_t b) {
+	sd.done &= ~(1 << b);
+}
+bool LogReader::test(const uint8_t b) {
+	return (sd.done & (1 << b));
+}
 
-	if (i == 0) {
-		f_len = load_int16_(buf, i);
-		i += 2;
+
+int j = 0;
+int LogReader::parser(const uint8_t need) {
+	bool ok = false;
+
+	if (test(need)) {
+		unset(need);
+		return 1;
 	}
-	if (i < f_len) {
-		int b = buf[i++];
-		int len = load_uint8_(buf, i);
+
+	if (buffer == NULL)
+		lSize=readLog();
+	if (i >= 508000-100)
+		i = i;
+
+	if (lSize <= i)
+		return 0;
+	const int f_len = load_int16_(buffer, i);
+	i += 2;
+	
+	while (i < f_len+j) {
+		const int b = buffer[i++];
+		int len = load_uint8_(buffer, i);
 		if (len == 0 && b == 9)
 			len = 4;
 		i++;
 		if (len == 0) {
-			len = load_int16_(buf, i);
+			len = load_int16_(buffer, i);
 			if (len < 0)
 				len = 0;
 			i += 2;
 		}
+		
 		switch (b) {
 
 		case MPU_SENS: {
 			if (len == 5)
 				ms5611_parser();
-			else
+			else {
 				mpu_parser();
+			}
 			break;
 		}
 		case MS5611_SENS: {
@@ -220,7 +186,7 @@ int LogReader::parser(byte buf[]) {
 		}
 
 		case AUTO: {
-			sd.control_bits = *(uint32_t*)&buf[i];
+			sd.control_bits = *(uint32_t*)&buffer[i];
 			break;
 		}
 		case HMC_BASE: {
@@ -229,7 +195,7 @@ int LogReader::parser(byte buf[]) {
 
 		}
 		case HMC_SENS: {
-			hmc_parser(buf, i);
+			hmc_parser();
 			break;
 		}
 		case HMC: {
@@ -237,7 +203,7 @@ int LogReader::parser(byte buf[]) {
 			break;
 		}
 		case TELE: {
-			telemetry_parser(buf, i);
+			telemetry_parser();
 			break;
 		}
 		case ZSTAB: {
@@ -245,22 +211,30 @@ int LogReader::parser(byte buf[]) {
 			break;
 		}
 		case BAL: {
-			
+			break;
 			break;
 		}
 		case COMM: {
-			commander_parser(buf, i);
+			commander_parser(len);
 			break;
 		}
 		default:
 
 			break;
 		}
+		if (need == b) {
+			ok = true;
+			unset(b);
+		}
+		else
+			set(b);
 		i += len;
-		return i;
+
 	}
-	else
-		return 0;
+	j += f_len;
+	
+	
+	return ok;
 }
 
 
@@ -269,17 +243,7 @@ int LogReader::parser(byte buf[]) {
 
 
 
-bool LogReader::initialize() {
 
-
-	return true;
-}
-
-bool init = false;
-void LogReader::loop() {
-	if (!init)
-		initialize();
-}
 
 LogReader logR;
 

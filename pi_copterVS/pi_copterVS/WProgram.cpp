@@ -12,15 +12,17 @@
 long log_time = 0;
 
 void set_current_time(long t) {
-	long log_time = t;
+	log_time = t;
 }
 int64_t micros_() {
-	return log_time * 1000;
-}
-int32_t millis_() {
 	return log_time;
 }
-
+int32_t millis_() {
+	return log_time / 1000;
+}
+void delay(unsigned long t) {
+	usleep(t * 1000);
+}
 
 #else
 

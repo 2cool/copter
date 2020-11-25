@@ -8,6 +8,9 @@
 #include "debug.h"
 #include "Log.h"
 #include "ssd1306.h"
+#ifdef LOG_READER
+#include "LogReader.h"
+#endif
 
 bool GPSClass::init()
 {	
@@ -154,9 +157,15 @@ SEND_I2C g_data;
 bool GPSClass::loop(){
 
 	const int32_t _ct = millis_();
-
+#ifdef LOG_READER
+	int ret=logR.parser(GPS_SENS);
+	if (ret < 0)
+		ret = 0;
+	else
+		memcpy((uint8_t*)&g_data, (uint8_t*)&logR.sd.gps, sizeof(SEND_I2C));
+#else
 	int ret = mega_i2c.get_gps(&g_data);
-	
+#endif
 	if (ret == -1) {
 		Telemetry.addMessage(e_GPS_ERROR);
 		cout << "gps right write error  , uptime=" << _ct << ",msec. last upd=" << loc.last_gps_data__time << "msec. \n";

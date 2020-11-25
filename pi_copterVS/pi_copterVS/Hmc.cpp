@@ -17,7 +17,9 @@
 #include "Log.h"
 #include "GPS.h"
 #include "ssd1306.h"
-
+#ifdef LOG_READER
+#include "LogReader.h"
+#endif
 
 
 
@@ -35,12 +37,14 @@ bool HmcClass::init()
 	//heading = 0;
 	ok = true;
 	calibrated_ = true;
+
+
+#ifndef LOG_READER
 #ifndef FLY_EMULATOR
-
-
 	cout << "Initializing I2C devices...\n";
 	initialize();
 	delay(100);
+
 	if (initialize() == -1)
 		return false;
 
@@ -58,6 +62,7 @@ bool HmcClass::init()
 #endif	
 	if (!ok)
 		myDisplay.textDisplay("HMC ERROR\n");
+#endif
 	return ok;
 }
 
@@ -231,13 +236,16 @@ bool HmcClass::loop(){
 	//double ttt = micros();
 	//бельіе ноги
 	int16_t mx,my,mz;
-	
+#ifdef LOG_READER
+	memcpy(buffer, logR.sd.buffer, 6);
+#else
 	if (readBytes(devAddr, HMC5883L_RA_DATAX_H, 6, buffer) == -1) {
 		Telemetry.addMessage(e_COMMPAS_RW_ERROR);
 		mega_i2c.beep_code(B_I2C_ERR);
 		return true;
 	}
 	if (mode == HMC5883L_MODE_SINGLE) writeByte(devAddr, HMC5883L_RA_MODE, HMC5883L_MODE_SINGLE << (HMC5883L_MODEREG_BIT - HMC5883L_MODEREG_LENGTH + 1));
+#endif
 	mx = (((int16_t)buffer[0]) << 8) | buffer[1];
 	my = (((int16_t)buffer[4]) << 8) | buffer[5];
 	mz = (((int16_t)buffer[2]) << 8) | buffer[3];

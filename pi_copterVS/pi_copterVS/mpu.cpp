@@ -11,6 +11,9 @@
 #include "Log.h"
 #include "MadgwickAHRS.h"
 #include "ssd1306.h"
+#ifdef LOG_READER
+#include "LogReader.h"
+#endif
 /*
 
 пользоватся только гироскопом если акселерометр показивает меньший угол. (но временно) и акселерометр и гироскоп должни бить отфильтровані
@@ -503,6 +506,17 @@ void MpuClass::gyro_acc_calibr(const float& ax, const float& ay, const float& az
 }
 
 bool MpuClass::loop() {//-------------------------------------------------L O O P-------------------------------------------------------------
+#ifdef LOG_READER
+	logR.parser(MPU_SENS);
+	time = micros_();
+	a[0] = logR.sd.a[0];
+	a[1] = logR.sd.a[1];
+	a[2] = logR.sd.a[2];
+	g[0] = logR.sd.g[0];
+	g[1] = logR.sd.g[1];
+	g[2] = logR.sd.g[2];
+
+#else
 	time = micros_();
 
 	if (accelgyro.getMotion6(&a[0], &a[1], &a[2], &g[0], &g[1], &g[2]) == -1) {
@@ -510,6 +524,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 		mega_i2c.beep_code(B_I2C_ERR);
 		return true;
 	}
+#endif
 
 	mpu_dt = 1e-6 * (time - mpu_time_);
 	//Debug.dump((double)mpu_dt, 0, 0, 0);
@@ -543,6 +558,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	yaw = -yaw;
 	yaw += yaw_correction_angle;
 	yaw=wrap_PI(yaw);
+	Debug.dump(pitch, roll);
 
 	sin_cos(yaw, sinYaw, cosYaw);
 	sin_cos(pitch, sinPitch, cosPitch);

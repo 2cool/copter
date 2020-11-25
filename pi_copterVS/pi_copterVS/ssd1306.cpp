@@ -33,6 +33,7 @@ void SSD1306::setAltI2C() {
 int currByteCount = 0;
 void SSD1306::textDisplay(const char* message) {
 #ifndef LOG_READER
+#ifndef FLY_EMULATOR
     if (!i2cInitialised)
     {
         initDisplay();
@@ -98,6 +99,7 @@ void SSD1306::textDisplay(const char* message) {
     }
 
     updateDisplayFull();
+#endif
 #endif
 }
 
@@ -216,7 +218,7 @@ void SSD1306::writeI2C(unsigned char* data, int bytes) {
     }
     if ((i2cHandle = open(deviceName, O_RDWR)) < 0)
     {
-        printf("error opening I2C\n");
+        printf("error opening I2C_ssd\n");
     }
     else
     {
