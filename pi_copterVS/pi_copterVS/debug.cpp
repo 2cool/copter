@@ -3,6 +3,7 @@
 // 
 #include "Settings.h"
 #include "debug.h"
+#include "define.h"
 
 	 int64_t d_old_t = 0;
 	 int d_delay = 50;
@@ -19,15 +20,15 @@ void DebugClass::graphic(const int n, const float x, const float y,const float z
 }
 	 void DebugClass::init() { i = 0; }
 	 void DebugClass::dump(const long f1, long f2, long f3, long f4) {
-		 printf("\n%q,%q,%q,%q\n", f1, f2, f3, f4);
+		 printf("\n%d,%d,%d,%d\n", f1, f2, f3, f4);
 	 }
 	 void DebugClass::dump(const double f1, double f2, double f3, double f4) {
-
+#ifndef LOG_READER
 		 int32_t t = millis_();
 		 if (t - old_time < d_delay)//20)
 			 return;
 		 old_time = t;
-
+#endif
 		 printf("\n%f,%f,%f,%f\n", f1, f2, f3, f4);
 
 

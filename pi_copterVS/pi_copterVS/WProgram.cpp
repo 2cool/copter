@@ -9,7 +9,7 @@
 
 
 #ifdef LOG_READER
-long log_time = 0;
+volatile static long log_time = 0;
 
 void set_current_time(long t) {
 	log_time = t;
@@ -20,8 +20,15 @@ int64_t micros_() {
 int32_t millis_() {
 	return log_time / 1000;
 }
+
+
+
 void delay(unsigned long t) {
-	usleep(t * 1000);
+	if (log_time==0)
+		usleep(t * 1000);
+	long start = log_time+t*1000;
+	while(start>log_time)
+		usleep(100);
 }
 
 #else

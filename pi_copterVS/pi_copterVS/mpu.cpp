@@ -307,9 +307,6 @@ void MpuClass::acc_gps_yaw_correciton() {
 
 		yaw_correction_angle -= (er) * 0.003f * GRAD2RAD;
 		wrap_PI(yaw_correction_angle);
-
-		//Debug.dump(yaw_correction_angle * RAD2GRAD);
-
 	}
 }
 
@@ -347,8 +344,6 @@ bool MpuClass::loop() {
 	accZ = Emu.get_accZ();
 
 	//faccZ += (accZ - faccZ)*ACC_Z_CF;
-	//Debug.dump(WaccX, WaccY, accZ,0);
-
 	accX = Emu.get_loc_accX();// (cosYaw * WaccX + sinYaw * WaccY); //relative to copter xy
 	accY = Emu.get_loc_accY();// (cosYaw * WaccY - sinYaw * WaccX);
 	
@@ -364,10 +359,6 @@ bool MpuClass::loop() {
 	test_Est_XY();
 	acc_gps_yaw_correciton();
 
-	//Debug.dump(er0,er1,er2);
-
-
-
 	yaw *= RAD2GRAD;
 	pitch *= RAD2GRAD;
 	roll *= RAD2GRAD;
@@ -379,11 +370,6 @@ bool MpuClass::loop() {
 	//	float eaccx=  (cosYaw * est_accX + sinYaw * est_accY); //relative to copter xy
 	//	float eaccy = (cosYaw * est_accY - sinYaw * est_accX);
 	
-
-		
-
-
-//	Debug.dump(accX+eaccx, accY+ eaccy);
 
 	//r_pitch = RAD2GRAD*pitch;
 	//r_roll = RAD2GRAD*roll;
@@ -509,6 +495,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 #ifdef LOG_READER
 	logR.parser(MPU_SENS);
 	time = micros_();
+	//Debug.dump(time/1000000,0,0,0);
 	a[0] = logR.sd.a[0];
 	a[1] = logR.sd.a[1];
 	a[2] = logR.sd.a[2];
@@ -527,7 +514,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 #endif
 
 	mpu_dt = 1e-6 * (time - mpu_time_);
-	//Debug.dump((double)mpu_dt, 0, 0, 0);
+
 	mpu_time_ = time;
 	static uint cnt2l = 0;
 	if (mpu_dt > 0.03 && cnt2l++) {
@@ -551,6 +538,7 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	
 
 	toEulerianAngle(q, roll, pitch, yaw);
+	
 
 	gyroPitch = -gyroPitch;
 	gyroYaw = -gyroYaw;
@@ -558,7 +546,6 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	yaw = -yaw;
 	yaw += yaw_correction_angle;
 	yaw=wrap_PI(yaw);
-	Debug.dump(pitch, roll);
 
 	sin_cos(yaw, sinYaw, cosYaw);
 	sin_cos(pitch, sinPitch, cosPitch);
@@ -587,6 +574,9 @@ bool MpuClass::loop() {//-------------------------------------------------L O O 
 	shmPTR->pitch = pitch *= RAD2GRAD;
 	shmPTR->roll = roll *= RAD2GRAD;
 	shmPTR->yaw = yaw*=RAD2GRAD;
+	Debug.dump(roll, pitch, yaw,mpu_dt*100);
+	pitch roll shows some shit
+
 	log();
 
 	return true;

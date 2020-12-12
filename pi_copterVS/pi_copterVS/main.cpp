@@ -149,11 +149,14 @@ bool loop()
 {
 
 	uint64_t beg = micros_();
+
+#ifndef LOG_READER
 	if (beg - timer < 9900)
 	{
 		usleep(9900 - (beg - timer));
 	
 	}
+#endif
 
 	timer = beg;
 

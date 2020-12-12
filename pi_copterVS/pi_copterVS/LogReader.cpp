@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <string>
-
+#include "debug.h"
 
 using namespace std;
 
@@ -133,7 +133,6 @@ bool LogReader::test(const uint8_t b) {
 	return (sd.done & (1 << b));
 }
 
-
 int j = 0;
 int LogReader::parser(const uint8_t need) {
 	bool ok = false;
@@ -153,6 +152,12 @@ int LogReader::parser(const uint8_t need) {
 	const int f_len = load_int16_(buffer, i);
 	i += 2;
 	
+	if (i + f_len > lSize){
+		cout << "!!!!!!!!!!!!!!!LOG END!!!!!!!!!!!!!!!!!!\n";
+		while (true)
+			usleep(1000);
+		
+	}
 	while (i < f_len+j) {
 		const int b = buffer[i++];
 		int len = load_uint8_(buffer, i);
